@@ -1,37 +1,112 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# import igraph
+import numpy
 from igraph import *
+from scipy.sparse import csr_matrix
+from signedcentrality._utils import *  # Import the strings defined in __init__.py.
 
 """
 This module contains utility functions that are used in the signedcentrality package.
 """
 
 
-def readGraph(pathName):
+def read_graph(path_name):
 	"""
 	Read a graph from a GraphML file.
 
-	The graph that are read by this library are undirected signed graphs.
+	The graph that are read by this library are directed or undirected signed graphs.
 	The function creates a Graph with the igraph library.
 
-	:param pathName: path of the GraphML file
-	:return: the Graph as an igraph.Graph
-	"""
-	return Graph.Read_GraphML(pathName, False, 0)
+	:param path_name: path of the GraphML file
+	:return: the graph
+	:rtype: igraph.Graph
 
-def getMatrix(graph):
+	Here is an example of how the GraphML file has to be written.
+	This GraphML file uses the standards of the igraph.graph.write_graphml() method.
+
+	:Example:
+
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<graphml
+			xmlns="http://graphml.graphdrawing.org/xmlns"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+			http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+		<key id="v_id" for="node" attr.name="id" attr.type="string"/>
+		<key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
+		<key id="e_id" for="edge" attr.name="id" attr.type="string"/>
+		<graph id="network_a" edgedefault="undirected">
+			<node id="n0">
+			<data key="v_id">1</data>
+			</node>
+			<node id="n1">
+			<data key="v_id">2</data>
+			</node>
+			<node id="n2">
+			<data key="v_id">3</data>
+			</node>
+			<edge source="n0" target="n1">
+			<data key="e_weight">1</data>
+			<data key="e_id">e0</data>
+			</edge>
+			<edge source="n1" target="n2">
+			<data key="e_weight">1</data>
+			<data key="e_id">e1</data>
+			</edge>
+			<edge source="n2" target="n3">
+			<data key="e_weight">1</data>
+			<data key="e_id">e2</data>
+			</edge>
+		</graph>
+	</graphml>
+
+	.. warning: In the GraphML file, the attribute which defines the weights of the edges has to be given the name "weight" with the attribute "attr.name".
+	"""
+
+	return Graph.Read(path_name, GRAPHML)
+
+
+def write_graph(graph, path_name):
+	"""
+	Write a GraphML file from a igraph Graph.
+
+	This function is used for tests.
+
+	:param graph: graph to write
+	:param path_name: path of the GraphML file
+	"""
+
+	graph.write_graphml(path_name)
+
+
+def get_matrix(graph):
 	"""
 	Returns the adjacency matrix of the given graph.
 
-	This matrix is an instance of the
+	This matrix is an instance of the class scipy.sparse.csr_matrix.
+	The default igraph.Matrix class isn't used because it doesn't support arithmetic operations.
 
 	:param graph: the graph one want the adjacency matrix
-	:return: the adjacency matrix as an igraph.Matrix
+	:return: the adjacency matrix
+	:rtype: scipy.sparse.csr_matrix
 	"""
 
-	return graph.get_adjacency()
+	return graph.get_adjacency_sparse(WEIGHT)  # scipy.sparse.csr_matrix
 
+
+def diagonal(n):
+	"""
+	Create a diagonal squared matrix.
+
+	:param n: number of rows and columns
+	:return: the matrix
+	:rtype: scipy.sparse.csr_matrix
+	"""
+
+	diag = csr_matrix(numpy.array([numpy.array([-1. for _1 in range(n)]) for _0 in range(n)]))  # Create a squared matrix of floats which is initialized with the float value -1.
+	diag.setdiag(1.)
+	return diag
 
 

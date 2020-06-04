@@ -1,29 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<graphml
-        xmlns="http://graphml.graphdrawing.org/xmlns"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-    <key id="d0" for="edge" attr.name="weight" attr.type="double"/>
-    <graph id="SampsonMonastery" edgedefault="undirected">
-        <node id="1"/>
-        <node id="2"/>
-        <node id="3"/>
-        <node id="4"/>
-        <node id="5"/>
-        <edge id="e0" source="1" target="3">
-            <data key="d0">1.0</data>
-        </edge>
-        <edge id="e1" source="2" target="3">
-            <data key="d0">1.0</data>
-        </edge>
-        <edge id="e2" source="3" target="4">
-            <data key="d0">1.0</data>
-        </edge>
-        <edge id="e3" source="3" target="5">
-            <data key="d0">1.0</data>
-        </edge>
-        <edge id="e4" source="4" target="5">
-            <data key="d0">1.0</data>
-        </edge>
-    </graph>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="v_id" for="node" attr.name="id" attr.type="string"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_id" for="edge" attr.name="id" attr.type="string"/>
+  <graph id="G" edgedefault="undirected">
+    <node id="n0">
+      <data key="v_id">1</data>
+    </node>
+    <node id="n1">
+      <data key="v_id">2</data>
+    </node>
+    <node id="n2">
+      <data key="v_id">3</data>
+    </node>
+    <node id="n3">
+      <data key="v_id">4</data>
+    </node>
+    <node id="n4">
+      <data key="v_id">5</data>
+    </node>
+    <edge source="n0" target="n2">
+      <data key="e_weight">1</data>
+      <data key="e_id">e0</data>
+    </edge>
+    <edge source="n1" target="n2">
+      <data key="e_weight">1</data>
+      <data key="e_id">e1</data>
+    </edge>
+    <edge source="n2" target="n3">
+      <data key="e_weight">1</data>
+      <data key="e_id">e2</data>
+    </edge>
+    <edge source="n2" target="n4">
+      <data key="e_weight">1</data>
+      <data key="e_id">e3</data>
+    </edge>
+    <edge source="n3" target="n4">
+      <data key="e_weight">1</data>
+      <data key="e_id">e4</data>
+    </edge>
+  </graph>
 </graphml>
