@@ -87,25 +87,25 @@ class SignedCentralityTest(unittest.TestCase):
 		self.assertIsInstance(array, numpy.ndarray)
 
 		array_test = numpy.array([
-			numpy.array([0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
-			numpy.array([1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0]),
-			numpy.array([0, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-			numpy.array([0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
-			numpy.array([0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
-			])  # Directed graph.
+				numpy.array([0, 1, 1, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]),
+				numpy.array([1, 0, 0, -1, 0, 0, 1, -1, 0, 0, -1, 0, -1, 0, 1, 1, 0, 0]),
+				numpy.array([1, 0, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, -1, -1, 0, 1, 1, -1, 1, 0, 1, 0, 0, 0, -1, 0, -1, 0, 0]),
+				numpy.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0]),
+				numpy.array([-1, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, -1]),
+				numpy.array([0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1]),
+				numpy.array([1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0]),
+				numpy.array([0, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+				numpy.array([0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0])
+			])  # Undirected graph, created from a directed graph.
 
 		for i in range(len(array)):
 			for j in range(len(array[i])):
@@ -127,8 +127,6 @@ class SignedCentralityTest(unittest.TestCase):
 		length = n1 + n2
 		diag = diagonal(n1, n2).toarray()
 
-		print(diag)
-
 		array_test = numpy.array(
 			[
 				numpy.array([1, 0, 0, 0, 0, 0, 0, 0]),
@@ -144,6 +142,19 @@ class SignedCentralityTest(unittest.TestCase):
 		for i in range(length):
 			for j in range(length):
 				self.assertEqual(diag[i][j], array_test[i][j])
+
+	def test_compute_eigenvector_centrality_network_a(self):
+		# print(compute_eigenvector_centrality((self.graph['a'])))
+		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality((self.graph['a']))], [.43, .43, 1., .74, .74])
+
+	def test_compute_eigenvector_centrality_network_b(self):
+		# print(compute_eigenvector_centrality((self.graph['b'])))
+		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality((self.graph['b']))], [.55, .55, 1., .35, -.35])
+
+
+	def test_compute_eigenvector_centrality_sampson(self):
+		# print(compute_eigenvector_centrality((self.graph['s'])))
+		pass
 
 
 if __name__ == '__main__':

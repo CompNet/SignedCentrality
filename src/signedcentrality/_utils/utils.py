@@ -16,9 +16,11 @@ def read_graph(path_name):
 	Read a graph from a GraphML file.
 
 	The graph that are read by this library are directed or undirected signed graphs.
+	They are converted to undirected signed graphs.
 	The function creates a Graph with the igraph library.
 
 	:param path_name: path of the GraphML file
+	:type path_name: str
 	:return: the graph
 	:rtype: igraph.Graph
 
@@ -65,17 +67,27 @@ def read_graph(path_name):
 	.. warning: In the GraphML file, the attribute which defines the weights of the edges has to be given the name "weight" with the attribute "attr.name".
 	"""
 
-	return Graph.Read(path_name, GRAPHML)
+	graph = Graph.Read(path_name, GRAPHML)
+
+	if graph.is_directed:
+		weights, ids = graph.es[WEIGHT], graph.es[ID]
+		graph = graph.as_undirected("each")
+		graph.es[WEIGHT], graph.es[ID] = weights, ids  # Because the Graph.as_undirected() method deletes the attributes of the graph.
+		graph.simplify(True, False, dict(weight="mean", id="first"))  # Deletes the additional edges.
+
+	return graph
 
 
 def write_graph(graph, path_name):
 	"""
-	Write a GraphML file from a igraph Graph.
+	Write a GraphML file from a Graph.
 
 	This function is used for tests.
 
 	:param graph: graph to write
+	:type graph: igraph.Graph
 	:param path_name: path of the GraphML file
+	:type path_name: str
 	"""
 
 	graph.write_graphml(path_name)
@@ -89,6 +101,7 @@ def get_matrix(graph):
 	The default igraph.Matrix class isn't used because it doesn't support arithmetic operations.
 
 	:param graph: the graph one want the adjacency matrix
+	:type graph: igraph.Graph
 	:return: the adjacency matrix
 	:rtype: scipy.sparse.csr_matrix
 	"""

@@ -23,3 +23,9 @@ String defining GraphML id for the attribte that defines the weight of an edge.
 
 This has to be given in the method graph.get_adjacency_sparse() which returns a weighted adjacency matrix for the given graph.
 """
+
+
+ID = "id"
+"""
+String defining GraphML id for the attribte that defines the id of an edge.
+"""
