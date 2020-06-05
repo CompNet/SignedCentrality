@@ -122,19 +122,23 @@ class SignedCentralityTest(unittest.TestCase):
 				self.assertEqual(self.array['s'][i][j], array_test[i][j])
 
 	def test_diagonal(self):
-		length = 8
-		diag = diagonal(length).toarray()
+		n1 = 4
+		n2 = 4
+		length = n1 + n2
+		diag = diagonal(n1, n2).toarray()
+
+		print(diag)
 
 		array_test = numpy.array(
 			[
-				numpy.array([1, -1, -1, -1, -1, -1, -1, -1]),
-				numpy.array([-1, 1, -1, -1, -1, -1, -1, -1]),
-				numpy.array([-1, -1, 1, -1, -1, -1, -1, -1]),
-				numpy.array([-1, -1, -1, 1, -1, -1, -1, -1]),
-				numpy.array([-1, -1, -1, -1, 1, -1, -1, -1]),
-				numpy.array([-1, -1, -1, -1, -1, 1, -1, -1]),
-				numpy.array([-1, -1, -1, -1, -1, -1, 1, -1]),
-				numpy.array([-1, -1, -1, -1, -1, -1, -1, 1]),
+				numpy.array([1, 0, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, 1, 0, 0, 0, 0, 0, 0]),
+				numpy.array([0, 0, 1, 0, 0, 0, 0, 0]),
+				numpy.array([0, 0, 0, 1, 0, 0, 0, 0]),
+				numpy.array([0, 0, 0, 0, -1, 0, 0, 0]),
+				numpy.array([0, 0, 0, 0, 0, -1, 0, 0]),
+				numpy.array([0, 0, 0, 0, 0, 0, -1, 0]),
+				numpy.array([0, 0, 0, 0, 0, 0, 0, -1]),
 				])
 
 		for i in range(length):

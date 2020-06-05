@@ -96,17 +96,3 @@ def get_matrix(graph):
 	return graph.get_adjacency_sparse(WEIGHT)  # scipy.sparse.csr_matrix
 
 
-def diagonal(n):
-	"""
-	Create a diagonal squared matrix.
-
-	:param n: number of rows and columns
-	:return: the matrix
-	:rtype: scipy.sparse.csr_matrix
-	"""
-
-	diag = csr_matrix(numpy.array([numpy.array([-1. for _1 in range(n)]) for _0 in range(n)]))  # Create a squared matrix of floats which is initialized with the float value -1.
-	diag.setdiag(1.)
-	return diag
-
-
