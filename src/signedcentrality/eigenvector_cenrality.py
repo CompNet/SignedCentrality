@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from igraph import *
+from numpy import *
 from scipy.sparse import lil_matrix
+from scipy.linalg import eigh
 
 from signedcentrality._utils.utils import *
 
@@ -38,28 +40,6 @@ def diagonal(n1, n2):
 	return diag.tocsr()
 
 
-def rearrange_matrix(graph):
-	"""
-	Rearranges the adjacency matrix of the graph to separate the individuals.
-
-	The new matrix is such that, if the graph structure is balanced or highly balanced, the individuals would be divided in two sets.
-
-	:param graph: graph to rearrange
-	:type graph: igraph.Graph
-	:return: the rearranged matrix and the sizes of its sets
-	:rtype: (scipy.sparse.csr_matrix, int, int)
-	"""
-
-	matrix = get_matrix(graph)
-	length = len(matrix.toarray())
-	n1 = None
-	n2 = None
-
-	# TODO
-
-	return matrix, n1, n2
-
-
 def compute_eigenvector_centrality(graph):
 	"""
 	Compute the eigenvector centrality.
@@ -71,14 +51,42 @@ def compute_eigenvector_centrality(graph):
 	:return: the eigenvector centrality
 	:rtype: list
 	"""
-	A, n1, n2 = rearrange_matrix(graph)  # A : valued binary symmetric matrix divided in two sets of individuals
-	D = diagonal(n1, n2)  # Diagonal matrix that have the same size than A. It is divided in to sets as A too.
 
-	B = D * A * D
+	matrix = get_matrix(graph).toarray()
 
-	print(B)
+	eigenvalues, eigenvectors = eigh(matrix)
 
-	# TODO
+	D = eye(len(eigenvectors))
+	print(D)
+	print()
+	print(matrix)
+	print()
+	print(eigenvalues)
+	print()
+	print(eigenvectors)
+
+	for i in range(5):
+
+		print()
+		print("1 =>", graph.evcent(False, True, WEIGHT))  # Works only for unsigned graphs.
+		print("1 =>", graph.evcent(False, False, WEIGHT))
+
+		print()
+		Dx = eigenvectors[:, i]
+		print("2 =>", dot(eigenvalues[i], Dx))
+
+		print()
+		print("3 =>", dot(matrix, Dx))
+
+		print()
+		print("4 =>", Dx)
+
+		print()
+		print("4 =>", linalg.norm(eigenvectors[:, i]))
+
+		print()
+
+	return Dx  # temporary
 
 
 

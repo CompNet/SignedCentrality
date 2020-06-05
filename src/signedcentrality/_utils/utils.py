@@ -68,12 +68,7 @@ def read_graph(path_name):
 	"""
 
 	graph = Graph.Read(path_name, GRAPHML)
-
-	if graph.is_directed:
-		weights, ids = graph.es[WEIGHT], graph.es[ID]
-		graph = graph.as_undirected("each")
-		graph.es[WEIGHT], graph.es[ID] = weights, ids  # Because the Graph.as_undirected() method deletes the attributes of the graph.
-		graph.simplify(True, False, dict(weight="mean", id="first"))  # Deletes the additional edges.
+	graph.to_undirected("collapse", dict(weight = "mean", id = "first"))
 
 	return graph
 
