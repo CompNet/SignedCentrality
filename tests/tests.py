@@ -144,17 +144,20 @@ class SignedCentralityTest(unittest.TestCase):
 				self.assertEqual(diag[i][j], array_test[i][j])
 
 	def test_compute_eigenvector_centrality_network_a(self):
-		# print(compute_eigenvector_centrality((self.graph['a'])))
-		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality((self.graph['a']))], [.43, .43, 1., .74, .74])
+		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['a'], None, True)], [.43, .43, 1., .74, .74])
 
 	def test_compute_eigenvector_centrality_network_b(self):
-		# print(compute_eigenvector_centrality((self.graph['b'])))
-		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality((self.graph['b']))], [.55, .55, 1., .35, -.35])
-
+		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['b'], None, True)], [.55, .55, 1., .35, -.35])  #
+		# self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], None, True)], [.55, .55, 1., .35, -.35])  # There aren't any problems if the result is truncated.
 
 	def test_compute_eigenvector_centrality_sampson(self):
-		# print(compute_eigenvector_centrality((self.graph['s'])))
-		pass
+		result = [round(i, 3) for i in compute_eigenvector_centrality(self.graph['s'])]
+		test = [.174, .188, .248, .319, .420, .219, .365, -.081, -.142, -.292, -.088, -.123, -.217, -.072, -.030, -.254, -.282, -.287]
+		# result.sort(reverse=True)
+		# test.sort(reverse=True)
+		print(result)
+		print(test)
+		self.assertSequenceEqual(result, test)
 
 
 if __name__ == '__main__':

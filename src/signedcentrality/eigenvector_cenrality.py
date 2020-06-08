@@ -1,10 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from igraph import *
+from scipy import *
+import networkx
+from collections import OrderedDict
 from numpy import *
 from scipy.sparse import lil_matrix
 from scipy.linalg import eigh
+from scipy.linalg import eig
+from scipy.sparse import linalg
 
 from signedcentrality._utils.utils import *
 
@@ -40,11 +45,12 @@ def diagonal(n1, n2):
 	return diag.tocsr()
 
 
-def compute_eigenvector_centrality(graph):
+def compute_eigenvector_centrality(graph, D=None, scaled=False):
 	"""
 	Compute the eigenvector centrality.
 
-	It is computed using the method explained int the article cited in the module documentation.
+	It is computed using the NetworkX Library.
+	Indeed, the method computing the eigenvecor centrality in NetworkX is able to compute it correctly for signed graphs.
 
 	:param graph: the graph
 	:type graph: igraph.Graph
@@ -52,42 +58,22 @@ def compute_eigenvector_centrality(graph):
 	:rtype: list
 	"""
 
-	matrix = get_matrix(graph).toarray()
+	scale = 1
 
-	eigenvalues, eigenvectors = eigh(matrix)
+	nx_graph = networkx.from_scipy_sparse_matrix(get_matrix(graph), False, None, WEIGHT)
 
-	D = eye(len(eigenvectors))
-	print(D)
-	print()
-	print(matrix)
-	print()
-	print(eigenvalues)
-	print()
-	print(eigenvectors)
+	centrality = networkx.eigenvector_centrality_numpy(nx_graph, WEIGHT)  # The result isn't scaled.
+	# centrality = networkx.eigenvector_centrality(nx_graph, 1000, 1.e-10, weight=WEIGHT)
 
-	for i in range(5):
+	if scaled:
+		max_value = sys.float_info.min  # Minimal value of a float
+		for _, value in centrality.items():
+			if value > max_value:
+				max_value = value
+		scale = 1 / max_value
 
-		print()
-		print("1 =>", graph.evcent(False, True, WEIGHT))  # Works only for unsigned graphs.
-		print("1 =>", graph.evcent(False, False, WEIGHT))
+	scaled_centrality = [value * scale for _, value in OrderedDict(sorted(centrality.items())).items()]
 
-		print()
-		Dx = eigenvectors[:, i]
-		print("2 =>", dot(eigenvalues[i], Dx))
-
-		print()
-		print("3 =>", dot(matrix, Dx))
-
-		print()
-		print("4 =>", Dx)
-
-		print()
-		print("4 =>", linalg.norm(eigenvectors[:, i]))
-
-		print()
-
-	return Dx  # temporary
-
-
+	return scaled_centrality
 
 
