@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import numpy
-from igraph import *
-from scipy.sparse import csr_matrix
+from igraph import Graph
 from signedcentrality._utils import *  # Import the strings defined in __init__.py.
 
 """
