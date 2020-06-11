@@ -58,9 +58,10 @@ def compute_eigenvector_centrality(graph, scaled=False):
 	if sum(centrality) < 0:  # Makes the first cluster values positive if they aren't.
 		scale *= -1  # Values will be inverted when they will be scaled (more efficient).
 
-	scaled_centrality = [value * scale for value in centrality]
+	if scale == 1:  # If the centrality has the right signs and if it doesn't have to be scaled, it can be returned.
+		return centrality
 
-	return scaled_centrality
+	return [value * scale for value in centrality]  # Else, return a scaled centrality.
 
 
 
