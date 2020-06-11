@@ -11,21 +11,29 @@ These modules should not be used out of signedcentrality, except for tests.
 """
 
 
-GRAPHML = "graphml"
-"""
-String defining GraphML format for the parameter "format" in method Graph.Read().
-"""
+class Format:
+
+	GRAPHML = "graphml"
+	"""
+	String defining GraphML format for the parameter "format" in method Graph.Read().
+	"""
+
+	CSV = "csv"
+	"""
+	String defining CSV format for the parameter "format" in method read_graph().
+	"""
 
 
-WEIGHT = "weight"
-"""
-String defining GraphML id for the attribte that defines the weight of an edge.
+class FileIds:
 
-This has to be given in the method graph.get_adjacency_sparse() which returns a weighted adjacency matrix for the given graph.
-"""
+	WEIGHT = "weight"
+	"""
+	String defining GraphML id for the attribte that defines the weight of an edge.
+	
+	This has to be given in the method graph.get_adjacency_sparse() which returns a weighted adjacency matrix for the given graph.
+	"""
 
-
-ID = "id"
-"""
-String defining GraphML id for the attribte that defines the id of an edge.
-"""
+	ID = "id"
+	"""
+	String defining GraphML id for the attribte that defines the id of an edge.
+	"""
