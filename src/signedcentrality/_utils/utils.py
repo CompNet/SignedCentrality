@@ -10,7 +10,6 @@ This module contains utility functions that are used in the signedcentrality pac
 
 
 def read_graph(path_name, format = None):
-
 	"""
 	Read a graph from a file.
 
@@ -21,7 +20,7 @@ def read_graph(path_name, format = None):
 	If format is None, it will be detected automatically.
 	It might cause errors. It is preferred that the format has been set.
 
-	The graph that are read by this library are directed or undirected signed graphs.
+	The graph that are read by this library may be directed or undirected signed graphs.
 	They are converted to undirected signed graphs.
 	The function creates a Graph with the igraph library.
 

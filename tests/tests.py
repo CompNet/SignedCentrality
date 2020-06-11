@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import unittest
-from collections import OrderedDict
-from networkx import eigenvector_centrality, from_scipy_sparse_matrix
-from scipy.sparse import csr_matrix
-from signedcentrality.eigenvector_centrality import *
-# noinspection PyProtectedMember
-from signedcentrality._utils.utils import *
-from numpy import trunc, ndarray, array
-
 """
 This module contains unit tests for the modules of the package signedcentrality.
 """
+
+import unittest
+from numpy import trunc, ndarray, array
+from scipy.sparse import csr_matrix
+# noinspection PyProtectedMember
+from signedcentrality._utils.utils import *
+from signedcentrality.eigenvector_centrality import *
 
 
 class SignedCentralityTest(unittest.TestCase):
@@ -54,7 +52,7 @@ class SignedCentralityTest(unittest.TestCase):
 				array([1, 1, 0, 1, 1]),
 				array([0, 0, 1, 0, 1]),
 				array([0, 0, 1, 1, 0])
-				])  # Undirected graph.
+				])
 
 		for i in range(len(array_a)):
 			for j in range(len(array_a[i])):
@@ -74,7 +72,7 @@ class SignedCentralityTest(unittest.TestCase):
 				array([1, 1, 0, 1, -1]),
 				array([0, 0, 1, 0, 1]),
 				array([0, 0, -1, 1, 0])
-				])  # Undirected graph.
+				])
 
 		for i in range(len(array_b)):
 			for j in range(len(array_b[i])):
@@ -84,35 +82,33 @@ class SignedCentralityTest(unittest.TestCase):
 		matrix = self.matrix['s']
 		array_s = self.array['s']
 
-		print(array_s)
-
 		self.assertIsInstance(matrix, csr_matrix)
 		self.assertIsInstance(array_s, ndarray)
 
 		array_test = array([
-				array([0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]), 
-				array([0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), 
-				array([0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1]), 
-				array([0, 1, 1, 0, 1, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0]), 
-				array([0, 1, 0, 1, 0, 1, 0, 0, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0]), 
-				array([0, 1, 0, 0, 0, 0, 1, 0, -1, -1, 1, 0, 0, 0, 0, -1, 0, 0]), 
-				array([0, 0, 1, 1, 1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0]), 
-				array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0]), 
-				array([-1, 0, 0, 0, 0, 0, 0, 1, 0, -1, 1, 0, -1, 0, 0, 1, 0, 0]), 
-				array([0, 0, 0, 0, -1, 0, -1, 1, 1, 0, 0, 0, 1, 0, -1, 0, 0, 0]), 
-				array([0, 0, 0, 0, -1, 0, -1, 1, 1, 0, 0, 1, 0, 0, 0, 0, -1, 0]), 
-				array([0, 0, 0, 0, -1, 0, 0, 1, 0, 1, 0, 0, 1, 0, -1, -1, 0, 0]), 
-				array([0, 0, 0, -1, -1, 0, -1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0]), 
-				array([0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, -1, -1, 0]), 
-				array([0, 1, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 1]), 
-				array([0, 0, 0, -1, -1, 0, 0, 0, 1, -1, 0, 0, 0, -1, 1, 0, 1, 1]), 
-				array([0, 0, 0, -1, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1]), 
-				array([-1, 0, 0, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0])
-			])  # Undirected graph, created from a directed graph.
+			array([0, 1, 1, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1]),
+			array([1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]),
+			array([1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1]),
+			array([0, 1, 1, 0, 1, 0, 1, 0, 0, -1, 0, 0, -1, 0, -1, -1, -1, 0]),
+			array([1, 1, 0, 1, 0, 1, 1, 0, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1]),
+			array([0, 1, 0, 0, 1, 0, 1, 0, -1, -1, 1, 0, 0, 0, 0, -1, 0, 0]),
+			array([0, 0, 1, 1, 1, 1, 0, 0, 0, -1, -1, 0, -1, 0, 0, -1, -1, -1]),
+			array([0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, -1, 0, 0, 0]),
+			array([-1, 0, 0, 0, -1, -1, 0, 1, 0, 0, 1, 0, -1, 0, 0, 1, 0, 0]),
+			array([0, 0, 0, -1, -1, -1, -1, 1, 0, 0, 0, 1, 1, 1, -1, -1, 1, 1]),
+			array([0, 0, 0, 0, -1, 1, -1, 1, 1, 0, 0, 1, 0, 0, 0, 0, -1, 0]),
+			array([0, 0, 0, 0, -1, 0, 0, 1, 0, 1, 1, 0, 1, 1, -1, -1, 0, 0]),
+			array([0, 0, 0, -1, -1, 0, -1, 1, -1, 1, 0, 1, 0, 1, 1, 0, 0, 0]),
+			array([0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, -1, -1, 0]),
+			array([1, 1, 0, -1, 0, 0, 0, -1, 0, -1, 0, -1, 1, 0, 0, 1, 0, 1]),
+			array([0, 0, -1, -1, -1, -1, -1, 0, 1, -1, 0, -1, 0, -1, 1, 0, 1, 1]),
+			array([0, 0, -1, -1, -1, 0, -1, 0, 0, 1, -1, 0, 0, -1, 0, 1, 0, 1]),
+			array([-1, 0, -1, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0])
+			])
 
 		for i in range(len(array_s)):
 			for j in range(len(array_s[i])):
-				self.assertEqual(array_s[i][j], array_test[i][j])  # There is an error because the merge of the edges changes the values : the final matrix is symmetric.
+				self.assertEqual(array_s[i][j], array_test[i][j])
 
 	def test_write_graph(self):
 		write_graph(self.graph['s'], self._test_path_name)
@@ -128,7 +124,7 @@ class SignedCentralityTest(unittest.TestCase):
 		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['a'], True)], [.43, .43, 1., .74, .74])
 
 	def test_compute_eigenvector_centrality_network_b(self):
-		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], True)], [.55, .55, 1., .35, -.35])  # There aren't any problems if the result is truncated.
+		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], True)], [.55, .55, 1., .35, -.35])
 
 	def test_compute_eigenvector_centrality_sampson(self):
 		result = [round(i, 3) for i in compute_eigenvector_centrality(self.graph['s'])]

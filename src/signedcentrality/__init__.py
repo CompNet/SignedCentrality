@@ -9,7 +9,7 @@ Each module of the package contains functions that compute a measure of centrali
 .. warning: In order to use this package, one has to install igraph and scipy libraries.
 
 .. seealso: _utils
-.. seealso: eigenvecto_centrality
+.. seealso: eigenvector_centrality
 .. seealso: igraph
 .. seealso: scipy
 """
