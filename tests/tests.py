@@ -6,11 +6,12 @@ This module contains unit tests for the modules of the package signedcentrality.
 """
 
 import unittest
+from sys import stderr
 from numpy import trunc, ndarray, array
-from scipy.sparse import csr_matrix
 # noinspection PyProtectedMember
 from signedcentrality._utils.utils import *
 from signedcentrality.eigenvector_centrality import *
+from signedcentrality.eigenvector_centrality import _get_matrix
 
 
 class SignedCentralityTest(unittest.TestCase):
@@ -20,16 +21,19 @@ class SignedCentralityTest(unittest.TestCase):
 
 		self._test_path_name = "test.graphml"
 
+		samplk3 = read_graph("SAMPLK3.csv", Format.CSV)
+		sampdlk = read_graph("SAMPDLK.csv", Format.CSV)
+
 		self.graph = {
 			'a': read_graph("network_a.graphml"),
 			'b': read_graph("network_b.graphml"),
-			's': read_graph("sampson.csv", Format.CSV)
+			's': (samplk3, sampdlk)
 			}
 
 		self.matrix = {
 			'a': get_matrix(self.graph['a']),
 			'b': get_matrix(self.graph['b']),
-			's': get_matrix(self.graph['s'])
+			's': _get_matrix(*self.graph['s'])
 			}
 
 		self.array = {
@@ -47,11 +51,11 @@ class SignedCentralityTest(unittest.TestCase):
 
 		array_test = array(
 			[
-				array([0, 0, 1, 0, 0]),
-				array([0, 0, 1, 0, 0]),
-				array([1, 1, 0, 1, 1]),
-				array([0, 0, 1, 0, 1]),
-				array([0, 0, 1, 1, 0])
+				[0, 0, 1, 0, 0],
+				[0, 0, 1, 0, 0],
+				[1, 1, 0, 1, 1],
+				[0, 0, 1, 0, 1],
+				[0, 0, 1, 1, 0]
 				])
 
 		for i in range(len(array_a)):
@@ -67,11 +71,11 @@ class SignedCentralityTest(unittest.TestCase):
 
 		array_test = array(
 			[
-				array([0, 0, 1, 0, 0]),
-				array([0, 0, 1, 0, 0]),
-				array([1, 1, 0, 1, -1]),
-				array([0, 0, 1, 0, 1]),
-				array([0, 0, -1, 1, 0])
+				[0, 0, 1, 0, 0],
+				[0, 0, 1, 0, 0],
+				[1, 1, 0, 1, -1],
+				[0, 0, 1, 0, 1],
+				[0, 0, -1, 1, 0]
 				])
 
 		for i in range(len(array_b)):
@@ -86,24 +90,24 @@ class SignedCentralityTest(unittest.TestCase):
 		self.assertIsInstance(array_s, ndarray)
 
 		array_test = array([
-			array([0, 1, 1, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1]),
-			array([1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]),
-			array([1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1]),
-			array([0, 1, 1, 0, 1, 0, 1, 0, 0, -1, 0, 0, -1, 0, -1, -1, -1, 0]),
-			array([1, 1, 0, 1, 0, 1, 1, 0, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1]),
-			array([0, 1, 0, 0, 1, 0, 1, 0, -1, -1, 1, 0, 0, 0, 0, -1, 0, 0]),
-			array([0, 0, 1, 1, 1, 1, 0, 0, 0, -1, -1, 0, -1, 0, 0, -1, -1, -1]),
-			array([0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, -1, 0, 0, 0]),
-			array([-1, 0, 0, 0, -1, -1, 0, 1, 0, 0, 1, 0, -1, 0, 0, 1, 0, 0]),
-			array([0, 0, 0, -1, -1, -1, -1, 1, 0, 0, 0, 1, 1, 1, -1, -1, 1, 1]),
-			array([0, 0, 0, 0, -1, 1, -1, 1, 1, 0, 0, 1, 0, 0, 0, 0, -1, 0]),
-			array([0, 0, 0, 0, -1, 0, 0, 1, 0, 1, 1, 0, 1, 1, -1, -1, 0, 0]),
-			array([0, 0, 0, -1, -1, 0, -1, 1, -1, 1, 0, 1, 0, 1, 1, 0, 0, 0]),
-			array([0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, -1, -1, 0]),
-			array([1, 1, 0, -1, 0, 0, 0, -1, 0, -1, 0, -1, 1, 0, 0, 1, 0, 1]),
-			array([0, 0, -1, -1, -1, -1, -1, 0, 1, -1, 0, -1, 0, -1, 1, 0, 1, 1]),
-			array([0, 0, -1, -1, -1, 0, -1, 0, 0, 1, -1, 0, 0, -1, 0, 1, 0, 1]),
-			array([-1, 0, -1, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0])
+			[0, 1, 1, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1],
+			[1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+			[1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1],
+			[0, 1, 1, 0, 1, 0, 1, 0, 0, -1, 0, 0, -1, 0, -1, -1, -1, 0],
+			[1, 1, 0, 1, 0, 1, 1, 0, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1],
+			[0, 1, 0, 0, 1, 0, 1, 0, -1, -1, 1, 0, 0, 0, 0, -1, 0, 0],
+			[0, 0, 1, 1, 1, 1, 0, 0, 0, -1, -1, 0, -1, 0, 0, -1, -1, -1],
+			[0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, -1, 0, 0, 0],
+			[-1, 0, 0, 0, -1, -1, 0, 1, 0, 0, 1, 0, -1, 0, 0, 1, 0, 0],
+			[0, 0, 0, -1, -1, -1, -1, 1, 0, 0, 0, 1, 1, 1, -1, -1, 1, 1],
+			[0, 0, 0, 0, -1, 1, -1, 1, 1, 0, 0, 1, 0, 0, 0, 0, -1, 0],
+			[0, 0, 0, 0, -1, 0, 0, 1, 0, 1, 1, 0, 1, 1, -1, -1, 0, 0],
+			[0, 0, 0, -1, -1, 0, -1, 1, -1, 1, 0, 1, 0, 1, 1, 0, 0, 0],
+			[0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, -1, -1, 0],
+			[1, 1, 0, -1, 0, 0, 0, -1, 0, -1, 0, -1, 1, 0, 0, 1, 0, 1],
+			[0, 0, -1, -1, -1, -1, -1, 0, 1, -1, 0, -1, 0, -1, 1, 0, 1, 1],
+			[0, 0, -1, -1, -1, 0, -1, 0, 0, 1, -1, 0, 0, -1, 0, 1, 0, 1],
+			[-1, 0, -1, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0]
 			])
 
 		for i in range(len(array_s)):
@@ -111,23 +115,24 @@ class SignedCentralityTest(unittest.TestCase):
 				self.assertEqual(array_s[i][j], array_test[i][j])
 
 	def test_write_graph(self):
-		write_graph(self.graph['s'], self._test_path_name)
+		graph_name = 'b'
+		write_graph(self.graph[graph_name], self._test_path_name)
 		test_graph = read_graph(self._test_path_name)
 
 		array_test = test_graph.get_adjacency_sparse(FileIds.WEIGHT).toarray()
 
-		for i in range(len(self.array['s'])):
-			for j in range(len(self.array['s'][i])):
-				self.assertEqual(self.array['s'][i][j], array_test[i][j])
+		for i in range(len(self.array[graph_name])):
+			for j in range(len(self.array[graph_name][i])):
+				self.assertEqual(self.array[graph_name][i][j], array_test[i][j])
 
 	def test_compute_eigenvector_centrality_network_a(self):
-		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['a'], True)], [.43, .43, 1., .74, .74])
+		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['a'], scaled = True)], [.43, .43, 1., .74, .74])
 
 	def test_compute_eigenvector_centrality_network_b(self):
-		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], True)], [.55, .55, 1., .35, -.35])
+		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], scaled = True)], [.55, .55, 1., .35, -.35])
 
 	def test_compute_eigenvector_centrality_sampson(self):
-		result = [round(i, 3) for i in compute_eigenvector_centrality(self.graph['s'])]
+		result = [round(i, 3) for i in compute_eigenvector_centrality(*self.graph['s'])]
 		test = [.174, .188, .248, .319, .420, .219, .365, -.081, -.142, -.292, -.088, -.123, -.217, -.072, -.030, -.254, -.282, -.287]
 		self.assertSequenceEqual(result, test)
 

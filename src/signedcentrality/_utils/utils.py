@@ -20,8 +20,6 @@ def read_graph(path_name, format = None):
 	If format is None, it will be detected automatically.
 	It might cause errors. It is preferred that the format has been set.
 
-	The graph that are read by this library may be directed or undirected signed graphs.
-	They are converted to undirected signed graphs.
 	The function creates a Graph with the igraph library.
 
 	:param path_name: path of the file
@@ -79,8 +77,6 @@ def read_graph(path_name, format = None):
 		graph = Graph.Read_Adjacency(path_name, ",", "#", FileIds.WEIGHT)  # The separator in CSV files is the comma.
 	else:
 		graph = Graph.Read(path_name, format)
-
-	graph.to_undirected("collapse", dict(weight = "mean", id = "first"))  # "mean" enables the program to get the same values as the article.
 
 	return graph
 

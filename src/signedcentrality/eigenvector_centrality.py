@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from sys import float_info
-from numpy import real
+from numpy import real, where, array
 from numpy.linalg import norm
+from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import eigs
 from signedcentrality._utils.utils import *
+from signedcentrality._utils import FileIds
 
 """
 This module contains functions related to the measure of eigenvector centrality.
@@ -16,23 +18,107 @@ The measure is computed by following the method of Phillip Bonacich and Paulette
 """
 
 
-def compute_eigenvector_centrality(graph, scaled=False):
+def _set_weights_to_1(graph):
+	"""
+	Set all weights in a graph to 1
+
+	This function shouldn't be used outside this module.
+
+	:param graph: the graph whose the weights are to be changed
+	:type graph: Graph
+	:return: the new graph
+	:rtype graph: Graph
+	"""
+
+	graph.es[FileIds.WEIGHT] = [1 for _ in range(graph.ecount())]
+	return graph
+
+
+def _get_matrix(*args):
+	"""
+	Convert a graph defined in one or two files to a symmetric undirected signed graph.
+
+	This function takes one or two parameters.
+	The fist one is a graph that represents the positive signed edges.
+	The second one is a graph that represents the negative signed edges.
+
+	If there is only one graph that is set in parameters, it is considered as a positive graph.
+
+	The graphs that are read by this library may be directed or undirected signed graphs.
+	They are converted to undirected signed graphs.
+
+	There are three steps to convert the graphs.
+	First, all the weights are set to 1 in each graph.
+	Secondly, The graphs are converted to undirected graphs.
+	Finally, the two graphs are merged.
+
+	This function shouldn't be used outside this module.
+
+	:param args: on or two graphs
+	:type args: Graph or tuple
+	:return: a symmetric undirected signed graph
+	:rtype args: Graph
+	"""
+
+	if len(args) == 0 or len(args) > 2:
+		raise ValueError("Wrong arguments number.")
+
+	new_graph = None
+	matrix = None
+
+	for graph in args:
+		if not isinstance(graph, Graph):
+			msg = "".join(["Arguments have to be igraph.Graph instances, not ", str(type(graph)), "."])
+			raise ValueError(msg)
+
+		# First step :
+		graph = _set_weights_to_1(graph)
+
+		# Second step :
+		graph.to_undirected("collapse", dict(weight = "max", id = "first"))  # "mean" enables the program to get the same values as the article.
+
+		# Third step :
+		if new_graph is None:  # If graph is the first of the list ...
+			new_graph = graph
+			continue  # ... the third step isn't done.
+
+		# Else, it isn't the first one, the third step is done.
+		new_matrix = get_matrix(new_graph).toarray()
+		additional_matrix = get_matrix(graph).toarray()
+		length = len(new_matrix)
+		matrix = array([[float(new_matrix[row, col] - additional_matrix[row, col]) for col in range(length)] for row in range(length)])
+
+	return csr_matrix(matrix)
+
+
+def compute_eigenvector_centrality(*graph, scaled=False):
 	"""
 	Compute the eigenvector centrality.
 
 	If scaled is True, the values will be set such that the maximum is 1.
+	This argument name have to be set in the function call.
+
+	The graph must be an undirected signed graph or two unsigned graphs.
+	If there are two graphs, the first one represent the positive weights and the second one defines the negative edges.
 
 	:param graph: the graph
-	:type graph: igraph.Graph
+	:type graph: igraph.Graph or tuple
 	:param scaled: the graph
 	:type scaled: bool
 	:return: the eigenvector centrality
 	:rtype: list
 	"""
 
-	scale = 1  # Thus, if scaled == False, the matrix won't be scaled.
+	if len(graph) == 0 or len(graph) > 2:
+		raise ValueError("Wrong arguments number.")
 
-	matrix = get_matrix(graph).toarray()
+	scale = 1  # Thus, if scaled == False, the matrix won't be scaled.
+	matrix = None
+
+	if len(graph) == 1:
+		matrix = get_matrix(graph[0]).toarray()
+	else:  # if len(graph) == 2
+		matrix = _get_matrix(*graph).toarray()
 
 	eigenvector = list(        # Because eigs() returns a ndarray.
 		real(                  # Because the matrix is treated as a complex matrix. So, only the real part must be kept.
