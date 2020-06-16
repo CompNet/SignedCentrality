@@ -2,16 +2,79 @@
 # -*- coding: utf-8 -*-
 
 """
-This module contains unit tests for the modules of the package signedcentrality.
+This module contains unit tests for the modules eigenvector_centrality and utils.
 """
 
 import unittest
-from sys import stderr
+from scipy.sparse import csr_matrix
 from numpy import trunc, ndarray, array
 # noinspection PyProtectedMember
 from signedcentrality._utils.utils import *
 from signedcentrality.eigenvector_centrality import *
-from signedcentrality.eigenvector_centrality import _get_matrix
+
+
+def convert_graph(*args):
+	"""
+	Convert a graph defined in one or two files to a symmetric undirected signed graph.
+
+	This function takes one or two parameters.
+	The fist one is a graph that represents the positive signed edges.
+	The second one is a graph that represents the negative signed edges.
+
+	If there is only one graph that is set in parameters, it is considered as a positive graph.
+
+	The graphs that are read by this function may be directed or undirected signed graphs.
+	They are converted to undirected signed graphs.
+
+	There are three steps to convert the graphs.
+	First, all the weights are set to 1 in each graph.
+	Secondly, The graphs are converted to undirected graphs.
+	Finally, the graphs are merged.
+
+	This function shouldn't be used outside this module.
+
+	:param args: on or two graphs
+	:type args: Graph or tuple
+	:return: a symmetric undirected signed graph
+	:rtype args: Graph
+	"""
+
+	if len(args) == 0 or len(args) > 2:
+		raise ValueError("Wrong arguments number.")
+
+	new_graph = None
+
+	for graph in args:
+		if not isinstance(graph, Graph):
+			msg = "".join(["Arguments have to be igraph.Graph instances, not ", str(type(graph)), "."])
+			raise ValueError(msg)
+
+		# First step :
+		graph.es[FileIds.WEIGHT] = [1 for _ in range(graph.ecount())]
+
+		# Second step :
+		graph.to_undirected("collapse", dict(weight = "max", id = "first"))  # "mean" enables the program to get the same values as the article.
+
+		# Third step :
+		if new_graph is None:  # If graph is the first of the list ...
+			new_graph = graph
+			continue  # ... the third step isn't done.
+
+		# Else, it isn't the first one, the third step is done.
+		new_matrix = get_matrix(new_graph).toarray()
+		additional_matrix = get_matrix(graph).toarray()
+		length = len(new_matrix)
+		matrix = array([[float(new_matrix[row, col] - additional_matrix[row, col]) for col in range(length)] for row in range(length)])
+
+		new_graph = Graph()
+		new_graph.add_vertices(length)
+		for row in range(length):
+			for col in range(row, length):  # Because it is an undirected graph.
+				weight = matrix[row, col]
+				if weight != 0:
+					new_graph.add_edge(row, col, weight = weight)
+
+	return new_graph
 
 
 class SignedCentralityTest(unittest.TestCase):
@@ -27,13 +90,13 @@ class SignedCentralityTest(unittest.TestCase):
 		self.graph = {
 			'a': read_graph("network_a.graphml"),
 			'b': read_graph("network_b.graphml"),
-			's': (samplk3, sampdlk)
+			's': convert_graph(samplk3, sampdlk)
 			}
 
 		self.matrix = {
 			'a': get_matrix(self.graph['a']),
 			'b': get_matrix(self.graph['b']),
-			's': _get_matrix(*self.graph['s'])
+			's': get_matrix(self.graph['s'])
 			}
 
 		self.array = {
@@ -132,7 +195,7 @@ class SignedCentralityTest(unittest.TestCase):
 		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], scaled = True)], [.55, .55, 1., .35, -.35])
 
 	def test_compute_eigenvector_centrality_sampson(self):
-		result = [round(i, 3) for i in compute_eigenvector_centrality(*self.graph['s'])]
+		result = [round(i, 3) for i in compute_eigenvector_centrality(self.graph['s'])]
 		test = [.174, .188, .248, .319, .420, .219, .365, -.081, -.142, -.292, -.088, -.123, -.217, -.072, -.030, -.254, -.282, -.287]
 		self.assertSequenceEqual(result, test)
 
