@@ -31,9 +31,7 @@ def convert_graph(*args):
 	Secondly, The graphs are converted to undirected graphs.
 	Finally, the graphs are merged.
 
-	This function shouldn't be used outside this module.
-
-	:param args: on or two graphs
+	:param args: one or two graphs
 	:type args: Graph or tuple
 	:return: a symmetric undirected signed graph
 	:rtype args: Graph
@@ -53,7 +51,7 @@ def convert_graph(*args):
 		graph.es[FileIds.WEIGHT] = [1 for _ in range(graph.ecount())]
 
 		# Second step :
-		graph.to_undirected("collapse", dict(weight = "max", id = "first"))  # "mean" enables the program to get the same values as the article.
+		graph.to_undirected("collapse", dict(weight = "max", id = "first"))
 
 		# Third step :
 		if new_graph is None:  # If graph is the first of the list ...
@@ -66,13 +64,7 @@ def convert_graph(*args):
 		length = len(new_matrix)
 		matrix = array([[float(new_matrix[row, col] - additional_matrix[row, col]) for col in range(length)] for row in range(length)])
 
-		new_graph = Graph()
-		new_graph.add_vertices(length)
-		for row in range(length):
-			for col in range(row, length):  # Because it is an undirected graph.
-				weight = matrix[row, col]
-				if weight != 0:
-					new_graph.add_edge(row, col, weight = weight)
+		new_graph = matrix_to_graph(matrix)
 
 	return new_graph
 

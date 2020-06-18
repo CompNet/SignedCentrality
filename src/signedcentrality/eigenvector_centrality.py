@@ -21,14 +21,13 @@ def compute_eigenvector_centrality(graph, scaled=False):
 	Compute the eigenvector centrality.
 
 	If scaled is True, the values will be set such that the maximum is 1.
-	This argument name have to be set in the function call.
 
 	The graph must be an undirected signed graph or two unsigned graphs.
 	If there are two graphs, the first one represent the positive weights and the second one defines the negative edges.
 
 	:param graph: the graph
 	:type graph: igraph.Graph or tuple
-	:param scaled: the graph
+	:param scaled: indicates if the centrality must be scaled
 	:type scaled: bool
 	:return: the eigenvector centrality
 	:rtype: list
@@ -51,11 +50,7 @@ def compute_eigenvector_centrality(graph, scaled=False):
 	centrality = [value * (1 / norm(eigenvector)) for value in eigenvector]  # If the norm isn't 1, it makes the result more accurate.
 
 	if scaled:  # Sets the values such that the maximum is 1
-		max_value = float_info.min  # Minimal value of a float
-		for value in centrality:
-			if abs(value) > max_value:  # abs(), because the magnitude must be scaled, not the signed value.
-				max_value = abs(value)
-		scale = 1 / max_value
+		scale = get_scale(centrality)
 	# else, the scale remains 1.
 
 	if sum(centrality) < 0:  # Makes the first cluster values positive if they aren't.

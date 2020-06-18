@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from sys import float_info
 from igraph import Graph
 from signedcentrality._utils import *  # Import the strings defined in __init__.py.
 
@@ -114,4 +115,77 @@ def get_matrix(graph):
 	except ValueError:
 		return graph.get_adjacency_sparse()  # If there aren't weights.
 
+
+def get_scale(centrality, fit_sign = False):
+	"""
+	Compute the scale value to scale a centrality
+
+	If fit_sign is True, the sign of the scale is changed when the sum of the centrality is negative.
+	It is used to make the first clique positive.
+
+	:param centrality: the centrality which the scale is to be computed
+	:type centrality: numpy.ndarray
+	:param fit_sign: indicates if the sign must be changed
+	:type fit_sign: bool
+	:return: the scale
+	:rtype: float
+	"""
+
+	max_value = float_info.min  # Minimal value of a float
+	for value in centrality:
+		if abs(value) > max_value:  # abs(), because the magnitude must be scaled, not the signed value.
+			max_value = abs(value)
+	scale = 1 / max_value
+
+	if fit_sign and sum(centrality) < 0:  # Makes the first cluster values positive if they aren't.
+		scale *= -1  # Values will be inverted when they will be scaled (more efficient).
+
+	return scale
+
+
+def scale_centrality(centrality, fit_sign = False):
+	"""
+	Scale the given centrality
+
+	If fit_sign is True, the sign of the scale is changed when the sum of the centrality is negative.
+	It is used to make the first clique positive.
+
+	:param centrality: the centrality which the scale is to be computed
+	:type centrality: numpy.ndarray
+	:param fit_sign: indicates if the sign must be changed
+	:type fit_sign: bool
+	:return: the scaled centrality
+	:rtype: numpy.ndarray
+	"""
+
+	scale_ = get_scale(centrality, fit_sign)
+
+	if scale_ == 1:  # If the centrality has the right signs and if it doesn't have to be scaled, it can be returned.
+		return centrality
+
+	return [value * scale_ for value in centrality]  # Else, return a scaled centrality.
+
+
+def matrix_to_graph(matrix):
+	"""
+	Creates a graph from a numpy adjacency matrix
+
+	:param matrix: the adjacency matrix
+	:type matrix: numpy.ndarray
+	:return: the graph
+	:rtype: igraph.Graph
+	"""
+
+	length = len(matrix)
+	graph = Graph()
+	graph.to_directed()  # If an undirected graph is needed, it will be done later.
+	graph.add_vertices(length)
+
+	for row in range(length):
+		for col in range(length):
+			weight = matrix[row, col]
+			if weight != 0:
+				graph.add_edge(row, col, weight = weight)
+
+	return graph
 
