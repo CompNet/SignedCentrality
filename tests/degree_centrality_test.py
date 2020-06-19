@@ -24,9 +24,8 @@ def read_CSV(path):
 	:rtype: igraph.Graph
 	"""
 
-	graph = None
-	vertex_list = []
-	matrix = []
+	matrix = None
+	csv = []
 
 	with open(path) as file:
 
@@ -37,16 +36,9 @@ def read_CSV(path):
 		file.seek(0)
 
 		for row in reader(file, dialect):
-			if graph is None:
-				graph = Graph()
-				graph.to_undirected()
-				if header:
-					for col in row:
-						graph.add_vertex(str(col))
-						vertex_list.append(str(col))  # Thus, the name can be accessed with its index in the matrix.
-				continue
+			csv.append(row)
 
-			matrix.append([float(row[i]) for i in range(int(header), len(row))])  # int(header) is 0 if False and 1 if true
+		matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
 
 	return matrix_to_graph(array(matrix))
 
@@ -150,15 +142,18 @@ class DegreeCentralityTest(unittest.TestCase):
 		graph.add_edge(3, 0)
 		graph.add_edge(4, 0)
 
-		print(test_in)
+		print("test in :   ", test_in)
 		print()
 
-		result = [round(100 * x, 3) for x in degree_centrality.NegativeCentrality.undirected(graph)]
-		print(result)
-		result_in = [round(100 * x, 3) for x in degree_centrality.NegativeCentrality.incoming(graph)]
-		print(result_in)
-		result_out = [round(100 * x, 3) for x in degree_centrality.NegativeCentrality.outgoing(graph)]
-		print(result_out)
+		result = [round(x, 1) for x in degree_centrality.NegativeCentrality.undirected(graph)]
+		# result = [round(x, 1) for x in degree_centrality.PositiveCentrality.undirected(graph)]
+		print("undirected :", result)
+		result_in = [round(x, 1) for x in degree_centrality.NegativeCentrality.incoming(graph)]
+		# result_in = [round(x, 1) for x in degree_centrality.PositiveCentrality.incoming(graph)]
+		print("incoming :  ", result_in)
+		result_out = [round(x, 1) for x in degree_centrality.NegativeCentrality.outgoing(graph)]
+		# result_out = [round(x, 1) for x in degree_centrality.PositiveCentrality.outgoing(graph)]
+		print("outgoing :  ", result_out)
 
 		self.assertSequenceEqual(result_in, test_in)
 		self.assertSequenceEqual(result_out, test_out)

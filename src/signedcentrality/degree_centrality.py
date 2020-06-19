@@ -96,6 +96,27 @@ class PositiveCentrality(DegreeCentrality):
 
 	@staticmethod
 	def incoming(graph, scaled = False):
+		pass
+
+	@staticmethod
+	def outgoing(graph, scaled = False):
+		pass
+
+	@staticmethod
+	def undirected(graph, scaled = False):
+		pass
+
+class NegativeCentrality(DegreeCentrality):
+	"""
+	Contain methods computing measures of degree centrality on graphs that contains only negative edges.
+
+	This graph may be a signed graph without positive edges or an unsigned graph which will be processed in the same way as the negative graph.
+	Actually, both of these graphs will be treated as unsigned graphs representing a negative graph.
+	If the graph is, in fact, a negative signed graph, it will be converted in positive graph.
+	"""
+
+	@staticmethod
+	def incoming(graph, scaled = False):
 		A = get_matrix(graph).toarray()
 		n = len(A)
 		I = identity(n)
@@ -142,27 +163,6 @@ class PositiveCentrality(DegreeCentrality):
 		return scale_centrality(h_star)
 
 
-class NegativeCentrality(DegreeCentrality):
-	"""
-	Contain methods computing measures of degree centrality on graphs that contains only negative edges.
-
-	This graph may be a signed graph without positive edges or an unsigned graph which will be processed in the same way as the negative graph.
-	Actually, both of these graphs will be treated as unsigned graphs representing a negative graph.
-	If the graph is, in fact, a negative signed graph, it will be converted in positive graph.
-	"""
-
-	@staticmethod
-	def incoming(graph, scaled = False):
-		return PositiveCentrality.incoming(graph.complementer(), scaled)
-
-	@staticmethod
-	def outgoing(graph, scaled = False):
-		return PositiveCentrality.outgoing(graph.complementer(), scaled)
-
-	@staticmethod
-	def undirected(graph, scaled = False):
-		return PositiveCentrality.undirected(graph.complementer(), scaled)
-
 
 class PNCentrality(DegreeCentrality):
 	"""
@@ -171,12 +171,62 @@ class PNCentrality(DegreeCentrality):
 
 	@staticmethod
 	def incoming(graph, scaled = False):
-		pass
+		matrix = get_matrix(graph).toarray()
+		n = len(matrix)
+		I = identity(n)
+
+		P = array([[max(col, 0) for col in row] for row in matrix])
+		N = array([[min(col, 0) for col in row] for row in matrix])
+		A = P - 2 * N
+
+		ones = array([1 for _ in range(n)])
+		beta1 = 1. / (4 * (n - 1.) ** 2)
+		beta2 = 1. / (2 * (n - 1.))
+
+		PN = dot(dot(inv(I - beta1 * dot(A.transpose(), A)), (I + beta2 * A.transpose())), ones)
+
+		if not scaled:
+			return PN
+
+		return scale_centrality(PN)
 
 	@staticmethod
 	def outgoing(graph, scaled = False):
-		pass
+		matrix = get_matrix(graph).toarray()
+		n = len(matrix)
+		I = identity(n)
+
+		P = array([[max(col, 0) for col in row] for row in matrix])
+		N = array([[min(col, 0) for col in row] for row in matrix])
+		A = P - 2 * N
+
+		ones = array([1 for _ in range(n)])
+		beta1 = 1. / (4 * (n - 1.) ** 2)
+		beta2 = 1. / (2 * (n - 1.))
+
+		PN = dot(dot(inv(I - beta1 * dot(A, A.transpose())), (I + beta2 * A)), ones)
+
+		if not scaled:
+			return PN
+
+		return scale_centrality(PN)
 
 	@staticmethod
 	def undirected(graph, scaled = False):
-		pass
+		matrix = get_matrix(graph).toarray()
+		n = len(matrix)
+		I = identity(n)
+
+		P = array([[max(col, 0) for col in row] for row in matrix])
+		N = array([[min(col, 0) for col in row] for row in matrix])
+		A = P - 2 * N
+
+		ones = array([1 for _ in range(n)])
+		beta = 1. / (2 * n - 2)
+
+		PN = dot(inv(I - beta * A), ones)
+
+		if not scaled:
+			return PN
+
+		return scale_centrality(PN)
