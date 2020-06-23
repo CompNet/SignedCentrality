@@ -12,16 +12,15 @@ m <- as.matrix(csv)
 
 dim(m)
 
-g <- graph_from_incidence_matrix(m, weighted = TRUE)
+g <- graph_from_incidence_matrix(m, weighted = "sign")#TRUE)#, add.names = "sign")
 
 g
 
 table(V(g)$type)
 
-p <- pn_index(g)  # TODO : Error here
+p <- pn_index(g)
 
-summary(p)
-
+p  # There are too many centralities in p
 
 
 

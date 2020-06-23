@@ -103,6 +103,25 @@ class DegreeCentralityTest(unittest.TestCase):
 		sampdlk = read_CSV("SAMPDLK.csv")
 		sampson = convert_graph(samplk3, sampdlk)
 
+		graph_2_directed = Graph(5)
+		graph_2_directed.to_directed()
+		graph_2_directed.add_edge(1, 0)
+		graph_2_directed.add_edge(2, 0)
+		graph_2_directed.add_edge(3, 0)
+		graph_2_directed.add_edge(4, 0)
+		print(get_matrix(graph_2_directed).toarray())
+		print()
+
+		graph_2_undirected = Graph(5)
+		graph_2_undirected.to_undirected()
+		graph_2_undirected.add_edge(1, 0)
+		graph_2_undirected.add_edge(2, 0)
+		graph_2_undirected.add_edge(3, 0)
+		graph_2_undirected.add_edge(4, 0)
+		print(get_matrix(graph_2_undirected).toarray())
+		print()
+
+
 		self.graph = {
 			'gamapos': gamapos,
 			'gamaneg': gamaneg,
@@ -110,6 +129,8 @@ class DegreeCentralityTest(unittest.TestCase):
 			'samplk3': samplk3,
 			'sampdlk': sampdlk,
 			'sampson': sampson,
+			'2_directed': graph_2_directed,
+			'2_undirected': graph_2_undirected,
 			'5': read_CSV("table_5.csv")
 			}
 
@@ -120,6 +141,8 @@ class DegreeCentralityTest(unittest.TestCase):
 			'samplk3': get_matrix(self.graph['samplk3']),
 			'sampdlk': get_matrix(self.graph['sampdlk']),
 			'sampson': get_matrix(self.graph['sampson']),
+			'2_directed': get_matrix(self.graph['2_directed']),
+			'2_undirected': get_matrix(self.graph['2_undirected']),
 			'5': get_matrix(self.graph['5'])
 			}
 
@@ -130,6 +153,8 @@ class DegreeCentralityTest(unittest.TestCase):
 			'samplk3': self.matrix['samplk3'].toarray(),
 			'sampdlk': self.matrix['sampdlk'].toarray(),
 			'sampson': self.matrix['sampson'].toarray(),
+			'2_directed': self.matrix['2_directed'].toarray(),
+			'2_undirected': self.matrix['2_undirected'].toarray(),
 			'5': self.matrix['5'].toarray()
 			}
 
@@ -151,53 +176,55 @@ class DegreeCentralityTest(unittest.TestCase):
 			for j in range(min(len(array_test[i]), len(self.array['5'][i]))):
 				self.assertEqual(self.array['5'][i][j], array_test[i][j])
 
-	def test_positive_centrality_undirected(self):
-		# print(self.array['gamaneg'])
-		# print(self.graph['gamaneg'])
+	def test_positive_centrality_undirected_on_gamaneg(self):
+		print(self.array['gamaneg'])
+		print(self.graph['gamaneg'])
 
-		# test = [71.83, 72.46, 90.38, 95.21, 81.31, 75.05, 100.00, 94.41, 80.69, 85.69, 74.44, 80.56, 80.97, 83.78, 67.76, 68.26]
-		# # result = [round(100 * x, 2) for x in degree_centrality.PositiveCentrality.undirected(self.graph['gamapos'], True)]
-		# # self.graph['gamapos'].to_undirected("collapse")
-		# result = [round(100 * x, 2) for x in degree_centrality.NegativeCentrality.undirected(self.graph['gamaneg'], True)]
-		# # result = [100 * x for x in degree_centrality.NegativeCentrality.undirected(self.graph['gamapos'], True)]
+		test = [71.83, 72.46, 90.38, 95.21, 81.31, 75.05, 100.00, 94.41, 80.69, 85.69, 74.44, 80.56, 80.97, 83.78, 67.76, 68.26]
+		result = [round(100 * x, 2) for x in degree_centrality.PositiveCentrality.undirected(self.graph['gamapos'], True)]
 		# # result.sort()
 		# # test.sort()
 
+		self.assertSequenceEqual(result, test)
+
+	def test_negative_centrality_undirected_on_gamaneg(self):  # Works correctly
+		print(self.array['gamaneg'])
+		print(self.graph['gamaneg'])
+
+		test = [71.83, 72.46, 90.38, 95.21, 81.31, 75.05, 100.00, 94.41, 80.69, 85.69, 74.44, 80.56, 80.97, 83.78, 67.76, 68.26]
+		result = [round(100 * x, 2) for x in degree_centrality.NegativeCentrality.undirected(self.graph['gamaneg'], True)]
+		# # result.sort()
+		# # test.sort()
+
+		print(test)
+		print(result)
+
+		self.assertSequenceEqual(result, test)
+
+	def test_positive_centrality_undirected(self):
 		test_in = [0.000, 1.000, 1.000, 1.000, 1.000]
 		test_out = [1.000, 0.996, 0.996, 0.996, 0.996]
 
-		graph = Graph(5)
-		graph.to_directed()
-		graph.add_edge(1, 0)
-		graph.add_edge(2, 0)
-		graph.add_edge(3, 0)
-		graph.add_edge(4, 0)
-		print(get_matrix(graph).toarray())
-		print()
-
-		undirected_graph = Graph(5)
-		undirected_graph.to_undirected()
-		undirected_graph.add_edge(1, 0)
-		undirected_graph.add_edge(2, 0)
-		undirected_graph.add_edge(3, 0)
-		undirected_graph.add_edge(4, 0)
-		print(get_matrix(undirected_graph).toarray())
-		print()
-
-		result = [round(x, 1) for x in degree_centrality.PositiveCentrality.undirected(undirected_graph)]
+		result = [round(x, 1) for x in degree_centrality.PositiveCentrality.undirected(self.graph['2_undirected'])]
 		print("P undirected :", result)
-		result_in = [round(x, 1) for x in degree_centrality.PositiveCentrality.incoming(graph)]
+		result_in = [round(x, 1) for x in degree_centrality.PositiveCentrality.incoming(self.graph['2_directed'])]
 		print("P incoming :  ", result_in)
-		result_out = [round(x, 1) for x in degree_centrality.PositiveCentrality.outgoing(graph)]
+		result_out = [round(x, 1) for x in degree_centrality.PositiveCentrality.outgoing(self.graph['2_directed'])]
 		print("P outgoing :  ", result_out)
-		print()
 
-		result = [round(x, 1) for x in degree_centrality.NegativeCentrality.undirected(undirected_graph)]
-		print("N undirected :", result)
-		result_in = [round(x, 1) for x in degree_centrality.NegativeCentrality.incoming(graph)]
-		print("N incoming :  ", result_in)
-		result_out = [round(x, 1) for x in degree_centrality.NegativeCentrality.outgoing(graph)]
-		print("N outgoing :  ", result_out)
+		self.assertSequenceEqual(result_in, test_in)
+		self.assertSequenceEqual(result_out, test_out)
+
+	def test_negative_centrality_undirected(self):
+		test_in = [0.000, 1.000, 1.000, 1.000, 1.000]
+		test_out = [1.000, 0.996, 0.996, 0.996, 0.996]
+
+		result = [round(x, 1) for x in degree_centrality.NegativeCentrality.undirected(self.graph['2_undirected'])]
+		print("undirected :", result)
+		result_in = [round(x, 1) for x in degree_centrality.NegativeCentrality.incoming(self.graph['2_directed'])]
+		print("incoming :  ", result_in)
+		result_out = [round(x, 1) for x in degree_centrality.NegativeCentrality.outgoing(self.graph['2_directed'])]
+		print("outgoing :  ", result_out)
 
 		self.assertSequenceEqual(result_in, test_in)
 		self.assertSequenceEqual(result_out, test_out)
