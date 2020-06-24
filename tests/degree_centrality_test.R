@@ -12,7 +12,7 @@ m <- as.matrix(csv)
 
 dim(m)
 
-g <- graph_from_incidence_matrix(m, weighted = "sign")#TRUE)#, add.names = "sign")
+g <- graph_from_incidence_matrix(m, weighted = "sign")
 
 g
 
