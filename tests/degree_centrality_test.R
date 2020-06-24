@@ -4,25 +4,32 @@ library(signnet)
 
 setwd("/Users/SUCAL-V/Documents/Université/Stage/Workspace/PycharmProjects/SignedCentrality/tests/")
 
+# Table 5
+
 csv <- read.csv("table_5.csv", header = FALSE)
-
-csv
-
+# csv
 m <- as.matrix(csv)
+# dim(m)
 
-dim(m)
-
-g <- graph_from_incidence_matrix(m, weighted = "sign")
-
-g
-
-table(V(g)$type)
-
+# Table 5 : undirected
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
+# g
 p <- pn_index(g)
+p  # Results are the same as in the article
 
-p  # There are too many centralities in p
+# Table 5 : in
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# g
+p_in <- pn_index(g, mode = "in")
+p_in
 
+# Table 5 : out
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# g
+p_out <- pn_index(g, mode = "out")
+p_out
 
+# plot(g)
 
 
 

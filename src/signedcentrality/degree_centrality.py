@@ -121,13 +121,14 @@ class NegativeCentrality(DegreeCentrality):
 		n = len(A)
 		I = identity(n)
 		ones = array([1 for _ in range(n)])
-		beta = 1. / (n - 1.)
+		beta1 = 1. / (n - 1.)
 		beta2 = 1. / ((n - 1.) ** 2)
 
-		# h_star = dot(inv(I - beta2 * dot(transpose(A), A)), dot(inv(I - beta * transpose(A)), ones))
-		h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta * transpose(A))), ones).flatten()
-		# h_star = dot(ones, dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta * transpose(A)))).flatten()
-		# h_star = (dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta * transpose(A)))).flatten()
+		# # h_star = dot(inv(I - beta2 * dot(transpose(A), A)), dot(inv(I - beta1 * transpose(A)), ones))
+		# h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta1 * transpose(A))), ones).flatten()
+		# # h_star = dot(ones, dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - bet1a * transpose(A)))).flatten()
+		# # h_star = (dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta1 * transpose(A)))).flatten()
+		h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), (I - beta1 * transpose(A))), ones)
 
 		if not scaled:
 			return h_star
@@ -140,11 +141,13 @@ class NegativeCentrality(DegreeCentrality):
 		n = len(A)
 		I = identity(n)
 		ones = array([1 for _ in range(n)])
-		beta = 1. / (n - 1.)
+		beta1 = 1. / (n - 1.)
 		beta2 = 1. / ((n - 1.) ** 2)
 
-		# h_star = dot(inv(I - beta2 * dot(A, transpose(A))), dot(inv(I - beta * A), ones))
-		h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), inv(I - beta * A)), ones)
+		# # # h_star = dot(inv(I - beta2 * dot(A, transpose(A))), dot(inv(I - beta1 * A), ones))
+		# # h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), inv(I - beta1 * A)), ones)
+		h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), (I - beta1 * A)), ones)
+		# h_star = dot(inv(I - beta2 * dot(A, transpose(A))), dot((I - beta1 * A), ones)).flatten()
 
 		if not scaled:
 			return h_star
@@ -184,7 +187,7 @@ class PNCentrality(DegreeCentrality):
 		A = P - 2 * N
 
 		ones = array([1 for _ in range(n)])
-		beta1 = 1. / (4 * (n - 1.) ** 2)
+		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
 		PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), (I + beta2 * transpose(A))), ones)
@@ -205,7 +208,7 @@ class PNCentrality(DegreeCentrality):
 		A = P - 2 * N
 
 		ones = array([1 for _ in range(n)])
-		beta1 = 1. / (4 * (n - 1.) ** 2)
+		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
 		PN = dot(dot(inv(I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
@@ -227,12 +230,12 @@ class PNCentrality(DegreeCentrality):
 
 		ones = array([1 for _ in range(n)])
 		# ones = array([[1] for _ in range(n)])
-		beta = 1. / (2. * n - 2.)
+		beta1 = 1. / (2. * n - 2.)
 
-		# PN = dot(inv(I - beta * A), ones)
+		PN = dot(inv(I - beta1 * A), ones)
 		# print("PN :", PN)
 		# PN = PN.flatten()
-		PN = dot((I - beta * A), ones)
+		# PN = dot((I - beta * A), ones)
 		# # PN = inv((I - beta * A)).flatten()
 		# PN = (I - (1/(2 * n-2)) * A)[1].flatten()
 
