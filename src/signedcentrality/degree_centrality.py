@@ -96,15 +96,27 @@ class PositiveCentrality(DegreeCentrality):
 
 	@staticmethod
 	def incoming(graph, scaled = False):
-		return NegativeCentrality.incoming(graph, scaled)
+		complement = graph.complementer()
+		# print(get_matrix(graph).toarray())
+		# print()
+		# print(get_matrix(complement).toarray())
+		return NegativeCentrality.incoming(complement, scaled)
 
 	@staticmethod
 	def outgoing(graph, scaled = False):
-		return NegativeCentrality.outgoing(graph, scaled)
+		complement = graph.complementer()
+		# print(get_matrix(graph).toarray())
+		# print()
+		# print(get_matrix(complement).toarray())
+		return NegativeCentrality.outgoing(complement, scaled)
 
 	@staticmethod
 	def undirected(graph, scaled = False):
-		return NegativeCentrality.undirected(graph, scaled)
+		complement = graph.complementer()
+		# print(get_matrix(graph).toarray())
+		# print()
+		# print(get_matrix(complement).toarray())
+		return NegativeCentrality.undirected(complement, scaled)
 
 class NegativeCentrality(DegreeCentrality):
 	"""
@@ -163,7 +175,6 @@ class NegativeCentrality(DegreeCentrality):
 		return scale_centrality(h_star)
 
 
-
 class PNCentrality(DegreeCentrality):
 	"""
 	Contain methods computing measures of degree centrality on graphs that contains both positive and negative edges.
@@ -198,12 +209,12 @@ class PNCentrality(DegreeCentrality):
 		I = identity(n)
 
 		P = array([[max(col, 0.) for col in row] for row in matrix])  # Positive weights
-		print(P, end="\n\n")
+		# print(P, end="\n\n")
 		N = array([[min(col, 0.) for col in row] for row in matrix])  # Negative weights
-		print(N, end="\n\n")
+		# print(N, end="\n\n")
 		# A = P - 2. * N  # All weights
 		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
-		print(A, end="\n\n")
+		# print(A, end="\n\n")
 
 		ones = array([1 for _ in range(n)])
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
