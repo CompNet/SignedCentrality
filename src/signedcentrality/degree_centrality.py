@@ -124,10 +124,6 @@ class NegativeCentrality(DegreeCentrality):
 		beta1 = 1. / (n - 1.)
 		beta2 = 1. / ((n - 1.) ** 2)
 
-		# # h_star = dot(inv(I - beta2 * dot(transpose(A), A)), dot(inv(I - beta1 * transpose(A)), ones))
-		# h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta1 * transpose(A))), ones).flatten()
-		# # h_star = dot(ones, dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - bet1a * transpose(A)))).flatten()
-		# # h_star = (dot(inv(I - beta2 * dot(transpose(A), A)), inv(I - beta1 * transpose(A)))).flatten()
 		h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), (I - beta1 * transpose(A))), ones)
 
 		if not scaled:
@@ -144,10 +140,7 @@ class NegativeCentrality(DegreeCentrality):
 		beta1 = 1. / (n - 1.)
 		beta2 = 1. / ((n - 1.) ** 2)
 
-		# # # h_star = dot(inv(I - beta2 * dot(A, transpose(A))), dot(inv(I - beta1 * A), ones))
-		# # h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), inv(I - beta1 * A)), ones)
 		h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), (I - beta1 * A)), ones)
-		# h_star = dot(inv(I - beta2 * dot(A, transpose(A))), dot((I - beta1 * A), ones)).flatten()
 
 		if not scaled:
 			return h_star
@@ -184,7 +177,8 @@ class PNCentrality(DegreeCentrality):
 
 		P = array([[max(col, 0) for col in row] for row in matrix])
 		N = array([[min(col, 0) for col in row] for row in matrix])
-		A = P - 2 * N
+		# A = P - 2. * N  # All weights
+		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
 
 		ones = array([1 for _ in range(n)])
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
@@ -203,9 +197,13 @@ class PNCentrality(DegreeCentrality):
 		n = len(matrix)
 		I = identity(n)
 
-		P = array([[max(col, 0) for col in row] for row in matrix])
-		N = array([[min(col, 0) for col in row] for row in matrix])
-		A = P - 2 * N
+		P = array([[max(col, 0.) for col in row] for row in matrix])  # Positive weights
+		print(P, end="\n\n")
+		N = array([[min(col, 0.) for col in row] for row in matrix])  # Negative weights
+		print(N, end="\n\n")
+		# A = P - 2. * N  # All weights
+		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
+		print(A, end="\n\n")
 
 		ones = array([1 for _ in range(n)])
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
@@ -225,19 +223,17 @@ class PNCentrality(DegreeCentrality):
 		I = identity(n)
 
 		P = array([[max(col, 0.) for col in row] for row in matrix])  # Positive weights
+		# print(P, end="\n\n")
 		N = array([[min(col, 0.) for col in row] for row in matrix])  # Negative weights
-		A = P - 2. * N  # All weights
+		# print(N, end="\n\n")
+		# A = P - 2. * N  # All weights
+		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
+		# print(A, end="\n\n")
 
 		ones = array([1 for _ in range(n)])
-		# ones = array([[1] for _ in range(n)])
 		beta1 = 1. / (2. * n - 2.)
 
 		PN = dot(inv(I - beta1 * A), ones)
-		# print("PN :", PN)
-		# PN = PN.flatten()
-		# PN = dot((I - beta * A), ones)
-		# # PN = inv((I - beta * A)).flatten()
-		# PN = (I - (1/(2 * n-2)) * A)[1].flatten()
 
 		if not scaled:
 			return PN
