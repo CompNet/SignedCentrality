@@ -5,6 +5,7 @@ library(signnet)
 setwd("/Users/SUCAL-V/Documents/Université/Stage/Workspace/PycharmProjects/SignedCentrality/tests/")
 
 # Table 5
+cat(paste("Table 5\n"))
 
 csv <- read.csv("table_5.csv", header = FALSE)
 # csv
@@ -12,49 +13,39 @@ m <- as.matrix(csv)
 # dim(m)
 
 # Table 5 : undirected
+cat(paste("\n\tUndirected :\n\n"))
+
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
-g
+# g
 adj <- as_adjacency_matrix(g, attr = "sign", sparse = T)
-adj
+# adj
 p <- pn_index(g)
 p  # Results are the same as in the article
 
-#        V1        V2        V3        V4        V5        V6        V7        V8
-# 0.9009747 0.8613482 0.9076997 0.8613482 0.8410658 0.8496558 0.8617321 0.9015909
-#        V9       V10
-# 0.8509848 0.9072930
-
-
 # Table 5 : in
+cat(paste("\n\tIncoming :\n\n"))
+
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
-g
+# g
 adj <- as_adjacency_matrix(g, "both", attr = "sign", sparse = T)
-adj
+# adj
 p_in <- pn_index(g, mode = "in")
 p_in
 
-#       V1       V2       V3       V4       V5       V6       V7       V8       V9
-# 1.132926 1.260525 1.144659 1.260525 1.179987 1.227421 1.256844 1.131042 1.219903
-#      V10
-# 1.148475
-
-
 # Table 5 : out
+cat(paste("\n\tOutgoing :\n\n"))
+
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
 # g
 p_out <- pn_index(g, mode = "out")
 p_out
 
-#       V1       V2       V3       V4       V5       V6       V7       V8       V9
-# 1.132926 1.260525 1.144659 1.260525 1.179987 1.227421 1.256844 1.131042 1.219903
-#      V10
-# 1.148475
-
-
+cat(paste("\n\n\n"))
 
 
 
 # GAMAPOS
+cat(paste("GAMAPOS\n"))
 
 csv <- read.csv("GAMAPOS.csv", header = TRUE)
 m <- as.matrix(csv)
@@ -62,42 +53,71 @@ m <- m[,-c(1)]
 # m
 
 # GAMAPOS : undirected
+cat(paste("\n\tUndirected :\n\n"))
+
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
 # g
 p <- pn_index(g)
 p
 
-#    GAVEV    KOTUN      OVE    ALIKA    NAGAM    GAHUK    MASIL    UKUDZ    NOTOH
-# 1.111111 1.111111 1.159564 1.079804 1.115326 1.199719 1.272832 1.234552 1.111397
-#    KOHIK    GEHAM    ASARO    UHETO    SEUVE    NAGAD     GAMA
-# 1.075419 1.162314 1.162314 1.151173 1.075550 1.111111 1.111111
-
-
 # GAMAPOS : in
+cat(paste("\n\tIncoming :\n\n"))
+
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
 # g
 p_in <- pn_index(g, mode = "in")
 p_in
 
-#     GAVEV     KOTUN       OVE     ALIKA     NAGAM     GAHUK     MASIL     UKUDZ
-# 0.9182736 0.9182736 0.9057796 0.9528579 0.9239120 0.8818301 0.8249723 0.8501708
-#     NOTOH     KOHIK     GEHAM     ASARO     UHETO     SEUVE     NAGAD      GAMA
-# 0.9179550 0.9474681 0.9095186 0.9095186 0.8945808 0.9472861 0.9182736 0.9182736
-
-
 # GAMAPOS : out
+cat(paste("\n\tOutgoing :\n\n"))
+
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
 # g
 p_out <- pn_index(g, mode = "out")
 p_out
 
-#     GAVEV     KOTUN       OVE     ALIKA     NAGAM     GAHUK     MASIL     UKUDZ
-# 0.9182736 0.9182736 0.9057796 0.9528579 0.9239120 0.8818301 0.8249723 0.8501708
-#     NOTOH     KOHIK     GEHAM     ASARO     UHETO     SEUVE     NAGAD      GAMA
-# 0.9179550 0.9474681 0.9095186 0.9095186 0.8945808 0.9472861 0.9182736 0.9182736
+cat(paste("\n\n\n"))
+
+
+
+# Sampson Monastery
+cat(paste("Sampson Monastery\n"))
+
+csv_directed <- read.csv("sampson_directed.csv", header = FALSE)
+csv_undirected <- read.csv("sampson_undirected.csv", header = FALSE)
+
+# Sampson : undirected
+cat(paste("\n\tUndirected :\n\n"))
+
+m <- as.matrix(csv_directed)
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
+# g
+p <- pn_index(g)
+p
+
+# Sampson : in
+cat(paste("\n\tIncoming :\n\n"))
+
+m <- as.matrix(csv_undirected)
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# g
+p_in <- pn_index(g, mode = "in")
+p_in
+
+# Sampson : out
+cat(paste("\n\tOutgoing :\n\n"))
+
+m <- as.matrix(csv_undirected)
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# g
+p_out <- pn_index(g, mode = "out")
+p_out
 
 
 # plot(g)
+
+
+cat(paste("\n\n\n"))
 
 
 

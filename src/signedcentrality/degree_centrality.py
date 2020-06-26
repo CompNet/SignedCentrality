@@ -197,7 +197,8 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
-		PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), (I + beta2 * transpose(A))), ones)
+		# PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), (I + beta2 * transpose(A))), ones)
+		PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), inv(I + beta2 * transpose(A))), ones)
 
 		if not scaled:
 			return PN
@@ -221,8 +222,8 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
-		PN = dot(dot(inv(I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
-		# PN = dot(dot((I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
+		# PN = dot(dot(inv(I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
+		PN = dot(dot(inv(I - (1 / (4 * ((n - 1) ** 2))) * dot(A, transpose(A))), inv(I + (1 / (2 * (n - 1))) * A)), ones)
 
 		if not scaled:
 			return PN
@@ -246,6 +247,7 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (2. * n - 2.)
 
 		PN = dot(inv(I - beta1 * A), ones)
+		# PN = inv(I - 1 / (2 * n - 2) * A).flatten()
 
 		if not scaled:
 			return PN
