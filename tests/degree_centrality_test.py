@@ -7,14 +7,14 @@ This module contains unit tests for the modules degree_centrality.
 
 import unittest
 from signedcentrality import degree_centrality
-from csv import reader, Sniffer
+from csv import reader, Sniffer, writer, QUOTE_MINIMAL
 from scipy.sparse import csr_matrix
 from numpy import trunc, ndarray, array, transpose, triu, tril
 from igraph import Graph
 from signedcentrality._utils.utils import *
 
 
-def read_CSV(path):
+def read_CSV(path, remove_signs = False):
 	"""
 	Creates an igraph.Graph from a CSV file
 
@@ -27,7 +27,7 @@ def read_CSV(path):
 	matrix = None
 	csv = []
 
-	with open(path) as file:
+	with open(path, 'r') as file:
 
 		dialect = Sniffer().sniff(file.read(1024))
 		file.seek(0)
@@ -38,9 +38,31 @@ def read_CSV(path):
 		for row in reader(file, dialect):
 			csv.append(row)
 
-		matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
+		if remove_signs:
+			matrix = array([[abs(float(csv[i][j])) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
+		else:
+			matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
 
 	return matrix_to_graph(array(matrix))
+
+
+def write_CSV(graph, path):
+	"""
+	Creates a CSV file from an igraph.Graph
+
+	:param graph: the graph
+	:type graph: igraph.Graph
+	:param path: the path of the CSV file
+	:type path: str
+	"""
+
+	with open(path, 'w') as file:
+
+		csv_writer = writer(file, delimiter = ',', quotechar='"', quoting=QUOTE_MINIMAL)
+		rows = [[str(col) for col in row] for row in get_matrix(graph).toarray().tolist()]
+		for row in rows:
+			# print(row)
+			csv_writer.writerow(row)
 
 
 def convert_graph(*args, directed = True):
@@ -103,8 +125,8 @@ class DegreeCentralityTest(unittest.TestCase):
 		gamaneg = read_CSV("GAMANEG.csv")
 		gamaboth = convert_graph(gamapos, gamaneg)
 
-		samplk3 = read_CSV("SAMPLK3.csv")
-		sampdlk = read_CSV("SAMPDLK.csv")
+		samplk3 = read_CSV("SAMPLK3.csv", True)
+		sampdlk = read_CSV("SAMPDLK.csv", True)
 		sampson = convert_graph(samplk3, sampdlk)
 
 		graph_2_directed = Graph(5)
@@ -126,6 +148,8 @@ class DegreeCentralityTest(unittest.TestCase):
 		# print()
 
 		graph_5_directed = read_CSV("table_5.csv")
+		graph_5_directed.to_undirected("collapse", dict(weight = "mean", id = "first"))
+		graph_5_directed.to_directed()
 		graph_5_undirected = read_CSV("table_5.csv")
 		graph_5_undirected.to_undirected("collapse", dict(weight = "mean", id = "first"))
 
@@ -334,49 +358,49 @@ class DegreeCentralityTest(unittest.TestCase):
 
 		self.assertSequenceEqual(result, test)
 
-	# def test_PN_centrality_in_5(self):
-	# 	"""
-	# 	Test data were computed with signnet.
-	# 	"""
-	#
-	# 	print()
-	# 	print(self.array['5_directed'])
-	# 	print(self.array['5_undirected'])
-	#
-	# 	test = [1.132926, 1.260525, 1.144659, 1.260525, 1.179987, 1.227421, 1.256844, 1.131042, 1.219903]
-	# 	result = [round(x, 6) for x in degree_centrality.PNCentrality.undirected(self.graph['5_undirected'])]
-	# 	result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['5_directed']))]
-	# 	result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['5_directed']))]
-	# 	# result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
-	# 	# result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(tril(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
-	#
-	# 	print("test in :   ", test)
-	# 	print("result in : ", result_in)
-	# 	print()
-	# 	print("undirected :", result)
-	# 	print("result out :", result_out)
-	#
-	# 	self.assertSequenceEqual(result_in, test)
+	def test_PN_centrality_in_5(self):
+		"""
+		Test data were computed with signnet.
+		"""
 
-	# def test_PN_centrality_out_5(self):
-	# 	"""
-	# 	Test data were computed with signnet.
-	# 	"""
-	#
-	# 	test = [1.132926, 1.260525, 1.144659, 1.260525, 1.179987, 1.227421, 1.256844, 1.131042, 1.219903]
-	# 	result = [round(x, 6) for x in degree_centrality.PNCentrality.undirected(self.graph['5_undirected'])]
-	# 	result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['5_directed']))]
-	# 	result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['5_directed']))]
-	# 	# result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
-	# 	# result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(tril(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
-	#
-	# 	print("test out :  ", test)
-	# 	print("result out :", result_out)
-	# 	print()
-	# 	print("undirected :", result)
-	# 	print("result in : ", result_in)
-	#
-	# 	self.assertSequenceEqual(result_out, test)
+		# print()
+		# print(self.array['5_directed'])
+		# print(self.array['5_undirected'])
+
+		test = [1.132926, 1.260525, 1.144659, 1.260525, 1.179987, 1.227421, 1.256844, 1.131042, 1.219903]
+		result = [round(x, 6) for x in degree_centrality.PNCentrality.undirected(self.graph['5_undirected'])]
+		result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['5_directed']))]
+		result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['5_directed']))]
+		# result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
+		# result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(tril(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
+
+		print("test in :   ", test)
+		print("result in : ", result_in)
+		print()
+		print("undirected :", result)
+		print("result out :", result_out)
+
+		self.assertSequenceEqual(result_in, test)
+
+	def test_PN_centrality_out_5(self):
+		"""
+		Test data were computed with signnet.
+		"""
+
+		test = [1.132926, 1.260525, 1.144659, 1.260525, 1.179987, 1.227421, 1.256844, 1.131042, 1.219903]
+		result = [round(x, 6) for x in degree_centrality.PNCentrality.undirected(self.graph['5_undirected'])]
+		result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['5_directed']))]
+		result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['5_directed']))]
+		# result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
+		# result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(tril(array([[max(col, 0) for col in row] for row in self.array['5_undirected']]))))]
+
+		print("test out :  ", test)
+		print("result out :", result_out)
+		print()
+		print("undirected :", result)
+		print("result in : ", result_in)
+
+		self.assertSequenceEqual(result_out, test)
 
 	def test_PN_centrality_in_sampson(self):
 
@@ -455,6 +479,11 @@ class DegreeCentralityTest(unittest.TestCase):
 		print()
 
 		self.assertSequenceEqual(result, test_undirected)
+
+	def test_write_csv(self):
+		graph = self.graph['sampson']
+		# print(get_matrix(graph).toarray())
+		write_CSV(graph, 'test.csv')
 
 
 if __name__ == '__main__':

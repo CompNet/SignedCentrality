@@ -13,7 +13,9 @@ m <- as.matrix(csv)
 
 # Table 5 : undirected
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
-# g
+g
+adj <- as_adjacency_matrix(g, attr = "sign", sparse = T)
+adj
 p <- pn_index(g)
 p  # Results are the same as in the article
 
@@ -25,7 +27,9 @@ p  # Results are the same as in the article
 
 # Table 5 : in
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
-# g
+g
+adj <- as_adjacency_matrix(g, "both", attr = "sign", sparse = T)
+adj
 p_in <- pn_index(g, mode = "in")
 p_in
 
@@ -54,7 +58,7 @@ p_out
 
 csv <- read.csv("GAMAPOS.csv", header = TRUE)
 m <- as.matrix(csv)
-m = m[,-c(1)]
+m <- m[,-c(1)]
 # m
 
 # GAMAPOS : undirected

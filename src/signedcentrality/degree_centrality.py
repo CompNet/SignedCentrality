@@ -186,10 +186,12 @@ class PNCentrality(DegreeCentrality):
 		n = len(matrix)
 		I = identity(n)
 
-		P = array([[max(col, 0) for col in row] for row in matrix])
-		N = array([[min(col, 0) for col in row] for row in matrix])
-		# A = P - 2. * N  # All weights
-		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
+		P = array([[max(col, 0.) for col in row] for row in matrix])  # Positive weights
+		# print(P, end="\n\n")
+		N = array([[abs(min(col, 0.)) for col in row] for row in matrix])  # Negative weights
+		# print(N, end="\n\n")
+		A = P - 2. * N  # All weights
+		# print(A, end="\n\n")
 
 		ones = array([1 for _ in range(n)])
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
@@ -210,10 +212,9 @@ class PNCentrality(DegreeCentrality):
 
 		P = array([[max(col, 0.) for col in row] for row in matrix])  # Positive weights
 		# print(P, end="\n\n")
-		N = array([[min(col, 0.) for col in row] for row in matrix])  # Negative weights
+		N = array([[abs(min(col, 0.)) for col in row] for row in matrix])  # Negative weights
 		# print(N, end="\n\n")
-		# A = P - 2. * N  # All weights
-		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
+		A = P - 2. * N  # All weights
 		# print(A, end="\n\n")
 
 		ones = array([1 for _ in range(n)])
@@ -221,6 +222,7 @@ class PNCentrality(DegreeCentrality):
 		beta2 = 1. / (2 * (n - 1.))
 
 		PN = dot(dot(inv(I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
+		# PN = dot(dot((I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
 
 		if not scaled:
 			return PN
@@ -235,10 +237,9 @@ class PNCentrality(DegreeCentrality):
 
 		P = array([[max(col, 0.) for col in row] for row in matrix])  # Positive weights
 		# print(P, end="\n\n")
-		N = array([[min(col, 0.) for col in row] for row in matrix])  # Negative weights
+		N = array([[abs(min(col, 0.)) for col in row] for row in matrix])  # Negative weights
 		# print(N, end="\n\n")
-		# A = P - 2. * N  # All weights
-		A = P + 2. * N  # In the article, the formula is 'A = P - 2. * N'. The operator '+' is used here because N is already negative.
+		A = P - 2. * N  # All weights
 		# print(A, end="\n\n")
 
 		ones = array([1 for _ in range(n)])
