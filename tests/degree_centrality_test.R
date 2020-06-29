@@ -65,6 +65,9 @@ cat(paste("\n\tIncoming :\n\n"))
 
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
 # g
+# adjmatrix <- as_adjacency_matrix(g, attr = "sign")
+# adjmatrix
+
 p_in <- pn_index(g, mode = "in")
 p_in
 
@@ -89,7 +92,7 @@ csv_undirected <- read.csv("sampson_undirected.csv", header = FALSE)
 # Sampson : undirected
 cat(paste("\n\tUndirected :\n\n"))
 
-m <- as.matrix(csv_directed)
+m <- as.matrix(csv_undirected)
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
 # g
 p <- pn_index(g)
@@ -98,7 +101,7 @@ p
 # Sampson : in
 cat(paste("\n\tIncoming :\n\n"))
 
-m <- as.matrix(csv_undirected)
+m <- as.matrix(csv_directed)
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
 # g
 p_in <- pn_index(g, mode = "in")
@@ -107,7 +110,42 @@ p_in
 # Sampson : out
 cat(paste("\n\tOutgoing :\n\n"))
 
+m <- as.matrix(csv_directed)
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# g
+p_out <- pn_index(g, mode = "out")
+p_out
+
+
+
+# Sampson Monastery
+cat(paste("GAMA\n"))
+
+csv_directed <- read.csv("gama_directed.csv", header = FALSE)
+csv_undirected <- read.csv("gama_undirected.csv", header = FALSE)
+
+# Sampson : undirected
+cat(paste("\n\tUndirected :\n\n"))
+
 m <- as.matrix(csv_undirected)
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
+# g
+p <- pn_index(g)
+p
+
+# Sampson : in
+cat(paste("\n\tIncoming :\n\n"))
+
+m <- as.matrix(csv_directed)
+g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# g
+p_in <- pn_index(g, mode = "in")
+p_in
+
+# Sampson : out
+cat(paste("\n\tOutgoing :\n\n"))
+
+m <- as.matrix(csv_directed)
 g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
 # g
 p_out <- pn_index(g, mode = "out")

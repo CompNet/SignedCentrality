@@ -96,27 +96,52 @@ class PositiveCentrality(DegreeCentrality):
 
 	@staticmethod
 	def incoming(graph, scaled = False):
-		complement = graph.complementer()
-		# print(get_matrix(graph).toarray())
-		# print()
-		# print(get_matrix(complement).toarray())
-		return NegativeCentrality.incoming(complement, scaled)
+		A = get_matrix(graph).toarray()
+		n = len(A)
+		I = identity(n)
+		ones = array([1 for _ in range(n)])
+		beta1 = 1. / (2 * n - 2.)
+		beta2 = 1. / ((2 * n - 2.) ** 2)
+
+		# h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), (I + beta1 * transpose(A))), ones)
+		h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), inv(I + beta1 * transpose(A))), ones)  # Test
+
+		if not scaled:
+			return h_star
+
+		return scale_centrality(h_star)
 
 	@staticmethod
 	def outgoing(graph, scaled = False):
-		complement = graph.complementer()
-		# print(get_matrix(graph).toarray())
-		# print()
-		# print(get_matrix(complement).toarray())
-		return NegativeCentrality.outgoing(complement, scaled)
+		A = get_matrix(graph).toarray()
+		n = len(A)
+		I = identity(n)
+		ones = array([1 for _ in range(n)])
+		beta1 = 1. / (2 * n - 2.)
+		beta2 = 1. / ((2 * n - 2.) ** 2)
+
+		# h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), (I + beta1 * A)), ones)
+		h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), inv(I + beta1 * A)), ones)  # Test
+
+		if not scaled:
+			return h_star
+
+		return scale_centrality(h_star)
 
 	@staticmethod
 	def undirected(graph, scaled = False):
-		complement = graph.complementer()
-		# print(get_matrix(graph).toarray())
-		# print()
-		# print(get_matrix(complement).toarray())
-		return NegativeCentrality.undirected(complement, scaled)
+		A = get_matrix(graph).toarray()
+		n = len(A)
+		I = identity(n)
+		ones = array([1 for _ in range(n)])
+		beta1 = 1. / (2. * n - 2.)
+
+		h_star = dot(inv(I - beta1 * A), ones)
+
+		if not scaled:
+			return h_star
+
+		return scale_centrality(h_star)
 
 class NegativeCentrality(DegreeCentrality):
 	"""
@@ -197,7 +222,6 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
-		# PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), (I + beta2 * transpose(A))), ones)
 		PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), inv(I + beta2 * transpose(A))), ones)
 
 		if not scaled:
@@ -222,7 +246,6 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
-		# PN = dot(dot(inv(I - beta1 * dot(A, transpose(A))), (I + beta2 * A)), ones)
 		PN = dot(dot(inv(I - (1 / (4 * ((n - 1) ** 2))) * dot(A, transpose(A))), inv(I + (1 / (2 * (n - 1))) * A)), ones)
 
 		if not scaled:
@@ -247,7 +270,6 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (2. * n - 2.)
 
 		PN = dot(inv(I - beta1 * A), ones)
-		# PN = inv(I - 1 / (2 * n - 2) * A).flatten()
 
 		if not scaled:
 			return PN
