@@ -103,8 +103,8 @@ class PositiveCentrality(DegreeCentrality):
 		beta1 = 1. / (2 * n - 2.)
 		beta2 = 1. / ((2 * n - 2.) ** 2)
 
-		# h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), (I + beta1 * transpose(A))), ones)
-		h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), inv(I + beta1 * transpose(A))), ones)  # Test
+		h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), (I + beta1 * transpose(A))), ones)
+		# h_star = dot(dot(inv(I - beta2 * dot(transpose(A), A)), inv(I + beta1 * transpose(A))), ones)  # Test
 
 		if not scaled:
 			return h_star
@@ -120,8 +120,8 @@ class PositiveCentrality(DegreeCentrality):
 		beta1 = 1. / (2 * n - 2.)
 		beta2 = 1. / ((2 * n - 2.) ** 2)
 
-		# h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), (I + beta1 * A)), ones)
-		h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), inv(I + beta1 * A)), ones)  # Test
+		h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), (I + beta1 * A)), ones)
+		# h_star = dot(dot(inv(I - beta2 * dot(A, transpose(A))), inv(I + beta1 * A)), ones)  # Test
 
 		if not scaled:
 			return h_star
@@ -222,7 +222,7 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
-		PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), inv(I + beta2 * transpose(A))), ones)
+		PN = dot(dot(inv(I - beta1 * dot(transpose(A), A)), (I + beta2 * transpose(A))), ones)
 
 		if not scaled:
 			return PN
@@ -246,7 +246,7 @@ class PNCentrality(DegreeCentrality):
 		beta1 = 1. / (4 * ((n - 1.) ** 2))
 		beta2 = 1. / (2 * (n - 1.))
 
-		PN = dot(dot(inv(I - (1 / (4 * ((n - 1) ** 2))) * dot(A, transpose(A))), inv(I + (1 / (2 * (n - 1))) * A)), ones)
+		PN = dot(dot(inv(I - (1 / (4 * ((n - 1) ** 2))) * dot(A, transpose(A))), (I + (1 / (2 * (n - 1))) * A)), ones)
 
 		if not scaled:
 			return PN

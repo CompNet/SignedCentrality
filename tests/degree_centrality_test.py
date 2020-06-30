@@ -422,21 +422,13 @@ class DegreeCentralityTest(unittest.TestCase):
 		test_undirected = [1.025, 1.162, 1.105, 0.944, 0.761, 0.852, 0.809, 0.999, 0.982, 1.071, 0.903, 0.955, 0.883,
 			0.873, 0.665, 0.420, 0.483, 0.447]
 
-		# print("test out :       ", test_out)
-		# print("test undirected :", test_undirected)
-		# print()
 		print("test in :        ", test_in)
 
 		result = [round(x, digits) for x in degree_centrality.PNCentrality.undirected(self.graph['sampson'])]
 		result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['sampson']))]
 		result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['sampson']))]
-		# result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['sampson']]))))]
-		# result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(tril(array([[max(col, 0) for col in row] for row in self.array['sampson']]))))]
 
 		print("result in :      ", result_in)
-		# print()
-		# print("undirected :     ", result)
-		# print("result out :     ", result_out)
 
 		self.assertSequenceEqual(result_in, test_in)
 
@@ -447,21 +439,13 @@ class DegreeCentralityTest(unittest.TestCase):
 		test_out = [1.122, 0.868, 0.793, 0.625, 0.880, 0.621, 0.598, 0.884, 0.779, 0.840, 0.607, 0.681, 0.733, 0.649, 0.682, 0.810, 0.940, 0.801]
 		test_undirected = [1.025, 1.162, 1.105, 0.944, 0.761, 0.852, 0.809, 0.999, 0.982, 1.071, 0.903, 0.955, 0.883, 0.873, 0.665, 0.420, 0.483, 0.447]
 
-		# print("test in :        ", test_in)
-		# print("test undirected :", test_undirected)
-		# print()
 		print("test out :       ", test_out)
 
 		result = [round(x, digits) for x in degree_centrality.PNCentrality.undirected(self.graph['sampson'])]
 		result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['sampson']))]
 		result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['sampson']))]
-		# result_in = [round(x, 6) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['sampson']]))))]
-		# result_out = [round(x, 6) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(tril(array([[max(col, 0) for col in row] for row in self.array['sampson']]))))]
 
 		print("result out :     ", result_out)
-		# print()
-		# print("undirected :     ", result)
-		# print("result in :      ", result_in)
 
 		self.assertSequenceEqual(result_out, test_out)
 
@@ -474,22 +458,9 @@ class DegreeCentralityTest(unittest.TestCase):
 		test_out = [1.122, 0.868, 0.793, 0.625, 0.880, 0.621, 0.598, 0.884, 0.779, 0.840, 0.607, 0.681, 0.733, 0.649, 0.682, 0.810, 0.940, 0.801]
 		test_undirected = [1.025, 1.162, 1.105, 0.944, 0.761, 0.852, 0.809, 0.999, 0.982, 1.071, 0.903, 0.955, 0.883, 0.873, 0.665, 0.420, 0.483, 0.447]
 
-		# print("test in :        ", test_in)
-		# print("test out :       ", test_out)
-		# print()
 		print("test undirected :", test_undirected)
 
 		print("undirected :     ", result)
-		result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(self.graph['sampson'])]
-		# result_in = [round(x, 1) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['sampson']]))))]
-
-		# print()
-		# print("incoming :       ", result_in)
-		result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(self.graph['sampson'])]
-		# # result_out = [round(x, 1) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(triu(array([[max(col, 0) for col in row] for row in self.array['sampson']]))))]
-		# print("outgoing :       ", result_out)
-
-		print()
 
 		self.assertSequenceEqual(result, test_undirected)
 
@@ -507,19 +478,10 @@ class DegreeCentralityTest(unittest.TestCase):
 		test_in = [1.1277216, 0.7911154, 0.8685023, 1.2121643, 1.4496312, 0.9348521, 1.3032497, 0.8645196, 1.0057663, 1.3416316, 1.1064069, 0.9283995, 0.9798499, 1.0524736, 1.0760285, 1.3132654, 1.2086277, 0.9422260]
 		test_out = [0.8709186, 0.8954481, 1.1398228, 1.2118824, 1.1221881, 1.1348530, 1.1204965, 0.8954618, 1.1046287, 1.1521332, 1.1615100, 1.1481738, 1.1541453, 1.1482881, 1.1236164, 1.1822837, 1.1368235, 1.1075642]
 
-		# print("test out :       ", test_out)
-		# print("test undirected :", test_undirected)
-		# print()
 		print("test in :        ", test_in)
-
-		# result = [round(x, digits) for x in degree_centrality.PNCentrality.undirected(self.graph['sampson'])]
 		result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['sampson']))]
-		# result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['sampson']))]
 
 		print("result in :      ", result_in)
-		# print()
-		# print("undirected :     ", result)
-		# print("result out :     ", result_out)
 
 		self.assertSequenceEqual(result_in, test_in)
 
@@ -537,19 +499,10 @@ class DegreeCentralityTest(unittest.TestCase):
 		test_in = [1.1277216, 0.7911154, 0.8685023, 1.2121643, 1.4496312, 0.9348521, 1.3032497, 0.8645196, 1.0057663, 1.3416316, 1.1064069, 0.9283995, 0.9798499, 1.0524736, 1.0760285, 1.3132654, 1.2086277, 0.9422260]
 		test_out = [0.8709186, 0.8954481, 1.1398228, 1.2118824, 1.1221881, 1.1348530, 1.1204965, 0.8954618, 1.1046287, 1.1521332, 1.1615100, 1.1481738, 1.1541453, 1.1482881, 1.1236164, 1.1822837, 1.1368235, 1.1075642]
 
-		# print("test in :        ", test_in)
-		# print("test undirected :", test_undirected)
-		# print()
 		print("test out :       ", test_out)
 
-		# result = [round(x, digits) for x in degree_centrality.PNCentrality.undirected(self.graph['sampson'])]
-		# result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['sampson']))]
 		result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['sampson']))]
-
 		print("result out :     ", result_out)
-		# print()
-		# print("undirected :     ", result)
-		# print("result in :      ", result_in)
 
 		self.assertSequenceEqual(result_out, test_out)
 
@@ -569,20 +522,8 @@ class DegreeCentralityTest(unittest.TestCase):
 		test_in = [1.1277216, 0.7911154, 0.8685023, 1.2121643, 1.4496312, 0.9348521, 1.3032497, 0.8645196, 1.0057663, 1.3416316, 1.1064069, 0.9283995, 0.9798499, 1.0524736, 1.0760285, 1.3132654, 1.2086277, 0.9422260]
 		test_out = [0.8709186, 0.8954481, 1.1398228, 1.2118824, 1.1221881, 1.1348530, 1.1204965, 0.8954618, 1.1046287, 1.1521332, 1.1615100, 1.1481738, 1.1541453, 1.1482881, 1.1236164, 1.1822837, 1.1368235, 1.1075642]
 
-		# print("test in :        ", test_in)
-		# print("test out :       ", test_out)
-		# print()
 		print("test undirected :", test_undirected)
-
 		print("undirected :     ", result)
-
-		# result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(self.graph['sampson'])]
-		# result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(self.graph['sampson'])]
-		# print()
-		# print("incoming :       ", result_in)
-		# print("outgoing :       ", result_out)
-		#
-		print()
 
 		self.assertSequenceEqual(result, test_undirected)
 
