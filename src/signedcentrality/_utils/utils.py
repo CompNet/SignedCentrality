@@ -166,12 +166,14 @@ def scale_centrality(centrality, fit_sign = False):
 	return [value * scale_ for value in centrality]  # Else, return a scaled centrality.
 
 
-def matrix_to_graph(matrix):
+def matrix_to_graph(matrix, weight_attr = FileIds.WEIGHT):
 	"""
 	Creates a graph from a numpy adjacency matrix
 
 	:param matrix: the adjacency matrix
 	:type matrix: numpy.ndarray
+	:param weight_attr: attribute name to use for weights
+	:type weight_attr: str
 	:return: the graph
 	:rtype: igraph.Graph
 	"""
@@ -185,7 +187,10 @@ def matrix_to_graph(matrix):
 		for col in range(length):
 			weight = matrix[row, col]
 			if weight != 0:
-				graph.add_edge(row, col, weight = weight)
+				if weight_attr == FileIds.SIGN:
+					graph.add_edge(row, col, sign = weight)
+				else:  # if weight_attr == FileIds.WEIGHT or it is a wrong value
+					graph.add_edge(row, col, weight = weight)
 
 	return graph
 

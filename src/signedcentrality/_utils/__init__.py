@@ -25,12 +25,18 @@ class Format:
 
 
 class FileIds:
-
 	WEIGHT = "weight"
 	"""
 	String defining GraphML id for the attribute that defines the weight of an edge.
-	
+
 	This has to be given in the method graph.get_adjacency_sparse() which returns a weighted adjacency matrix for the given graph.
+	"""
+
+	SIGN = "sign"
+	"""
+	String defining GraphML id for the attribute that defines the weight of an edge.
+
+	The weight is called "sign" in degree_centrality module.
 	"""
 
 	ID = "id"
