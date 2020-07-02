@@ -1,3 +1,5 @@
+#! /usr/bin/Rscript
+
 library(Matrix)
 library(igraph)
 library(signnet)

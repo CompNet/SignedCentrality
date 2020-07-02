@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This module contains unit tests for the modules degree_centrality.
+This module contains unit tests for the module degree_centrality.
 """
 
 import unittest
