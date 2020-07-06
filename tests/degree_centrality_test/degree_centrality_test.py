@@ -6,13 +6,16 @@ This module contains unit tests for the module degree_centrality.
 """
 
 import unittest
+from os.path import abspath
+from subprocess import call
 from signedcentrality import degree_centrality
 from csv import reader, Sniffer, writer, QUOTE_MINIMAL
 from scipy.sparse import csr_matrix
 from numpy import trunc, ndarray, array, transpose, triu, tril
 from igraph import Graph
 from signedcentrality._utils.utils import *
-from tests.eigenvector_centrality_tests import convert_graph as convert_symmetrized_graph
+from tests import load_data
+from tests.degree_centrality_test import Path
 
 
 def read_CSV(path, remove_signs = False):
@@ -43,6 +46,8 @@ def read_CSV(path, remove_signs = False):
 			matrix = array([[abs(float(csv[i][j])) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
 		else:
 			matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
+
+		# matrix = array([[float(min(1, abs(csv[i][j]))) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # min(1, abs(csv[i][j])) is 0 if abs(csv[i][j])==0 and 1 if abs(csv[i][j])>=1 ; int(header) is 0 if False and 1 if true
 
 	return matrix_to_graph(array(matrix))
 
@@ -118,19 +123,95 @@ def convert_graph(*args, directed = True):
 	return new_graph
 
 
+def convert_sampson_graph(*args, directed = True):
+	"""
+	Convert a graph defined in several files to a symmetric undirected signed graph.
+
+	This function takes groups of two parameters.
+	The fist one is a graph that represents the positive signed edges.
+	The second one is a graph that represents the negative signed edges.
+
+	If there is an odd number of graphs that are set in parameters, the last one is considered as a positive graph.
+
+	The graphs that are read by this function may be directed or undirected signed graphs.
+
+	:param args: groups of two graphs
+	:type args: Graph or tuple
+	:param directed: indicates if the merged graph has to be directed
+	:type directed: Bool
+	:return: a symmetric undirected signed graph
+	:rtype args: Graph
+	"""
+
+	new_graph = None
+	sign = -1  # Sign of the additional_matrix. It is True, because the first time, it won't be processed.
+
+	for graph in args:
+		if not isinstance(graph, Graph):
+			msg = "".join(["Arguments have to be igraph.Graph instances, not ", str(type(graph)), "."])
+			raise ValueError(msg)
+
+		# graph.es[FileIds.WEIGHT] = [1 for _ in range(graph.ecount())]
+		graph.es[FileIds.WEIGHT] = [abs(value) for value in range(graph.ecount())]
+
+		# graph.to_undirected("collapse", dict(weight = "max", id = "first"))
+		if not directed:
+			graph.to_undirected("collapse", dict(weight = "max", id = "first"))
+
+		if new_graph is None:  # If graph is the first of the list ...
+			new_graph = graph
+			continue  # ... the next steps aren't done.
+
+		# Else, it isn't the first one, the next steps are done.
+		new_matrix = get_matrix(new_graph).toarray()
+		additional_matrix = get_matrix(graph).toarray()
+		length = len(new_matrix)
+		matrix = array([[float(new_matrix[row, col] + sign * additional_matrix[row, col]) for col in range(length)] for row in range(length)])
+		sign = - sign
+
+		new_graph = matrix_to_graph(matrix)
+
+	length = len(matrix)
+	for i in range(length):
+		for j in range(length):
+			if matrix[i, j] > 0:
+				matrix[i, j] = 1
+			if matrix[i, j] < 0:
+				matrix[i, j] = -1
+			# else, the value is 0.
+
+	# print(matrix)
+
+	new_graph = matrix_to_graph(matrix)
+
+	return new_graph
+
+
 class DegreeCentralityTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
+		# Load data from R script
+		print(Path.R_SCRIPT)
+		load_data(abspath(Path.RES), abspath(Path.R_SCRIPT))
+
 		gamapos = read_CSV("GAMAPOS.csv")
 		gamaneg = read_CSV("GAMANEG.csv")
 		gama = convert_graph(gamapos, gamaneg)
-		symmetrized_gama = convert_symmetrized_graph(gamapos, gamaneg)
+		symmetrized_gama = convert_graph(gamapos, gamaneg, directed = False)
 
 		samplk3 = read_CSV("SAMPLK3.csv", True)
 		sampdlk = read_CSV("SAMPDLK.csv", True)
-		sampson = convert_graph(samplk3, sampdlk)
-		symmetrized_sampson = convert_symmetrized_graph(samplk3, sampdlk)
+		sampes = read_CSV("SAMPES.csv", True)
+		sampdes = read_CSV("SAMPDES.csv", True)
+		sampin = read_CSV("SAMPIN.csv", True)
+		sampnin = read_CSV("SAMPNIN.csv", True)
+		samppr = read_CSV("SAMPPR.csv", True)
+		sampnpr = read_CSV("SAMPNPR.csv", True)
+		sampson = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
+		symmetrized_sampson = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr, directed = False)
+		# sampson = convert_sampson_graph(samplk3, sampdlk)
+		# symmetrized_sampson = convert_sampson_graph(samplk3, sampdlk, directed = False)
 
 		graph_2_directed = Graph(5)
 		graph_2_directed.to_directed()

@@ -1,10 +1,63 @@
-#! /usr/bin/Rscript
+#! /usr/bin/Rscript --vanilla
+args <- commandArgs(trailingOnly=TRUE)
 
 library(Matrix)
 library(igraph)
 library(signnet)
 
-setwd("/Users/SUCAL-V/Documents/Université/Stage/Workspace/PycharmProjects/SignedCentrality/tests/")
+# print(args[1])
+
+path <- args[1]
+res_path <- paste0(path, '/res/')  # Resource folder to write result files.
+setwd(path)
+
+if (! dir.exists(res_path)) {
+  dir.create(res_path)
+}
+
+# modes :
+mode_undirected <- "undirected"
+mode_in <- "in"
+mode_out <- "out"
+
+# Functions :
+
+export <- function (values, file_name) {
+  path <- paste0(res_path, file_name)
+
+  if (! file.exists(path)) {
+    file.create(path)
+  }
+
+  write.table(values, file = path, append = FALSE, sep = ',', eol = '\n')
+}
+
+compute_centrality <- function (matrix, mode, file_name) {
+  cat(paste(file_name, ":"))
+
+  graph_mode <- "undirected"
+  pn_mode <- "all"
+  if (mode == "in") {
+    graph_mode <- "directed"
+    pn_mode <- "in"
+  }
+  else if (mode == "out") {
+    graph_mode <- "directed"
+    pn_mode <- "out"
+  }
+  # else, mode == "undirected"
+
+  g <- graph_from_adjacency_matrix(matrix, weighted = "sign", mode = graph_mode)
+  adj <- as_adjacency_matrix(g, attr = "sign", sparse = T)
+  # adj
+  p_in <- pn_index(g, mode = pn_mode)
+
+  # p  # Results are the same as in the article
+  export(p, file_name)
+}
+
+# Program :
+
 
 # Table 5
 cat(paste("Table 5\n"))
@@ -15,32 +68,38 @@ m <- as.matrix(csv)
 # dim(m)
 
 # Table 5 : undirected
-cat(paste("\n\tUndirected :\n\n"))
+# cat(paste("\n\tUndirected :\n\n"))
 
-g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
-# g
-adj <- as_adjacency_matrix(g, attr = "sign", sparse = T)
-# adj
-p <- pn_index(g)
-p  # Results are the same as in the article
+# g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "undirected")
+# # g
+# adj <- as_adjacency_matrix(g, attr = "sign", sparse = T)
+# # adj
+# p <- pn_index(g)
+# # p  # Results are the same as in the article
+# export(p, '5_undirected.csv')
+compute_centrality(m, mode_undirected, '5_undirected.csv')
 
 # Table 5 : in
 cat(paste("\n\tIncoming :\n\n"))
 
-g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
-# g
-adj <- as_adjacency_matrix(g, "both", attr = "sign", sparse = T)
-# adj
-p_in <- pn_index(g, mode = "in")
-p_in
+# g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# # g
+# adj <- as_adjacency_matrix(g, "both", attr = "sign", sparse = T)
+# # adj
+# p_in <- pn_index(g, mode = "in")
+# p_in
+# export(p_in, '5_in.csv')
+compute_centrality(m, mode_in, '5_in.csv')
+
 
 # Table 5 : out
 cat(paste("\n\tOutgoing :\n\n"))
 
-g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
-# g
-p_out <- pn_index(g, mode = "out")
-p_out
+# g <- graph_from_adjacency_matrix(m, weighted = "sign", mode = "directed")
+# # g
+# p_out <- pn_index(g, mode = "out")
+# p_out
+compute_centrality(m, mode_out, '5_out.csv')
 
 cat(paste("\n\n\n"))
 
