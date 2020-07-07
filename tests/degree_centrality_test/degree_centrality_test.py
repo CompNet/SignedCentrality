@@ -11,7 +11,7 @@ from subprocess import call
 from signedcentrality import degree_centrality
 from csv import reader, Sniffer, writer, QUOTE_MINIMAL
 from scipy.sparse import csr_matrix
-from numpy import trunc, ndarray, array, transpose, triu, tril
+from numpy import array, transpose, zeros, diag
 from igraph import Graph
 from signedcentrality._utils.utils import *
 from tests import load_data
@@ -123,15 +123,13 @@ def convert_graph(*args, directed = True):
 	return new_graph
 
 
-def convert_sampson_graph(*args, directed = True):
+def convert_sampson_graph(*args):
 	"""
 	Convert a graph defined in several files to a symmetric undirected signed graph.
 
 	This function takes groups of two parameters.
 	The fist one is a graph that represents the positive signed edges.
 	The second one is a graph that represents the negative signed edges.
-
-	If there is an odd number of graphs that are set in parameters, the last one is considered as a positive graph.
 
 	The graphs that are read by this function may be directed or undirected signed graphs.
 
@@ -143,48 +141,67 @@ def convert_sampson_graph(*args, directed = True):
 	:rtype args: Graph
 	"""
 
-	new_graph = None
-	sign = -1  # Sign of the additional_matrix. It is True, because the first time, it won't be processed.
-
 	for graph in args:
 		if not isinstance(graph, Graph):
 			msg = "".join(["Arguments have to be igraph.Graph instances, not ", str(type(graph)), "."])
 			raise ValueError(msg)
 
-		# graph.es[FileIds.WEIGHT] = [1 for _ in range(graph.ecount())]
-		graph.es[FileIds.WEIGHT] = [abs(value) for value in range(graph.ecount())]
+	if len(args) == 0 or len(args) % 2 != 0:
+		raise ValueError("Wrong arguments number.")
 
-		# graph.to_undirected("collapse", dict(weight = "max", id = "first"))
-		if not directed:
-			graph.to_undirected("collapse", dict(weight = "max", id = "first"))
+	length = args[0].ecount()
 
-		if new_graph is None:  # If graph is the first of the list ...
-			new_graph = graph
-			continue  # ... the next steps aren't done.
+	positive_matrices = []
+	negative_matrices = []
+	for i in range(len(args)):
+		matrix = array([[min(1, abs(value)) for value in row] for row in get_matrix(args[i]).toarray()])
 
-		# Else, it isn't the first one, the next steps are done.
-		new_matrix = get_matrix(new_graph).toarray()
-		additional_matrix = get_matrix(graph).toarray()
-		length = len(new_matrix)
-		matrix = array([[float(new_matrix[row, col] + sign * additional_matrix[row, col]) for col in range(length)] for row in range(length)])
-		sign = - sign
+		if i % 2 != 0:
+			positive_matrices.append(matrix)
+		else:
+			negative_matrices.append(matrix)
 
-		new_graph = matrix_to_graph(matrix)
+	all_matrices = [positive_matrices, negative_matrices]
+	matrices = [zeros((length, length)), zeros((length, length))]  # Same length as all_matrices.
 
-	length = len(matrix)
-	for i in range(length):
-		for j in range(length):
-			if matrix[i, j] > 0:
-				matrix[i, j] = 1
-			if matrix[i, j] < 0:
-				matrix[i, j] = -1
-			# else, the value is 0.
+	for i in range(len(matrices)):
+		for j in range(len(matrices[i])):
+			for row_index in range(length):
+				for col_index in range(length):
+					matrices[i][row_index][col_index] += all_matrices[i][j][row_index][col_index]
 
-	# print(matrix)
+	for i in range(len(matrices)):
+		matrices[i] = array([[min(1, abs(value)) for value in row] for row in matrices[i]])
 
-	new_graph = matrix_to_graph(matrix)
+	positive_matrix = matrices[0]
+	negative_matrix = matrices[1]
 
-	return new_graph
+	print(positive_matrix)
+	print(negative_matrix)
+
+	symmetric_matrices = [positive_matrix, negative_matrix]
+
+	for i in range(len(matrices)):
+		symmetric_matrices[i] = array([[min(1, abs(value)) for value in row] for row in symmetric_matrices[i] + transpose(symmetric_matrices[i]) - diag(symmetric_matrices[i].diagonal())])
+
+	symmetric_positive_matrix = positive_matrix
+	symmetric_negative_matrix = negative_matrix
+
+	# print(symmetric_positive_matrix)
+	# print(symmetric_negative_matrix)
+
+	pn_matrix = zeros((length, length))
+	for row_index in range(length):
+		for col_index in range(length):
+			pn_matrix[row_index, col_index] = symmetric_positive_matrix[row_index, col_index] - symmetric_negative_matrix[row_index, col_index]
+
+	print(pn_matrix)
+
+	return {
+		'pn': pn_matrix,
+		'positive': positive_matrix,
+		'negative': negative_matrix
+		}
 
 
 class DegreeCentralityTest(unittest.TestCase):
@@ -209,7 +226,7 @@ class DegreeCentralityTest(unittest.TestCase):
 		samppr = read_CSV("SAMPPR.csv", True)
 		sampnpr = read_CSV("SAMPNPR.csv", True)
 		sampson = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
-		symmetrized_sampson = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr, directed = False)
+		symmetrized_sampson = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
 		# sampson = convert_sampson_graph(samplk3, sampdlk)
 		# symmetrized_sampson = convert_sampson_graph(samplk3, sampdlk, directed = False)
 
@@ -236,7 +253,6 @@ class DegreeCentralityTest(unittest.TestCase):
 		graph_5_directed.to_directed()
 		graph_5_undirected = read_CSV("table_5.csv")
 		graph_5_undirected.to_undirected("collapse", dict(weight = "mean", id = "first"))
-
 
 		self.graph = {
 			'gamapos': gamapos,

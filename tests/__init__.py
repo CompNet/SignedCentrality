@@ -7,8 +7,8 @@ This package contains unit tests for the modules of the packages signedcentralit
 .. seealso: signedcentrality
 .. seealso: clustering
 """
-from os import system, stat
-from os.path import dirname, exists
+from os import stat
+from os.path import dirname, exists, basename
 
 from numpy import array
 from csv import reader, Sniffer, unix_dialect
@@ -27,10 +27,10 @@ def load_data(res_path, R_script_path):
 	"""
 
 	call([R_script_path, dirname(R_script_path)])
-	# system(R_script_path + ' ' + dirname(R_script_path))
 
 	path_names = [path for path in glob(res_path)]  # Paths of the files which are exported by the script.
 	files_contents = []
+	names = []
 
 	for path in path_names:
 		csv = []
@@ -38,8 +38,6 @@ def load_data(res_path, R_script_path):
 		if exists(path) and stat(path).st_size != 0:
 			with open(path, 'r') as file:
 
-				# dialect = unix_dialect
-				# header = False
 				dialect = Sniffer().sniff(file.read(1024))
 				file.seek(0)
 				header = Sniffer().has_header(file.read(1024))
@@ -49,8 +47,12 @@ def load_data(res_path, R_script_path):
 					csv.append(row)
 
 				files_contents.append(array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))]))  # int(header) is 0 if False and 1 if true.
+				names.append(basename(path))
 
-	# TODO: parse data.
-	print(files_contents)  # For tests.
+	results = {}
+	for i in range(len(files_contents)):
+		results[names[i]] = files_contents[i].transpose().flatten()
+
+	print(results)  # For tests.
 
 	return None
