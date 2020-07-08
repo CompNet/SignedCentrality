@@ -8,7 +8,7 @@ This package contains unit tests for the modules of the packages signedcentralit
 .. seealso: clustering
 """
 from os import stat
-from os.path import dirname, exists, basename
+from os.path import dirname, exists, basename, splitext
 
 from numpy import array
 from csv import reader, Sniffer, unix_dialect
@@ -47,12 +47,12 @@ def load_data(res_path, R_script_path):
 					csv.append(row)
 
 				files_contents.append(array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))]))  # int(header) is 0 if False and 1 if true.
-				names.append(basename(path))
+				names.append(splitext(basename(path))[0])
 
 	results = {}
 	for i in range(len(files_contents)):
 		results[names[i]] = files_contents[i].transpose().flatten()
 
-	print(results)  # For tests.
+	# print(results)  # For tests.
 
-	return None
+	return results

@@ -97,13 +97,15 @@ def write_graph(graph, path_name):
 	graph.write_graphml(path_name)
 
 
-def get_matrix(graph):
+def get_matrix(graph, weights = FileIds.WEIGHT):
 	"""
 	Returns the adjacency matrix of the given graph.
 
 	This matrix is an instance of the class scipy.sparse.csr_matrix.
 	The default igraph.Matrix class isn't used because it doesn't support arithmetic operations.
 
+	:param weights: name of the weights
+	:type weights: str
 	:param graph: the graph one want the adjacency matrix
 	:type graph: igraph.Graph
 	:return: the adjacency matrix
@@ -111,7 +113,7 @@ def get_matrix(graph):
 	"""
 
 	try:
-		return graph.get_adjacency_sparse(FileIds.WEIGHT)  # scipy.sparse.csr_matrix
+		return graph.get_adjacency_sparse(weights)  # scipy.sparse.csr_matrix
 	except ValueError:
 		return graph.get_adjacency_sparse()  # If there aren't weights.
 

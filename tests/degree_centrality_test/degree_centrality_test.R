@@ -34,8 +34,6 @@ export <- function (values, file_name) {
 }
 
 compute_centrality <- function (matrix, mode, file_name) {
-  cat(paste(file_name, "\n"))
-
   graph_mode <- "undirected"
   pn_mode <- "all"
   if (mode == "in") {
@@ -87,21 +85,21 @@ compute_centralities_from_csv_file <- function (csv_path, header = FALSE) {
 
 
 # Table 5
-cat(paste("Table 5\n"))
+# cat(paste("Table 5\n"))
 
 compute_centralities_from_csv_file('table_5.csv', header = FALSE)
 
 
 
 # GAMAPOS
-cat(paste("GAMAPOS\n"))
+# cat(paste("GAMAPOS\n"))
 
 compute_centralities_from_csv_file("GAMAPOS.csv", header = TRUE)
 
 
 
 # Sampson Monastery
-cat(paste("Sampson Monastery\n"))
+# cat(paste("Sampson Monastery\n"))
 
 csv_directed <- read.csv("sampson_directed.csv", header = FALSE)
 csv_undirected <- read.csv("sampson_undirected.csv", header = FALSE)
@@ -111,20 +109,12 @@ compute_centralities_from_csv(csv_undirected, 'sampson_undirected')
 
 
 # Gama
-cat(paste("GAMA\n"))
+# cat(paste("GAMA\n"))
 
 csv_directed <- read.csv("gama_directed.csv", header = FALSE)
 csv_undirected <- read.csv("gama_undirected.csv", header = FALSE)
 
 compute_centralities_from_csv(csv_directed, 'gama_directed')
 compute_centralities_from_csv(csv_undirected, 'gama_undirected')
-
-
-
-
-
-
-
-
 
 

@@ -1,0 +1,6 @@
+eigenvector_centrality_test/test.graphml
+*/res
+degree_centrality_test/gama_directed.csv
+degree_centrality_test/gama_undirected.csv
+degree_centrality_test/sampson_directed.csv
+degree_centrality_test/sampson_undirected.csv
