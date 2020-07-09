@@ -46,8 +46,6 @@ def read_CSV(path, remove_signs = False):
 		else:
 			matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
 
-		# matrix = array([[float(min(1, abs(csv[i][j]))) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # min(1, abs(csv[i][j])) is 0 if abs(csv[i][j])==0 and 1 if abs(csv[i][j])>=1 ; int(header) is 0 if False and 1 if true
-
 	return matrix_to_graph(array(matrix))
 
 
@@ -66,7 +64,6 @@ def write_CSV(graph, path):
 		csv_writer = writer(file, delimiter = ',', quotechar='"', quoting=QUOTE_MINIMAL)
 		rows = [[str(col) for col in row] for row in get_matrix(graph).toarray().tolist()]
 		for row in rows:
-			# print(row)
 			csv_writer.writerow(row)
 
 
@@ -203,19 +200,19 @@ class DegreeCentralityTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
-		gamapos = read_CSV("GAMAPOS.csv")
-		gamaneg = read_CSV("GAMANEG.csv")
+		gamapos = read_CSV("res/GAMAPOS.csv")
+		gamaneg = read_CSV("res/GAMANEG.csv")
 		gama = convert_graph(gamapos, gamaneg)
 		symmetrized_gama = convert_graph(gamapos, gamaneg, directed = False)
 
-		samplk3 = read_CSV("SAMPLK3.csv", True)
-		sampdlk = read_CSV("SAMPDLK.csv", True)
-		sampes = read_CSV("SAMPES.csv", True)
-		sampdes = read_CSV("SAMPDES.csv", True)
-		sampin = read_CSV("SAMPIN.csv", True)
-		sampnin = read_CSV("SAMPNIN.csv", True)
-		samppr = read_CSV("SAMPPR.csv", True)
-		sampnpr = read_CSV("SAMPNPR.csv", True)
+		samplk3 = read_CSV("res/SAMPLK3.csv", True)
+		sampdlk = read_CSV("res/SAMPDLK.csv", True)
+		sampes = read_CSV("res/SAMPES.csv", True)
+		sampdes = read_CSV("res/SAMPDES.csv", True)
+		sampin = read_CSV("res/SAMPIN.csv", True)
+		sampnin = read_CSV("res/SAMPNIN.csv", True)
+		samppr = read_CSV("res/SAMPPR.csv", True)
+		sampnpr = read_CSV("res/SAMPNPR.csv", True)
 		sampson_graphs = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
 		pn_sampson = sampson_graphs['pn']
 		symmetric_pn_sampson = sampson_graphs['symmetric_pn_sampson']
@@ -223,10 +220,10 @@ class DegreeCentralityTest(unittest.TestCase):
 		negative_sampson = sampson_graphs['negative']
 
 		# Graphs used by M. Everett and S. Borgatti in their paper :
-		samn = read_CSV("SAMN.csv", True)
-		samp = read_CSV("SAMP.csv", True)
-		samnsym = read_CSV("SAMNSYM.csv", True)
-		sampsym = read_CSV("SAMPSYM.csv", True)
+		samn = read_CSV("res/SAMN.csv", True)
+		samp = read_CSV("res/SAMP.csv", True)
+		samnsym = read_CSV("res/SAMNSYM.csv", True)
+		sampsym = read_CSV("res/SAMPSYM.csv", True)
 		sampson_paper = convert_graph(samp, samn)
 		symmetric_sampson_paper = convert_graph(sampsym, samnsym)
 
@@ -244,10 +241,10 @@ class DegreeCentralityTest(unittest.TestCase):
 		graph_2_undirected.add_edge(3, 0)
 		graph_2_undirected.add_edge(4, 0)
 
-		graph_5_directed = read_CSV("table_5.csv")
+		graph_5_directed = read_CSV("res/table_5.csv")
 		graph_5_directed.to_undirected("collapse", dict(weight = "mean", id = "first"))
 		graph_5_directed.to_directed()
-		graph_5_undirected = read_CSV("table_5.csv")
+		graph_5_undirected = read_CSV("res/table_5.csv")
 		graph_5_undirected.to_undirected("collapse", dict(weight = "mean", id = "first"))
 
 		self.graph = {
@@ -303,13 +300,13 @@ class DegreeCentralityTest(unittest.TestCase):
 
 		# Load signnet computed data from R script
 
-		write_CSV(pn_sampson, 'sampson_directed.csv')
-		write_CSV(symmetric_pn_sampson, 'sampson_undirected.csv')
+		write_CSV(pn_sampson, 'res/generated/sampson_directed.csv')
+		write_CSV(symmetric_pn_sampson, 'res/generated/sampson_undirected.csv')
 
-		write_CSV(gama, 'gama_directed.csv')
-		write_CSV(symmetrized_gama, 'gama_undirected.csv')
+		write_CSV(gama, 'res/generated/gama_directed.csv')
+		write_CSV(symmetrized_gama, 'res/generated/gama_undirected.csv')
 
-		self.signnet_data = load_data(abspath(Path.RES), abspath(Path.R_SCRIPT))
+		self.signnet_data = load_data(abspath(Path.R_RES), abspath(Path.R_SCRIPT))
 
 	# def test_read_graph(self):
 	# 	array_test = array([

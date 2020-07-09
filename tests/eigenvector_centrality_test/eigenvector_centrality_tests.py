@@ -74,14 +74,14 @@ class SignedCentralityTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
-		self._test_path_name = "test.graphml"
+		self._test_path_name = "res/generated/test.graphml"
 
-		samplk3 = read_graph("SAMPLK3.csv", Format.CSV)
-		sampdlk = read_graph("SAMPDLK.csv", Format.CSV)
+		samplk3 = read_graph("res/SAMPLK3.csv", Format.CSV)
+		sampdlk = read_graph("res/SAMPDLK.csv", Format.CSV)
 
 		self.graph = {
-			'a': read_graph("network_a.graphml"),
-			'b': read_graph("network_b.graphml"),
+			'a': read_graph("res/network_a.graphml"),
+			'b': read_graph("res/network_b.graphml"),
 			's': convert_graph(samplk3, sampdlk)
 			}
 

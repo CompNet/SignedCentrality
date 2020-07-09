@@ -5,76 +5,83 @@
 This module contains a classifier which uses centralities computed in signedcentrality package.
 """
 
+from os.path import dirname
+from subprocess import call
+from typing import Any
 from numpy import array, mean
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from clustering import SVCKernel
+from clustering import Path
 
 
-def test_classifier(data, classifier):
+def load_data(path: str):
 	"""
-	Train and test a given classifier with the given data set
+	Load dataset to train and test a Classifier.
 
-	The classifier in trained with 70% of training data and 30% of test data.
-	Data set is randomly divided.
-
-	:param data: data set which have to be used to train and test the classifier.
-	:param classifier: classifier that must be tested
-	:return: means for all accuracy, precision and recall scores
+	:param path: Path to the dataset
+	:type path: str
+	:return: the loaded and paresed data
 	"""
-	train_tests = train_test_split(data, test_size = .3)
-	train_sets = []
-	test_sets = []
-	for i in range(len(train_tests)):
-		if i % 2 != 0:
-			train_sets.append(train_tests[i])
-		else:
-			test_sets.append(train_tests[i])
 
-	svm_classifier = classifier
-	svm_classifier.fit(train_sets)
+	call([Path.R_SCRIPT, dirname(Path.R_SCRIPT)])
 
-	accuracy_list = []
-	precision_list = []
-	recall_list = []
-
-	for test in test_sets:
-		predicted = svm_classifier.predict(test)
-		accuracy_list.append(accuracy_score(test, predicted))
-		precision_list.append(precision_score(test, predicted))
-		recall_list.append(recall_score(test, predicted))
-
-	accuracy = mean(accuracy_list)
-	precision = mean(precision_list)
-	recall = mean(recall_list)
-
-	return {'accuracy': accuracy, 'precision': precision, 'recall': recall}
+	# TODO: This function doesn't work.
 
 
-def test_classifiers(data):
+class Classifier:
 	"""
-	Test classifiers.
 
-	Each classifier has been set with different parameters.
-
-	:param data: data set which have to be used to train and test the classifier.
-	:return: a list of results for all classifiers
 	"""
-	classifiers = [
-		SVC(kernel = SVCKernel.LINEAR),
-		SVC(kernel = SVCKernel.POLY),
-		SVC(kernel = SVCKernel.SIGMOID),
-		SVC(kernel = SVCKernel.PRECOMPUTED),
-		SVC()
-		]
-	test_results = []
 
-	for classifier in classifiers:
-		results = test_classifier(classifier)
-		test_results.append(results)
+	def __init__(self, classifier: SVC, dataset = None):
+		"""
+		Creates a newly allocated Classifier object.
 
-		for key, result in results:
-			print(key, " :\t", result, end="\n\n")
+		:param classifier: SVC classifier which must be used as classifier
+		:type classifier: SVC
+		"""
 
-	return test_results
+		self.data = dataset
+
+		self._classifier = classifier
+		self.accuracy_score = None
+		self.precision_score = None
+		self.recall_score = None
+		self.accuracy_list = []
+		self.precision_list = []
+		self.recall_list = []
+
+		self.train_tests = train_test_split(Classifier.DATA, test_size = .3)
+		self.train_sets = []
+		self.test_sets = []
+		for i in range(len(self.train_tests)):
+			if i % 2 != 0:
+				self.train_sets.append(self.train_tests[i])
+			else:
+				self.test_sets.append(self.train_tests[i])
+
+	def train(self):
+		"""
+		Train and test the classifier
+
+		The classifier in trained with 70% of training data and 30% of test data.
+		Data set is randomly divided.
+
+		:return: means for all accuracy, precision and recall scores
+		"""
+
+		self._classifier.fit(self.train_sets)
+
+		for test in self.test_sets:
+			predicted = self._classifier.predict(test)
+			self.accuracy_list.append(accuracy_score(test, predicted))
+			self.precision_list.append(precision_score(test, predicted))
+			self.recall_list.append(recall_score(test, predicted))
+
+		self.accuracy_score = mean(self.accuracy_list)
+		self.precision_score = mean(self.precision_list)
+		self.recall_score = mean(self.recall_list)
+
+		return {'accuracy': self.accuracy_score, 'precision': self.precision_score, 'recall': self.recall_score}
+

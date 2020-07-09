@@ -12,7 +12,7 @@ import tests
 
 
 class Path:
-	RES = "./res/*.csv"
+	R_RES = "./res/generated/R/*.csv"
 	"""
 	Directory containing test resources for clustering module
 	"""

@@ -5,9 +5,9 @@ library(igraph)
 library(signnet)
 
 path <- args[1]
-res_path <- paste0(path, '/res/')
-generated_path <- paste0(path, '/res/generated/')  # Resource folder to read result files.
-r_generated_path <- paste0(path, '/res/generated/R/')  # Resource folder to write result files.
+res_path <- paste0(path, '../../res/')
+generated_path <- paste0(path, '../../res/generated/')  # Resource folder to read result files.
+r_generated_path <- paste0(path, '../../res/generated/R/')  # Resource folder to write result files.
 setwd(path)
 
 if (! dir.exists(r_generated_path)) {
@@ -27,7 +27,9 @@ mode_out <- "out"
 
 # Functions :
 
-source('../../src/functions.R')
+source('../functions.R')
+
+
 
 # Program :
 

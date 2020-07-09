@@ -6,14 +6,20 @@ library(igraph)
 library(signnet)
 library(tools)
 
-# print(args[1])
-
 path <- args[1]
-res_path <- paste0(path, '/res/')  # Resource folder to write result files.
+res_path <- paste0(path, '/res/')
+generated_path <- paste0(path, '/res/generated/')  # Resource folder to read result files.
+r_generated_path <- paste0(path, '/res/generated/R/')  # Resource folder to write result files.
 setwd(path)
 
-if (! dir.exists(res_path)) {
-  dir.create(res_path)
+if (! dir.exists(r_generated_path)) {
+  if (! dir.exists(generated_path)) {
+    if (! dir.exists(res_path)) {
+      dir.create(res_path)
+    }
+    dir.create(generated_path)
+  }
+  dir.create(r_generated_path)
 }
 
 # modes :
@@ -23,15 +29,7 @@ mode_out <- "out"
 
 # Functions :
 
-export <- function (values, file_name) {
-  path <- paste0(res_path, file_name)
-
-  if (! file.exists(path)) {
-    file.create(path)
-  }
-
-  write.table(values, file = path, append = FALSE, sep = ',', eol = '\n')
-}
+source('../../src/functions.R')
 
 compute_centrality <- function (matrix, mode, file_name) {
   graph_mode <- "undirected"
@@ -87,22 +85,22 @@ compute_centralities_from_csv_file <- function (csv_path, header = FALSE) {
 # Table 5
 # cat(paste("Table 5\n"))
 
-compute_centralities_from_csv_file('table_5.csv', header = FALSE)
+compute_centralities_from_csv_file('res/table_5.csv', header = FALSE)
 
 
 
 # GAMAPOS
 # cat(paste("GAMAPOS\n"))
 
-compute_centralities_from_csv_file("GAMAPOS.csv", header = TRUE)
+compute_centralities_from_csv_file("res/GAMAPOS.csv", header = TRUE)
 
 
 
 # Sampson Monastery
 # cat(paste("Sampson Monastery\n"))
 
-csv_directed <- read.csv("sampson_directed.csv", header = FALSE)
-csv_undirected <- read.csv("sampson_undirected.csv", header = FALSE)
+csv_directed <- read.csv("res/generated/sampson_directed.csv", header = FALSE)
+csv_undirected <- read.csv("res/generated/sampson_undirected.csv", header = FALSE)
 
 compute_centralities_from_csv(csv_directed, 'sampson_directed')
 compute_centralities_from_csv(csv_undirected, 'sampson_undirected')
@@ -111,8 +109,8 @@ compute_centralities_from_csv(csv_undirected, 'sampson_undirected')
 # Gama
 # cat(paste("GAMA\n"))
 
-csv_directed <- read.csv("gama_directed.csv", header = FALSE)
-csv_undirected <- read.csv("gama_undirected.csv", header = FALSE)
+csv_directed <- read.csv("res/generated/gama_directed.csv", header = FALSE)
+csv_undirected <- read.csv("res/generated/gama_undirected.csv", header = FALSE)
 
 compute_centralities_from_csv(csv_directed, 'gama_directed')
 compute_centralities_from_csv(csv_undirected, 'gama_undirected')
