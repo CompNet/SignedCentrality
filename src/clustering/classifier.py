@@ -15,20 +15,6 @@ from sklearn.svm import SVC
 from clustering import Path
 
 
-def load_data(path: str):
-	"""
-	Load dataset to train and test a Classifier.
-
-	:param path: Path to the dataset
-	:type path: str
-	:return: the loaded and paresed data
-	"""
-
-	call([Path.R_SCRIPT, dirname(Path.R_SCRIPT)])
-
-	# TODO: This function doesn't work.
-
-
 class Classifier:
 	"""
 
@@ -44,7 +30,7 @@ class Classifier:
 
 		self.data = dataset
 
-		self._classifier = classifier
+		self.__classifier = classifier
 		self.accuracy_score = None
 		self.precision_score = None
 		self.recall_score = None
@@ -52,7 +38,7 @@ class Classifier:
 		self.precision_list = []
 		self.recall_list = []
 
-		self.train_tests = train_test_split(Classifier.DATA, test_size = .3)
+		self.train_tests = train_test_split(self.data, test_size = .3)
 		self.train_sets = []
 		self.test_sets = []
 		for i in range(len(self.train_tests)):
@@ -71,10 +57,10 @@ class Classifier:
 		:return: means for all accuracy, precision and recall scores
 		"""
 
-		self._classifier.fit(self.train_sets)
+		self.__classifier.fit(self.train_sets)
 
 		for test in self.test_sets:
-			predicted = self._classifier.predict(test)
+			predicted = self.__classifier.predict(test)
 			self.accuracy_list.append(accuracy_score(test, predicted))
 			self.precision_list.append(precision_score(test, predicted))
 			self.recall_list.append(recall_score(test, predicted))

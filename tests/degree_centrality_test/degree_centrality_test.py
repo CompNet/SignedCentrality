@@ -13,58 +13,8 @@ from csv import reader, Sniffer, writer, QUOTE_MINIMAL
 from numpy import array, transpose, zeros
 from igraph import Graph
 from signedcentrality._utils.utils import *
-from tests import load_data
+from tests import load_data, write_CSV, read_CSV
 from tests.degree_centrality_test import Path
-
-
-def read_CSV(path, remove_signs = False):
-	"""
-	Creates an igraph.Graph from a CSV file
-
-	:param path: the path of the CSV file
-	:type path: str
-	:return: the graph
-	:rtype: igraph.Graph
-	"""
-
-	matrix = None
-	csv = []
-
-	with open(path, 'r') as file:
-
-		dialect = Sniffer().sniff(file.read(1024))
-		file.seek(0)
-
-		header = Sniffer().has_header(file.read(1024))
-		file.seek(0)
-
-		for row in reader(file, dialect):
-			csv.append(row)
-
-		if remove_signs:
-			matrix = array([[abs(float(csv[i][j])) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
-		else:
-			matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
-
-	return matrix_to_graph(array(matrix))
-
-
-def write_CSV(graph, path):
-	"""
-	Creates a CSV file from an igraph.Graph
-
-	:param graph: the graph
-	:type graph: igraph.Graph
-	:param path: the path of the CSV file
-	:type path: str
-	"""
-
-	with open(path, 'w') as file:
-
-		csv_writer = writer(file, delimiter = ',', quotechar='"', quoting=QUOTE_MINIMAL)
-		rows = [[str(col) for col in row] for row in get_matrix(graph).toarray().tolist()]
-		for row in rows:
-			csv_writer.writerow(row)
 
 
 def convert_graph(*args, directed = True):

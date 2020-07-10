@@ -9,11 +9,61 @@ This package contains unit tests for the modules of the packages signedcentralit
 """
 from os import stat
 from os.path import dirname, exists, basename, splitext
-
 from numpy import array
-from csv import reader, Sniffer, unix_dialect
+from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
 from glob import glob
 from subprocess import call
+from signedcentrality._utils.utils import get_matrix, matrix_to_graph
+
+
+def read_CSV(path, remove_signs = False):
+	"""
+	Creates an igraph.Graph from a CSV file
+
+	:param path: the path of the CSV file
+	:type path: str
+	:return: the graph
+	:rtype: igraph.Graph
+	"""
+
+	matrix = None
+	csv = []
+
+	with open(path, 'r') as file:
+
+		dialect = Sniffer().sniff(file.read(1024))
+		file.seek(0)
+
+		header = Sniffer().has_header(file.read(1024))
+		file.seek(0)
+
+		for row in reader(file, dialect):
+			csv.append(row)
+
+		if remove_signs:
+			matrix = array([[abs(float(csv[i][j])) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
+		else:
+			matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
+
+	return matrix_to_graph(array(matrix))
+
+
+def write_CSV(graph, path):
+	"""
+	Creates a CSV file from an igraph.Graph
+
+	:param graph: the graph
+	:type graph: igraph.Graph
+	:param path: the path of the CSV file
+	:type path: str
+	"""
+
+	with open(path, 'w') as file:
+
+		csv_writer = writer(file, delimiter = ',', quotechar='"', quoting=QUOTE_MINIMAL)
+		rows = [[str(col) for col in row] for row in get_matrix(graph).toarray().tolist()]
+		for row in rows:
+			csv_writer.writerow(row)
 
 
 def load_data(res_path, R_script_path):
