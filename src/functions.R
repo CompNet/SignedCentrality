@@ -1,5 +1,4 @@
 #! /usr/bin/Rscript --vanilla
-args <- commandArgs(trailingOnly=TRUE)
 
 library(igraph)
 library(signnet)

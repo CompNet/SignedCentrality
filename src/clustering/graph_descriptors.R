@@ -12,6 +12,7 @@ dataset_path <- paste0(path, '/', args[5])
 input_dataset_path <- paste0(dataset_path, '/inputs/')
 output_dataset_path <- paste0(dataset_path, '/outputs/')
 input_files_paths_csv_file <- paste0(args[6])
+
 setwd(path)
 
 if (! dir.exists(r_generated_path)) {
@@ -25,15 +26,21 @@ if (! dir.exists(r_generated_path)) {
 }
 
 
+
 # Functions :
 
 source('../functions.R')
 
-get_graph_from_path <-function (file_name, format = 'graphml') {
+
+export_results <- function(original_path, output_directory_path, results) {
+  output_path <- paste0(output_directory_path, )
+}
+
+get_graph_from_path <- function (file_name, format = 'graphml') {
   g <- read_graph(file_name, format = format)
 
   matrix <- get.adjacency(g, attr = 'weight')
-  graph <- graph_from_adjacency_matrix(matrix, weighted = "sign")
+  graph <- graph_from_adjacency_matrix(matrix, weighted = "sign", mode = 'undirected')
 
   return(graph)
 }
@@ -64,23 +71,13 @@ compute_negative_ties_ratio <- function (graph) {
 }
 
 compute_signed_triangles <- function (graph) {
+  res <- count_signed_triangles(graph)
+  res <- c(res['+++'], res['++-'], res['+--'])
 
+  return(res)
 }
 
-compute_eigenvector_centrality_mean_stddev <- function (graph) {
-
-}
-
-compute_degree_centrality_mean_stddev <- function (graph) {
-
-}
-
-compute_centralities_mean_stddev <- function (graph) {
-  compute_eigenvector_centrality_mean_stddev(graph)
-  compute_degree_centrality_mean_stddev(graph)
-}
-
-compute_descriptors <- function (file_name) {
+compute_descriptors <- function (file_name, output_file) {
   graph <- get_graph_from_path(file_name)
 
   # print(graph)
@@ -88,8 +85,11 @@ compute_descriptors <- function (file_name) {
   nodes_number <- compute_nodes_number(graph)
   negative_ties_ratio <- compute_negative_ties_ratio(graph)
   signed_triangles <- compute_signed_triangles(graph)
-  centralities_mean_stddev <- compute_centralities_mean_stddev(graph)
+
+
 }
+
+
 
 
 # Program :
@@ -101,6 +101,8 @@ csv <- read.csv(input_files_paths_csv_file, header = FALSE)
 for (file_names in csv) {
   for (file_name in file_names) {
     file_name <- paste0(file_name)
+
+    cat(paste(file_name[0], file_name[1], sep = "\n"))
 
     # if (file.exists(file_name)) {
     #   print("File exists.")
@@ -125,7 +127,8 @@ for (file_names in csv) {
     #   print("File doesn't exist.")
     # }
 
-    compute_descriptors(file_name)
+    compute_descriptors(file_name[0], file_name[1])
+
   }
 }
 

@@ -11,13 +11,13 @@ The measure is computed by following the method of Martin Everett and Stephen Bo
 
 import abc
 from sys import float_info
-
 from numpy import array, identity, dot, transpose
 from numpy.linalg import inv
+from signedcentrality import CentralityMeasure
 from signedcentrality._utils.utils import *
 
 
-class DegreeCentrality(metaclass = abc.ABCMeta):
+class DegreeCentrality(CentralityMeasure):
 	"""
 	Metaclass used as an interface for classes that contain methods computing measures of degree centrality
 	"""
@@ -25,18 +25,6 @@ class DegreeCentrality(metaclass = abc.ABCMeta):
 	@classmethod
 	def __subclasshook__(cls, subclass):
 		return hasattr(subclass, 'incoming') and callable(subclass.incoming) and hasattr(subclass, 'outgoing') and callable(subclass.outgoing) and hasattr(subclass, 'undirected') and callable(subclass.undirected)
-
-	def __new__(cls, *args, **kwargs):
-		"""
-		Constructor
-
-		This class, and its subclasses can't be instantiated.
-
-		:param args: unused
-		:param kwargs: unused
-		"""
-
-		raise TypeError("This class can't be instantiated.")
 
 	@staticmethod
 	@abc.abstractmethod
