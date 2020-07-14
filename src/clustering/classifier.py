@@ -8,23 +8,24 @@ This module contains a classifier which uses centralities computed in signedcent
 from os.path import dirname
 from subprocess import call
 from typing import Any
+from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
 from numpy import array, mean
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from clustering import Path
+from clustering import XMLKeys
 from os import walk
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
 from subprocess import call
 from sklearn.svm import SVC
 from clustering import SVCKernel
-from clustering.classifier import Classifier
 from signedcentrality import eigenvector_centrality, degree_centrality, CentralityMeasure
 from signedcentrality._utils.utils import *
 from signedcentrality.degree_centrality import PNCentrality
 from signedcentrality.eigenvector_centrality import compute_eigenvector_centrality, EigenvectorCentrality
 from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
+from tests.clustering_test import Path
 
 
 def _compute_centrality_mean_stddev(graph, centrality_class):
@@ -69,6 +70,53 @@ def compute_centralities_mean_stddev(graph):
 	return [_compute_centrality_mean_stddev(graph, centrality_class) for centrality_class in centrality_classes]
 
 
+def read_xml(path):
+	"""
+	Read an XML file
+
+	This file must contain results written by the R script.
+
+	:param path: path of the XML file
+	:type path: str
+	:return: results
+	:rtype: dict
+	"""
+
+	results = {}
+	xml_tree = parse(path)
+	root = xml_tree.getroot()
+	for descriptor in root:
+		descriptor_type = descriptor.get(XMLKeys.TYPE)
+		descriptor_value = descriptor.get(XMLKeys.VALUE)
+
+		results[descriptor_type] = descriptor_value
+
+	return results
+
+
+def write_xml(xml_path, paths):
+	"""
+	Write an XML file.
+
+	This file contains paths to input files which must be read by the R script and results files which are created by the R script.
+
+	:param paths: Paths to input and results files
+	:type paths: list of list
+	:param xml_path: Path to the file this function creates
+	:type xml_path: str
+	"""
+
+	root = Element(XMLKeys.ROOT)
+	for row in paths:
+		if len(row) < 2:
+			raise IndexError("The list must contain tuples of two elements.")
+
+		SubElement(root, XMLKeys.PATH, **{"" + str(XMLKeys.INPUT_FILE): row[0], "" + str(XMLKeys.RESULT_FILE): row[1]})
+
+	tree = ElementTree(root)
+	tree.write(xml_path)
+
+
 def load_data(path: str = None):
 	"""
 	Load dataset to train and test a Classifier.
@@ -91,20 +139,38 @@ def load_data(path: str = None):
 	# # 	output_file_path = input_file_path.replace(Path.INPUTS_PATH, '')
 	# # 	output_file_paths.append(output_file_path)
 	# #
-	# output_file_paths = [input_file_path.replace(Path.INPUTS_PATH, '') for input_file_path in input_files_paths]
 
-	with open(Path.GENERATED_CSV_PATHS_FILE, 'w') as file:
-		csv_writer = writer(file, delimiter = ',', quotechar = '"', quoting = QUOTE_MINIMAL)
-		csv_writer.writerows([
-			[
-				input_file_path,  # Path to input file.
-				Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')  # Path to R generated file containing results for input file.
-			] for input_file_path in input_files_paths])
+	# with open(Path.GENERATED_CSV_PATHS_FILE, 'w') as file:
+	# 	csv_writer = writer(file, delimiter = ',', quotechar = '"', quoting = QUOTE_MINIMAL)
+	# 	csv_writer.writerows([
+	# 		[
+	# 			input_file_path,  # Path to input file.
+	# 			Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')  # Path to R generated file containing results for input file.
+	# 		] for input_file_path in input_files_paths])
+
+	file_paths = [
+		[
+			input_file_path,  # Path to input file.
+			Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')  # Path to R generated file containing results for input file.
+		] for input_file_path in input_files_paths]
+
+	write_xml(Path.GENERATED_XML_PATHS_FILE, file_paths)
 
 	# Compute the descriptors :
 	call([Path.R_SCRIPT, dirname(Path.R_SCRIPT), Path.RES_PATH, Path.GENERATED_RES_PATH, Path.R_GENERATED_RES_PATH, path, Path.GENERATED_CSV_PATHS_FILE])
 
-	# TODO : load descriptors computed by the R script.
+	output_files_paths = []
+	for (dir_path, dir_names, file_names) in walk(Path.R_GENERATED_RES_PATH):
+		for file_name in file_names:
+			if splitext(basename(file_name))[1] == Path.XML_EXT:
+				file_path = dir_path + '/' + file_name
+				output_files_paths.append(file_path)
+
+	results = []
+	for path in output_files_paths:
+		results.append(read_xml(path))
+
+	return results
 
 
 class Classifier:

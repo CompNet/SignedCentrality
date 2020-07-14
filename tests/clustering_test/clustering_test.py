@@ -15,8 +15,8 @@ from os.path import dirname, splitext, basename
 from statistics import mean, stdev
 from subprocess import call
 from sklearn.svm import SVC
-from clustering import SVCKernel
-from clustering.classifier import Classifier
+from clustering import SVCKernel, XMLKeys
+from clustering.classifier import Classifier, load_data
 from signedcentrality import eigenvector_centrality, degree_centrality, CentralityMeasure
 from signedcentrality._utils.utils import *
 from signedcentrality.degree_centrality import PNCentrality
@@ -30,6 +30,7 @@ class ClusteringTest(unittest.TestCase):
 		super().__init__(method_name)
 
 		self.data = load_data(Path.DATASET_SAMPLE_PATH)
+		print(self.data)
 
 	def test_classifier(self):
 		"""

@@ -65,3 +65,45 @@ class Path:
 	"""
 	Script computing data to load in clustering_test module.
 	"""
+
+
+class XMLKeys:
+	ROOT = "root"
+	"""
+	Root element of XML files.
+	"""
+
+	DESCRIPTOR = "descriptor"
+	"""
+	Node defining a graph descriptor.
+	"""
+
+	PATH = "path"
+	"""
+	Node defining a path.
+	"""
+
+	TYPE = "type"
+	"""
+	Attribute defining the type of an element.
+	"""
+
+	VALUE = "value"
+	"""
+	Attribute defining the value of an element.
+	"""
+
+	INPUT_FILE = "input"
+	"""
+	Attribute defining the path to input train/test files.
+	"""
+
+	OUTPUT_FILE = "output"
+	"""
+	Attribute defining the path to output train/test files.
+	"""
+
+	RESULT_FILE = "results"
+	"""
+	Attribute defining the path to files that contain results computed by the R script.
+	"""

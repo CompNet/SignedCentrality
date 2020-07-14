@@ -3,6 +3,7 @@ args <- commandArgs(trailingOnly=TRUE)
 
 library(igraph)
 library(signnet)
+library(XML)
 
 path <- args[1]
 res_path <- paste0(path, '/', args[2])
@@ -37,6 +38,7 @@ export_results <- function(original_path, output_directory_path, results) {
 }
 
 get_graph_from_path <- function (file_name, format = 'graphml') {
+  print(paste0(file_name))
   g <- read_graph(file_name, format = format)
 
   matrix <- get.adjacency(g, attr = 'weight')
@@ -95,14 +97,17 @@ compute_descriptors <- function (file_name, output_file) {
 # Program :
 
 
-csv <- read.csv(input_files_paths_csv_file, header = FALSE)
+# csv <- read.csv(input_files_paths_csv_file, header = FALSE)
+csv <- read.table(input_files_paths_csv_file, header = FALSE, sep = ",", quote = "\"", dec = ".", fill = TRUE, comment.char = "")
 
+csv
 
 for (file_names in csv) {
   for (file_name in file_names) {
-    file_name <- paste0(file_name)
+    # file_name <- paste0(file_name)
 
-    cat(paste(file_name[0], file_name[1], sep = "\n"))
+    # print(paste("0 =>\t", file_name[0]))
+    print(paste("1 =>\t", file_name[1]))
 
     # if (file.exists(file_name)) {
     #   print("File exists.")
@@ -127,7 +132,7 @@ for (file_names in csv) {
     #   print("File doesn't exist.")
     # }
 
-    compute_descriptors(file_name[0], file_name[1])
+    # compute_descriptors(file_name[0], file_name[1])
 
   }
 }

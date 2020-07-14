@@ -47,6 +47,11 @@ class Path (clustering.Path):
 	Pattern to use .csv files
 	"""
 
+	XML_EXT = ".xml"
+	"""
+	Pattern to use .csv files
+	"""
+
 	GRAPHML_EXT = ".graphml"
 	"""
 	Pattern to use .graphml files
@@ -69,5 +74,10 @@ class Path (clustering.Path):
 
 	GENERATED_CSV_PATHS_FILE = clustering.Path.GENERATED_RES_PATH + "/inputs.csv"
 	"""
-	Path of the CSV file containing the paths of the files which have to be used as input files in graph_descriptors.R.
+	Path of the CSV file containing the paths of the files which have to be used as input and results files in graph_descriptors.R.
+	"""
+
+	GENERATED_XML_PATHS_FILE = clustering.Path.GENERATED_RES_PATH + "/inputs.xml"
+	"""
+	Path of the XML file containing the paths of the files which have to be used as input and results files in graph_descriptors.R.
 	"""
