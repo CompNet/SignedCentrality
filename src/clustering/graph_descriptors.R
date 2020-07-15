@@ -37,6 +37,16 @@ export_results <- function(original_path, output_directory_path, results) {
   output_path <- paste0(output_directory_path, )
 }
 
+write_xml <- function (data, new_xml_file_path) {
+  root <- newXMLNode('root')
+
+  for (descriptor in data) {
+    newXMLNode('descriptor', attrs = c(input = paste(), results = paste()), parent = root)
+  }
+
+  write.xml(root, new_xml_file_path)
+}
+
 get_graph_from_path <- function (file_name, format = 'graphml') {
   print(paste0(file_name))
   g <- read_graph(file_name, format = format)
@@ -91,51 +101,23 @@ compute_descriptors <- function (file_name, output_file) {
 
 }
 
-
+# print(paste0('OK'))
 
 
 # Program :
 
+xml <- xmlParse(input_files_paths_csv_file)  # TODO: error here
+# print(paste0('OK'))
 
-# csv <- read.csv(input_files_paths_csv_file, header = FALSE)
-csv <- read.table(input_files_paths_csv_file, header = FALSE, sep = ",", quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+root <- xmlRoot(xml)
+# print(paste0('OK'))
 
-csv
+nodes <- xmlChildren(xml)
+# print(paste0('OK'))
 
-for (file_names in csv) {
-  for (file_name in file_names) {
-    # file_name <- paste0(file_name)
-
-    # print(paste("0 =>\t", file_name[0]))
-    print(paste("1 =>\t", file_name[1]))
-
-    # if (file.exists(file_name)) {
-    #   print("File exists.")
-    #   cat(paste0(file_name))
-    #
-    #   file <- file(file_name)
-    #   open(file, 'r')
-    #
-    #   if (isOpen(file, rw = 'r')) {
-    #     print("File is open.")
-    #
-    #     graph <- read_graph(file_name, format = 'graphml')
-    #     graph
-    #     set.graph.attribute(graph, 'sign', get.graph.attribute(graph, 'weight'))
-    #     graph
-    #   }
-    #   else {
-    #     print("File isn't open.")
-    #   }
-    # }
-    # else {
-    #   print("File doesn't exist.")
-    # }
-
-    # compute_descriptors(file_name[0], file_name[1])
-
-  }
+for (node in nodes) {
+  # print(paste0('OK'))
+  print(paste(attributes, sep = "\t"))
 }
-
 
 

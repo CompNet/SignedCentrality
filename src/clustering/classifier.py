@@ -114,7 +114,7 @@ def write_xml(xml_path, paths):
 		SubElement(root, XMLKeys.PATH, **{"" + str(XMLKeys.INPUT_FILE): row[0], "" + str(XMLKeys.RESULT_FILE): row[1]})
 
 	tree = ElementTree(root)
-	tree.write(xml_path)
+	tree.write(xml_path, encoding = 'utf-8', xml_declaration = True)
 
 
 def load_data(path: str = None):
