@@ -30,7 +30,13 @@ class ClusteringTest(unittest.TestCase):
 		super().__init__(method_name)
 
 		self.data = load_data(Path.DATASET_SAMPLE_PATH)
-		print(self.data)
+
+		# Tests :
+		for xml in self.data:
+			for key, value in xml.items():
+				print(key, ":", value)
+			print()
+			print()
 
 	def test_classifier(self):
 		"""

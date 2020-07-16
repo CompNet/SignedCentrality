@@ -134,30 +134,16 @@ def load_data(path: str = None):
 				file_path = dir_path + '/' + file_name
 				input_files_paths.append(file_path)
 
-	# # output_file_paths = []
-	# # for input_file_path in input_files_paths:
-	# # 	output_file_path = input_file_path.replace(Path.INPUTS_PATH, '')
-	# # 	output_file_paths.append(output_file_path)
-	# #
-
-	# with open(Path.GENERATED_CSV_PATHS_FILE, 'w') as file:
-	# 	csv_writer = writer(file, delimiter = ',', quotechar = '"', quoting = QUOTE_MINIMAL)
-	# 	csv_writer.writerows([
-	# 		[
-	# 			input_file_path,  # Path to input file.
-	# 			Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')  # Path to R generated file containing results for input file.
-	# 		] for input_file_path in input_files_paths])
-
 	file_paths = [
 		[
 			input_file_path,  # Path to input file.
-			Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')  # Path to R generated file containing results for input file.
+			(Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')).replace(Path.GRAPHML_EXT, Path.XML_EXT)  # Path to R generated file containing results for input file.
 		] for input_file_path in input_files_paths]
 
 	write_xml(Path.GENERATED_XML_PATHS_FILE, file_paths)
 
 	# Compute the descriptors :
-	call([Path.R_SCRIPT, dirname(Path.R_SCRIPT), Path.RES_PATH, Path.GENERATED_RES_PATH, Path.R_GENERATED_RES_PATH, path, Path.GENERATED_CSV_PATHS_FILE])
+	call([Path.R_SCRIPT, dirname(Path.R_SCRIPT), Path.RES_PATH, Path.GENERATED_RES_PATH, Path.R_GENERATED_RES_PATH, path, Path.GENERATED_XML_PATHS_FILE])
 
 	output_files_paths = []
 	for (dir_path, dir_names, file_names) in walk(Path.R_GENERATED_RES_PATH):

@@ -1,6 +1,16 @@
 #! /usr/bin/Rscript --vanilla
 args <- commandArgs(trailingOnly=TRUE)
 
+# args <- c(
+#   # "",
+#   "../../src/clustering",
+#   "../../res/generated/",
+#   "../../res/generated/",
+#   "../../res/generated/R/",
+#   "../../res/clustering_dataset_sample/",
+#   "../../res/generated//inputs.xml"
+# )
+
 library(igraph)
 library(signnet)
 library(XML)
@@ -12,7 +22,7 @@ r_generated_path <- paste0(path, '/', args[4])  # Resource folder to write resul
 dataset_path <- paste0(path, '/', args[5])
 input_dataset_path <- paste0(dataset_path, '/inputs/')
 output_dataset_path <- paste0(dataset_path, '/outputs/')
-input_files_paths_csv_file <- paste0(args[6])
+input_files_paths_xml_file <- paste0(args[6])
 
 setwd(path)
 
@@ -32,23 +42,56 @@ if (! dir.exists(r_generated_path)) {
 
 source('../functions.R')
 
-
 export_results <- function(original_path, output_directory_path, results) {
   output_path <- paste0(output_directory_path, )
 }
 
-write_xml <- function (data, new_xml_file_path) {
+write_xml_results <- function (data, new_xml_file_path) {
   root <- newXMLNode('root')
+  rows <- dim(data)[1]
 
-  for (descriptor in data) {
-    newXMLNode('descriptor', attrs = c(input = paste(), results = paste()), parent = root)
+  for (i in 1:rows) {
+    newXMLNode('descriptor', attrs = c(type = paste(data[i, 1]), value = paste(data[i, 2])), parent = root)
   }
 
-  write.xml(root, new_xml_file_path)
+  path_list <- strsplit(new_xml_file_path, '/')[[1]]
+  dir_path <- ""
+
+  for (dir in head(path_list, -1)) {
+    if(dir_path == "") {
+      dir_path <- paste(dir)
+    }
+    else {
+      dir_path <- paste(dir_path, dir, sep = '/')
+    }
+
+    if (paste0(dir) == "." || paste0(dir) == "..") {
+      next
+    }
+
+    if (! dir.exists(dir_path)) {
+      dir.create(dir_path)
+    }
+  }
+
+  if (! file.exists(new_xml_file_path)) {
+    file.create(new_xml_file_path)
+  }
+
+  # write(root, new_xml_file_path)
+  saveXML(root, new_xml_file_path, doctype = "<?xml version='1.0' encoding='utf-8'?>")
+
+  # connection <- file(new_xml_file_path)
+  # open(connection, "w+")
+  #
+  # # write(root, connection)
+  # cat(root, file = new_xml_file_path)
+  #
+  # close(connection)
 }
 
 get_graph_from_path <- function (file_name, format = 'graphml') {
-  print(paste0(file_name))
+  # print(paste0(file_name))
   g <- read_graph(file_name, format = format)
 
   matrix <- get.adjacency(g, attr = 'weight')
@@ -98,26 +141,47 @@ compute_descriptors <- function (file_name, output_file) {
   negative_ties_ratio <- compute_negative_ties_ratio(graph)
   signed_triangles <- compute_signed_triangles(graph)
 
+  data <- matrix(
+    c(
+      c("nodes-number", nodes_number),
+      c("negative-ties-ratio", negative_ties_ratio),
+      c("signed-triangles-ppp", signed_triangles['+++']),
+      c("signed-triangles-ppm", signed_triangles['++-']),
+      c("signed-triangles-pmm", signed_triangles['+--'])
+    ),
+    nrow = 5,
+    byrow = TRUE
+  )
 
+  # for (i in data) {
+  #   print(paste0("--------"))
+  #   for (j in i) {
+  #     print(j)
+  #   }
+  # }
+  #
+  # print(paste0("--------"))
+  # print("")
+
+  # print(data)
+
+  write_xml_results(data, output_file)
 }
-
-# print(paste0('OK'))
 
 
 # Program :
 
-xml <- xmlParse(input_files_paths_csv_file)  # TODO: error here
-# print(paste0('OK'))
-
+xml <- xmlParse(input_files_paths_xml_file)
 root <- xmlRoot(xml)
-# print(paste0('OK'))
+nodes <- xmlToList(xml)
 
-nodes <- xmlChildren(xml)
-# print(paste0('OK'))
+# print(nodes)
 
 for (node in nodes) {
-  # print(paste0('OK'))
-  print(paste(attributes, sep = "\t"))
+  input_file_path <- node['input']
+  results_file_path <- node['results']
+
+  compute_descriptors(input_file_path, results_file_path)
 }
 
 
