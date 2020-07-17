@@ -10,7 +10,7 @@ The dataset "Space of optimal solutions of the Correlation Clustering problem" (
 """
 
 import unittest
-from os import walk
+from os import walk, getcwd, chdir
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
 from subprocess import call
@@ -29,14 +29,25 @@ class ClusteringTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
-		self.data = load_data(Path.DATASET_SAMPLE_PATH)
+		# Change the path of unit tests working directory:
+		print(getcwd())
+		chdir("/".join([getcwd(), Path.TESTS_RES_PATH]))
+		print(getcwd())
+		Path.load()
+		print('res :', Path.RES_PATH)
+
+		self.data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH)
 
 		# Tests :
-		for xml in self.data:
-			for key, value in xml.items():
-				print(key, ":", value)
+		for train_target, data in self.data.items():
+			print("----", train_target, "----")
 			print()
-			print()
+			for input_graph, xml in data.items():
+				print("=>", input_graph)
+				for key, value in xml.items():
+					print(key, ": ", value, sep = "")
+				print()
+				print()
 
 	def test_classifier(self):
 		"""

@@ -1,30 +1,17 @@
 #! /usr/bin/Rscript --vanilla
 args <- commandArgs(trailingOnly=TRUE)
 
-# args <- c(
-#   # "",
-#   "../../src/clustering",
-#   "../../res/generated/",
-#   "../../res/generated/",
-#   "../../res/generated/R/",
-#   "../../res/clustering_dataset_sample/",
-#   "../../res/generated//inputs.xml"
-# )
-
 library(igraph)
 library(signnet)
 library(XML)
 
-path <- args[1]
-res_path <- paste0(path, '/', args[2])
-generated_path <- paste0(path, '/', args[3])  # Resource folder to read result files.
-r_generated_path <- paste0(path, '/', args[4])  # Resource folder to write result files.
-dataset_path <- paste0(path, '/', args[5])
-input_dataset_path <- paste0(dataset_path, '/inputs/')
-output_dataset_path <- paste0(dataset_path, '/outputs/')
-input_files_paths_xml_file <- paste0(args[6])
+working_directory_path <- args[1]  # Current working directory
+res_path <- paste0(working_directory_path)  # Path to standard resource folder for the project.
+generated_path <- paste0(res_path, '/generated')  # Standard resource folder containing generated resource, to read Python generated files.
+r_generated_path <- paste0(generated_path, '/R')  # Standard resource folder to write result files.
+input_files_paths_xml_file <- paste0(args[2])  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
 
-setwd(path)
+setwd(working_directory_path)
 
 if (! dir.exists(r_generated_path)) {
   if (! dir.exists(generated_path)) {
@@ -78,16 +65,7 @@ write_xml_results <- function (data, new_xml_file_path) {
     file.create(new_xml_file_path)
   }
 
-  # write(root, new_xml_file_path)
   saveXML(root, new_xml_file_path, doctype = "<?xml version='1.0' encoding='utf-8'?>")
-
-  # connection <- file(new_xml_file_path)
-  # open(connection, "w+")
-  #
-  # # write(root, connection)
-  # cat(root, file = new_xml_file_path)
-  #
-  # close(connection)
 }
 
 get_graph_from_path <- function (file_name, format = 'graphml') {
@@ -127,9 +105,10 @@ compute_negative_ties_ratio <- function (graph) {
 
 compute_signed_triangles <- function (graph) {
   res <- count_signed_triangles(graph)
-  res <- c(res['+++'], res['++-'], res['+--'])
+  all <- sum(res)
+  ratios <- c(res['+++'] / all, res['++-'] / all, res['+--'] / all)
 
-  return(res)
+  return(ratios)
 }
 
 compute_descriptors <- function (file_name, output_file) {
@@ -152,18 +131,6 @@ compute_descriptors <- function (file_name, output_file) {
     nrow = 5,
     byrow = TRUE
   )
-
-  # for (i in data) {
-  #   print(paste0("--------"))
-  #   for (j in i) {
-  #     print(j)
-  #   }
-  # }
-  #
-  # print(paste0("--------"))
-  # print("")
-
-  # print(data)
 
   write_xml_results(data, output_file)
 }

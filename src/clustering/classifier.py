@@ -5,7 +5,7 @@
 This module contains a classifier which uses centralities computed in signedcentrality package.
 """
 
-from os.path import dirname
+from os.path import dirname, exists
 from subprocess import call
 from typing import Any
 from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
@@ -14,7 +14,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from clustering import XMLKeys
-from os import walk
+from os import walk, makedirs, getcwd
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
 from subprocess import call
@@ -25,7 +25,8 @@ from signedcentrality._utils.utils import *
 from signedcentrality.degree_centrality import PNCentrality
 from signedcentrality.eigenvector_centrality import compute_eigenvector_centrality, EigenvectorCentrality
 from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
-from tests.clustering_test import Path
+from clustering import Path
+from signedcentrality._utils.utils import *
 
 
 def _compute_centrality_mean_stddev(graph, centrality_class):
@@ -50,7 +51,7 @@ def _compute_centrality_mean_stddev(graph, centrality_class):
 	centrality_mean = mean(centrality)
 	centrality_stddev = stdev(centrality)
 
-	return centrality_mean, centrality_stddev
+	return {'mean': centrality_mean, 'stddev': centrality_stddev}
 
 
 def compute_centralities_mean_stddev(graph):
@@ -67,7 +68,19 @@ def compute_centralities_mean_stddev(graph):
 		PNCentrality
 		]
 
-	return [_compute_centrality_mean_stddev(graph, centrality_class) for centrality_class in centrality_classes]
+	results = {}
+	for centrality_class in centrality_classes:
+		centralities = _compute_centrality_mean_stddev(graph, centrality_class)
+
+		results = {
+			**results,
+			**dict(zip(
+				['-'.join([centrality_class.__name__, key]) for key in centralities.keys()],
+				[value for value in centralities.values()]
+				))
+			}
+
+	return results
 
 
 def read_xml(path):
@@ -106,6 +119,10 @@ def write_xml(xml_path, paths):
 	:type xml_path: str
 	"""
 
+	makedirs(Path.RES_PATH, exist_ok = True)
+	makedirs(Path.GENERATED_RES_PATH, exist_ok = True)
+	makedirs(Path.R_GENERATED_RES_PATH, exist_ok = True)
+
 	root = Element(XMLKeys.ROOT)
 	for row in paths:
 		if len(row) < 2:
@@ -117,18 +134,18 @@ def write_xml(xml_path, paths):
 	tree.write(xml_path, encoding = 'utf-8', xml_declaration = True)
 
 
-def load_data(path: str = None):
+def load_data(training_data_directory_path: str, target_directory_path: str, input_files_paths_xml_file: str = Path.GENERATED_XML_PATHS_FILE):
 	"""
 	Load dataset to train and test a Classifier.
 
-	:param path: Path to the dataset
-	:type path: str
+	:param input_files_paths_xml_file: Path to the dataset
+	:type input_files_paths_xml_file: str
 	:return: the loaded and parsed data
 	"""
 
 	# Create a file containing paths to the graphs of the dataset:
 	input_files_paths = []
-	for (dir_path, dir_names, file_names) in walk(Path.INPUTS_PATH):
+	for (dir_path, dir_names, file_names) in walk(training_data_directory_path):
 		for file_name in file_names:
 			if splitext(basename(file_name))[1] == Path.DEFAULT_EXT:
 				file_path = dir_path + '/' + file_name
@@ -137,26 +154,42 @@ def load_data(path: str = None):
 	file_paths = [
 		[
 			input_file_path,  # Path to input file.
-			(Path.R_GENERATED_RES_PATH + input_file_path.replace(Path.INPUTS_PATH, '')).replace(Path.GRAPHML_EXT, Path.XML_EXT)  # Path to R generated file containing results for input file.
-		] for input_file_path in input_files_paths]
+			(Path.R_GENERATED_RES_PATH + input_file_path.replace(training_data_directory_path, '')).replace(Path.GRAPHML_EXT,
+				Path.XML_EXT)  # Path to R generated file containing results for input file.
+			] for input_file_path in input_files_paths
+		]
 
-	write_xml(Path.GENERATED_XML_PATHS_FILE, file_paths)
+	write_xml(input_files_paths_xml_file, file_paths)
 
-	# Compute the descriptors :
-	call([Path.R_SCRIPT, dirname(Path.R_SCRIPT), Path.RES_PATH, Path.GENERATED_RES_PATH, Path.R_GENERATED_RES_PATH, path, Path.GENERATED_XML_PATHS_FILE])
+	# # Compute the descriptors :
+	# print("test :", getcwd())
+	# Path.load(getcwd())
+	# print('res :', Path.RES_PATH)
+	# print('R_SCRIPT :', Path.R_SCRIPT)
+	call([
+		Path.R_SCRIPT,  # Path to the script to run
+		dirname(Path.R_SCRIPT),  # Current working directory of this script
+		input_files_paths_xml_file  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
+		])
 
-	output_files_paths = []
-	for (dir_path, dir_names, file_names) in walk(Path.R_GENERATED_RES_PATH):
-		for file_name in file_names:
-			if splitext(basename(file_name))[1] == Path.XML_EXT:
-				file_path = dir_path + '/' + file_name
-				output_files_paths.append(file_path)
+	# output_files_paths = []
+	# for (dir_path, dir_names, file_names) in walk(Path.R_GENERATED_RES_PATH):
+	# 	for file_name in file_names:
+	# 		if splitext(basename(file_name))[1] == Path.XML_EXT:
+	# 			file_path = dir_path + '/' + file_name
+	# 			output_files_paths.append(file_path)
 
-	results = []
-	for path in output_files_paths:
-		results.append(read_xml(path))
+	training_data = {}
+	for io_paths in file_paths:
+		input_file_path = io_paths[0]
+		result_file_path = io_paths[1]
 
-	return results
+		xml_results = read_xml(result_file_path)
+		centralities = compute_centralities_mean_stddev(read_graph(input_file_path))
+
+		training_data = {**training_data, input_file_path: {**xml_results, **centralities}}
+
+	return {'training_data': training_data}
 
 
 class Classifier:
@@ -164,7 +197,7 @@ class Classifier:
 	This class computes the number of classes of solutions for a clustering.
 	"""
 
-	def __init__(self, classifier: SVC, dataset = None):
+	def __init__(self, classifier: SVC, training_vectors = None, target_values = None, dataset = None):
 		"""
 		Creates a newly allocated Classifier object.
 
@@ -172,7 +205,8 @@ class Classifier:
 		:type classifier: SVC
 		"""
 
-		self.data = dataset
+		self.data = training_vectors
+		self.target = target_values
 
 		self.__classifier = classifier
 		self.accuracy_score = None
@@ -182,14 +216,8 @@ class Classifier:
 		self.precision_list = []
 		self.recall_list = []
 
-		self.train_tests = train_test_split(self.data, test_size = .3)
-		self.train_sets = []
-		self.test_sets = []
-		for i in range(len(self.train_tests)):
-			if i % 2 != 0:
-				self.train_sets.append(self.train_tests[i])
-			else:
-				self.test_sets.append(self.train_tests[i])
+		self.train_data, self.test_data, self.train_target, self.test_target = train_test_split(self.data, self.target,
+			test_size = .3)
 
 	def train(self):
 		"""
@@ -201,17 +229,19 @@ class Classifier:
 		:return: means for all accuracy, precision and recall scores
 		"""
 
-		self.__classifier.fit(self.train_sets)
+		self.__classifier.fit(
+			self.train_data,  # Lists of descriptors
+			self.test_target  # List of results for each list of descriptors
+			)
 
-		for test in self.test_sets:
-			predicted = self.__classifier.predict(test)
-			self.accuracy_list.append(accuracy_score(test, predicted))
-			self.precision_list.append(precision_score(test, predicted))
-			self.recall_list.append(recall_score(test, predicted))
+		for test_data in self.test_data:
+			predicted_test_target = self.__classifier.predict(test_data)
+			self.accuracy_list.append(accuracy_score(self.test_target, predicted_test_target))
+			self.precision_list.append(precision_score(self.test_target, predicted_test_target))
+			self.recall_list.append(recall_score(self.test_target, predicted_test_target))
 
 		self.accuracy_score = mean(self.accuracy_list)
 		self.precision_score = mean(self.precision_list)
 		self.recall_score = mean(self.recall_list)
 
 		return {'accuracy': self.accuracy_score, 'precision': self.precision_score, 'recall': self.recall_score}
-
