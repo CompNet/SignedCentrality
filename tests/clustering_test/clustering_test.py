@@ -25,56 +25,107 @@ from tests.clustering_test import Path
 from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
 
 
+main_data = None
+"""
+Datasets to train the classifier.
+
+This variable is global to compute it only one time.
+"""
+
+
+def init_svm():
+	"""
+	Initilaize dataset to train the classifier
+
+	:return: the data
+	"""
+
+	global main_data
+
+	if main_data is not None:
+		return main_data
+
+	# Change the path of unit tests working directory:
+	# print(getcwd())
+	chdir("/".join([getcwd(), Path.TESTS_RES_PATH]))
+	# print(getcwd())
+	Path.load()
+	# print('res :', Path.RES_PATH)
+
+	training_data, target_data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH)
+
+	# Tests :
+	print("---- Training Data ----")
+	print()
+	for input_graph, xml in training_data:
+		print("=>", input_graph)
+		for key, value in xml.items():
+			print(key, ": ", value, sep="")
+		print()
+		print()
+
+	print("---- Target Data ----")
+	print()
+	if target_data is not  None:
+		for input_graph, xml in target_data:
+			print("=>", input_graph)
+			for key, value in xml.items():
+				print(key, ": ", value, sep="")
+			print()
+			print()
+	else:
+		print('No target data.')
+
+	main_data = (training_data, target_data)
+
+	return main_data
+
+
 class ClusteringTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
-		# Change the path of unit tests working directory:
-		print(getcwd())
-		chdir("/".join([getcwd(), Path.TESTS_RES_PATH]))
-		print(getcwd())
-		Path.load()
-		print('res :', Path.RES_PATH)
+		self.data = init_svm()
 
-		self.data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH)
+	def test_classifier_default_kernel(self):
 
-		# Tests :
-		for train_target, data in self.data.items():
-			print("----", train_target, "----")
-			print()
-			for input_graph, xml in data.items():
-				print("=>", input_graph)
-				for key, value in xml.items():
-					print(key, ": ", value, sep = "")
-				print()
-				print()
+		classifier = Classifier(SVC(), *self.data)
+		results = classifier.train()
 
-	def test_classifier(self):
-		"""
-		Test classifiers.
+		for key, result in results:
+			print(key, " :\t", result, end="\n\n")
 
-		Each classifier has been set with different parameters.
+	def test_classifier_linear_kernel(self):
 
-		:return: a list of results for all classifiers
-		"""
-		# classifiers = [
-		# 	SVC(kernel = SVCKernel.LINEAR),
-		# 	SVC(kernel = SVCKernel.POLY),
-		# 	SVC(kernel = SVCKernel.SIGMOID),
-		# 	SVC(kernel = SVCKernel.PRECOMPUTED),
-		# 	SVC()
-		# 	]
-		# test_results = []
-		#
-		# for c in classifiers:
-		# 	classifier = Classifier(c, self.data)
-		# 	results = classifier.train()
-		# 	test_results.append(results)
-		#
-		# 	for key, result in results:
-		# 		print(key, " :\t", result, end = "\n\n")
+		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), *self.data)
+		results = classifier.train()
 
-	pass
+		for key, result in results:
+			print(key, " :\t", result, end="\n\n")
+
+	def test_classifier_poly_kernel(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.POLY), *self.data)
+		results = classifier.train()
+
+		for key, result in results:
+			print(key, " :\t", result, end="\n\n")
+
+	def test_classifier_sigmoid_kernel(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), *self.data)
+		results = classifier.train()
+
+		for key, result in results:
+			print(key, " :\t", result, end="\n\n")
+
+	def test_classifier_pre_kernel(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), *self.data)
+		results = classifier.train()
+
+		for key, result in results:
+			print(key, " :\t", result, end="\n\n")
 
 
 if __name__ == '__main__':

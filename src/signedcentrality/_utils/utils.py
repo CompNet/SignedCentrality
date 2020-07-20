@@ -10,7 +10,7 @@ This module contains utility functions that are used in the signedcentrality pac
 """
 
 
-def read_graph(path_name, format = None):
+def read_graph(path_name, format=None):
 	"""
 	Read a graph from a file.
 
@@ -97,7 +97,7 @@ def write_graph(graph, path_name):
 	graph.write_graphml(path_name)
 
 
-def get_matrix(graph, weights = FileIds.WEIGHT):
+def get_matrix(graph, weights=FileIds.WEIGHT):
 	"""
 	Returns the adjacency matrix of the given graph.
 
@@ -118,7 +118,7 @@ def get_matrix(graph, weights = FileIds.WEIGHT):
 		return graph.get_adjacency_sparse()  # If there aren't weights.
 
 
-def get_scale(centrality, fit_sign = False):
+def get_scale(centrality, fit_sign=False):
 	"""
 	Compute the scale value to scale a centrality
 
@@ -145,7 +145,7 @@ def get_scale(centrality, fit_sign = False):
 	return scale
 
 
-def scale_centrality(centrality, fit_sign = False):
+def scale_centrality(centrality, fit_sign=False):
 	"""
 	Scale the given centrality
 
@@ -168,7 +168,7 @@ def scale_centrality(centrality, fit_sign = False):
 	return [value * scale_ for value in centrality]  # Else, return a scaled centrality.
 
 
-def matrix_to_graph(matrix, weight_attr = FileIds.WEIGHT):
+def matrix_to_graph(matrix, weight_attr=FileIds.WEIGHT):
 	"""
 	Creates a graph from a numpy adjacency matrix
 
@@ -190,9 +190,8 @@ def matrix_to_graph(matrix, weight_attr = FileIds.WEIGHT):
 			weight = matrix[row, col]
 			if weight != 0:
 				if weight_attr == FileIds.SIGN:
-					graph.add_edge(row, col, sign = weight)
+					graph.add_edge(row, col, sign=weight)
 				else:  # if weight_attr == FileIds.WEIGHT or it is a wrong value
-					graph.add_edge(row, col, weight = weight)
+					graph.add_edge(row, col, weight=weight)
 
 	return graph
-

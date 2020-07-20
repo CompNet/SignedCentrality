@@ -119,6 +119,11 @@ class Path:
 	Pattern to use .net files
 	"""
 
+	TXT_EXT = ".txt"
+	"""
+	Pattern to use .txt files
+	"""
+
 	DEFAULT_EXT = GRAPHML_EXT
 	"""
 	Default pattern

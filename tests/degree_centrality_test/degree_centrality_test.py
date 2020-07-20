@@ -17,6 +17,14 @@ from tests import load_data, write_CSV, read_CSV
 from tests.degree_centrality_test import Path
 
 
+main_data = None
+"""
+Datasets to train the classifier.
+
+This variable is global to compute it only one time.
+"""
+
+
 def convert_graph(*args, directed = True):
 	"""
 	Convert a graph defined in one or two files to a symmetric undirected signed graph.
@@ -146,117 +154,141 @@ def convert_sampson_graph(*args):
 		}
 
 
+def initialize_data():
+	"""
+	Initilaize dataset to train the classifier
+
+	:return: the data
+	"""
+
+	global main_data
+
+	if main_data is not None:
+		return main_data
+
+	main_data = {}
+	
+	gamapos = read_CSV("res/GAMAPOS.csv")
+	gamaneg = read_CSV("res/GAMANEG.csv")
+	gama = convert_graph(gamapos, gamaneg)
+	symmetrized_gama = convert_graph(gamapos, gamaneg, directed=False)
+
+	samplk3 = read_CSV("res/SAMPLK3.csv", True)
+	sampdlk = read_CSV("res/SAMPDLK.csv", True)
+	sampes = read_CSV("res/SAMPES.csv", True)
+	sampdes = read_CSV("res/SAMPDES.csv", True)
+	sampin = read_CSV("res/SAMPIN.csv", True)
+	sampnin = read_CSV("res/SAMPNIN.csv", True)
+	samppr = read_CSV("res/SAMPPR.csv", True)
+	sampnpr = read_CSV("res/SAMPNPR.csv", True)
+	sampson_graphs = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
+	pn_sampson = sampson_graphs['pn']
+	symmetric_pn_sampson = sampson_graphs['symmetric_pn_sampson']
+	positive_sampson = sampson_graphs['positive']
+	negative_sampson = sampson_graphs['negative']
+
+	# Graphs used by M. Everett and S. Borgatti in their paper :
+	samn = read_CSV("res/SAMN.csv", True)
+	samp = read_CSV("res/SAMP.csv", True)
+	samnsym = read_CSV("res/SAMNSYM.csv", True)
+	sampsym = read_CSV("res/SAMPSYM.csv", True)
+	sampson_paper = convert_graph(samp, samn)
+	symmetric_sampson_paper = convert_graph(sampsym, samnsym)
+
+	graph_2_directed = Graph(5)
+	graph_2_directed.to_directed()
+	graph_2_directed.add_edge(1, 0)
+	graph_2_directed.add_edge(2, 0)
+	graph_2_directed.add_edge(3, 0)
+	graph_2_directed.add_edge(4, 0)
+
+	graph_2_undirected = Graph(5)
+	graph_2_undirected.to_undirected()
+	graph_2_undirected.add_edge(1, 0)
+	graph_2_undirected.add_edge(2, 0)
+	graph_2_undirected.add_edge(3, 0)
+	graph_2_undirected.add_edge(4, 0)
+
+	graph_5_directed = read_CSV("res/table_5.csv")
+	graph_5_directed.to_undirected("collapse", dict(weight="mean", id="first"))
+	graph_5_directed.to_directed()
+	graph_5_undirected = read_CSV("res/table_5.csv")
+	graph_5_undirected.to_undirected("collapse", dict(weight="mean", id="first"))
+
+	main_data['graph'] = {
+		'gamapos': gamapos,
+		'gamaneg': gamaneg,
+		'gama': gama,
+		'symmetrized_gama': symmetrized_gama,
+		'pn_sampson': pn_sampson,
+		'symmetric_pn_sampson': symmetric_pn_sampson,
+		'positive_sampson': positive_sampson,
+		'negative_sampson': negative_sampson,
+		'sampson_paper': sampson_paper,
+		'symmetric_sampson_paper': symmetric_sampson_paper,
+		'2_directed': graph_2_directed,
+		'2_undirected': graph_2_undirected,
+		'5_directed': graph_5_directed,
+		'5_undirected': graph_5_undirected
+	}
+
+	main_data['matrix'] = {
+		'gamapos': get_matrix(main_data['graph']['gamapos']),
+		'gamaneg': get_matrix(main_data['graph']['gamaneg']),
+		'gama': get_matrix(main_data['graph']['gama']),
+		'symmetrized_gama': get_matrix(main_data['graph']['symmetrized_gama']),
+		'pn_sampson': get_matrix(main_data['graph']['pn_sampson']),
+		'symmetric_pn_sampson': get_matrix(main_data['graph']['symmetric_pn_sampson']),
+		'positive_sampson': get_matrix(main_data['graph']['positive_sampson']),
+		'negative_sampson': get_matrix(main_data['graph']['negative_sampson']),
+		'sampson_paper': get_matrix(main_data['graph']['sampson_paper']),
+		'symmetric_sampson_paper': get_matrix(main_data['graph']['symmetric_sampson_paper']),
+		'2_directed': get_matrix(main_data['graph']['2_directed']),
+		'2_undirected': get_matrix(main_data['graph']['2_undirected']),
+		'5_directed': get_matrix(main_data['graph']['5_directed']),
+		'5_undirected': get_matrix(main_data['graph']['5_undirected'])
+	}
+
+	main_data['array'] = {
+		'gamapos': main_data['matrix']['gamapos'].toarray(),
+		'gamaneg': main_data['matrix']['gamaneg'].toarray(),
+		'gama': main_data['matrix']['gama'].toarray(),
+		'symmetrized_gama': main_data['matrix']['symmetrized_gama'].toarray(),
+		'pn_sampson': main_data['matrix']['pn_sampson'].toarray(),
+		'symmetric_pn_sampson': main_data['matrix']['symmetric_pn_sampson'].toarray(),
+		'positive_sampson': main_data['matrix']['positive_sampson'].toarray(),
+		'negative_sampson': main_data['matrix']['negative_sampson'].toarray(),
+		'sampson_paper': main_data['matrix']['sampson_paper'].toarray(),
+		'symmetric_sampson_paper': main_data['matrix']['symmetric_sampson_paper'].toarray(),
+		'2_directed': main_data['matrix']['2_directed'].toarray(),
+		'2_undirected': main_data['matrix']['2_undirected'].toarray(),
+		'5_directed': main_data['matrix']['5_directed'].toarray(),
+		'5_undirected': main_data['matrix']['5_undirected'].toarray()
+	}
+
+	# Load signnet computed main_data from R script
+
+	write_CSV(pn_sampson, 'res/generated/sampson_directed.csv')
+	write_CSV(symmetric_pn_sampson, 'res/generated/sampson_undirected.csv')
+
+	write_CSV(gama, 'res/generated/gama_directed.csv')
+	write_CSV(symmetrized_gama, 'res/generated/gama_undirected.csv')
+
+	main_data['signnet_data'] = load_data(abspath(Path.R_RES), abspath(Path.R_SCRIPT))
+
+	return main_data
+
+
 class DegreeCentralityTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
-		gamapos = read_CSV("res/GAMAPOS.csv")
-		gamaneg = read_CSV("res/GAMANEG.csv")
-		gama = convert_graph(gamapos, gamaneg)
-		symmetrized_gama = convert_graph(gamapos, gamaneg, directed = False)
+		self.data = initialize_data()
 
-		samplk3 = read_CSV("res/SAMPLK3.csv", True)
-		sampdlk = read_CSV("res/SAMPDLK.csv", True)
-		sampes = read_CSV("res/SAMPES.csv", True)
-		sampdes = read_CSV("res/SAMPDES.csv", True)
-		sampin = read_CSV("res/SAMPIN.csv", True)
-		sampnin = read_CSV("res/SAMPNIN.csv", True)
-		samppr = read_CSV("res/SAMPPR.csv", True)
-		sampnpr = read_CSV("res/SAMPNPR.csv", True)
-		sampson_graphs = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
-		pn_sampson = sampson_graphs['pn']
-		symmetric_pn_sampson = sampson_graphs['symmetric_pn_sampson']
-		positive_sampson = sampson_graphs['positive']
-		negative_sampson = sampson_graphs['negative']
-
-		# Graphs used by M. Everett and S. Borgatti in their paper :
-		samn = read_CSV("res/SAMN.csv", True)
-		samp = read_CSV("res/SAMP.csv", True)
-		samnsym = read_CSV("res/SAMNSYM.csv", True)
-		sampsym = read_CSV("res/SAMPSYM.csv", True)
-		sampson_paper = convert_graph(samp, samn)
-		symmetric_sampson_paper = convert_graph(sampsym, samnsym)
-
-		graph_2_directed = Graph(5)
-		graph_2_directed.to_directed()
-		graph_2_directed.add_edge(1, 0)
-		graph_2_directed.add_edge(2, 0)
-		graph_2_directed.add_edge(3, 0)
-		graph_2_directed.add_edge(4, 0)
-
-		graph_2_undirected = Graph(5)
-		graph_2_undirected.to_undirected()
-		graph_2_undirected.add_edge(1, 0)
-		graph_2_undirected.add_edge(2, 0)
-		graph_2_undirected.add_edge(3, 0)
-		graph_2_undirected.add_edge(4, 0)
-
-		graph_5_directed = read_CSV("res/table_5.csv")
-		graph_5_directed.to_undirected("collapse", dict(weight = "mean", id = "first"))
-		graph_5_directed.to_directed()
-		graph_5_undirected = read_CSV("res/table_5.csv")
-		graph_5_undirected.to_undirected("collapse", dict(weight = "mean", id = "first"))
-
-		self.graph = {
-			'gamapos': gamapos,
-			'gamaneg': gamaneg,
-			'gama': gama,
-			'symmetrized_gama': symmetrized_gama,
-			'pn_sampson': pn_sampson,
-			'symmetric_pn_sampson': symmetric_pn_sampson,
-			'positive_sampson': positive_sampson,
-			'negative_sampson': negative_sampson,
-			'sampson_paper': sampson_paper,
-			'symmetric_sampson_paper': symmetric_sampson_paper,
-			'2_directed': graph_2_directed,
-			'2_undirected': graph_2_undirected,
-			'5_directed': graph_5_directed,
-			'5_undirected': graph_5_undirected
-			}
-
-		self.matrix = {
-			'gamapos': get_matrix(self.graph['gamapos']),
-			'gamaneg': get_matrix(self.graph['gamaneg']),
-			'gama': get_matrix(self.graph['gama']),
-			'symmetrized_gama': get_matrix(self.graph['symmetrized_gama']),
-			'pn_sampson': get_matrix(self.graph['pn_sampson']),
-			'symmetric_pn_sampson': get_matrix(self.graph['symmetric_pn_sampson']),
-			'positive_sampson': get_matrix(self.graph['positive_sampson']),
-			'negative_sampson': get_matrix(self.graph['negative_sampson']),
-			'sampson_paper': get_matrix(self.graph['sampson_paper']),
-			'symmetric_sampson_paper': get_matrix(self.graph['symmetric_sampson_paper']),
-			'2_directed': get_matrix(self.graph['2_directed']),
-			'2_undirected': get_matrix(self.graph['2_undirected']),
-			'5_directed': get_matrix(self.graph['5_directed']),
-			'5_undirected': get_matrix(self.graph['5_undirected'])
-			}
-
-		self.array = {
-			'gamapos': self.matrix['gamapos'].toarray(),
-			'gamaneg': self.matrix['gamaneg'].toarray(),
-			'gama': self.matrix['gama'].toarray(),
-			'symmetrized_gama': self.matrix['symmetrized_gama'].toarray(),
-			'pn_sampson': self.matrix['pn_sampson'].toarray(),
-			'symmetric_pn_sampson': self.matrix['symmetric_pn_sampson'].toarray(),
-			'positive_sampson': self.matrix['positive_sampson'].toarray(),
-			'negative_sampson': self.matrix['negative_sampson'].toarray(),
-			'sampson_paper': self.matrix['sampson_paper'].toarray(),
-			'symmetric_sampson_paper': self.matrix['symmetric_sampson_paper'].toarray(),
-			'2_directed': self.matrix['2_directed'].toarray(),
-			'2_undirected': self.matrix['2_undirected'].toarray(),
-			'5_directed': self.matrix['5_directed'].toarray(),
-			'5_undirected': self.matrix['5_undirected'].toarray()
-			}
-
-		# Load signnet computed data from R script
-
-		write_CSV(pn_sampson, 'res/generated/sampson_directed.csv')
-		write_CSV(symmetric_pn_sampson, 'res/generated/sampson_undirected.csv')
-
-		write_CSV(gama, 'res/generated/gama_directed.csv')
-		write_CSV(symmetrized_gama, 'res/generated/gama_undirected.csv')
-
-		self.signnet_data = load_data(abspath(Path.R_RES), abspath(Path.R_SCRIPT))
+		self.graph = self.data['graph']
+		self.matrix = self.data['matrix']
+		self.array = self.data['array']
+		self.signnet_data = self.data['signnet_data']
 
 	# def test_read_graph(self):
 	# 	array_test = array([
