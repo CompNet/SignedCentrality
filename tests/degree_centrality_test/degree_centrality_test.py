@@ -8,12 +8,13 @@ This module contains unit tests for the module degree_centrality.
 import unittest
 from math import trunc
 from os.path import abspath
+from numpy.linalg import inv
 from signedcentrality import degree_centrality
 from csv import reader, Sniffer, writer, QUOTE_MINIMAL
-from numpy import array, transpose, zeros
+from numpy import array, transpose, zeros, identity, dot
 from igraph import Graph
 from signedcentrality._utils.utils import *
-from tests import load_data, write_CSV, read_CSV
+from tests import load_data, write_csv, read_csv
 from tests.degree_centrality_test import Path
 
 
@@ -25,12 +26,12 @@ This variable is global to compute it only one time.
 """
 
 
-def convert_graph(*args, directed = True):
+def convert_graph(*args, directed=True):
 	"""
 	Convert a graph defined in one or two files to a symmetric undirected signed graph.
 
 	This function takes two or three parameters.
-	The fist one is a graph that represents the positive signed edges.
+	The first one is a graph that represents the positive signed edges.
 	The optional second one is a graph that represents the negative signed edges.
 	The third one indicates if the merged graph has to be directed
 
@@ -126,8 +127,8 @@ def convert_sampson_graph(*args):
 	positive_matrix = matrices[1]
 	negative_matrix = matrices[0]
 
-	print('positive_matrix :', positive_matrix, sep = '\n', end = '\n\n')
-	print('negative_matrix :', negative_matrix, sep = '\n', end = '\n\n')
+	# print('positive_matrix :', positive_matrix, sep='\n', end='\n\n')
+	# print('negative_matrix :', negative_matrix, sep='\n', end='\n\n')
 
 	symmetric_matrices = [positive_matrix, negative_matrix]
 
@@ -137,21 +138,21 @@ def convert_sampson_graph(*args):
 	symmetric_positive_matrix = symmetric_matrices[0]
 	symmetric_negative_matrix = symmetric_matrices[1]
 
-	print('symmetric_positive_matrix :', symmetric_positive_matrix, sep = '\n', end = '\n\n')
-	print('symmetric_negative_matrix :', symmetric_negative_matrix, sep = '\n', end = '\n\n')
+	# print('symmetric_positive_matrix :', symmetric_positive_matrix, sep='\n', end='\n\n')
+	# print('symmetric_negative_matrix :', symmetric_negative_matrix, sep='\n', end='\n\n')
 
 	pn_matrix = positive_matrix - negative_matrix
 	symmetric_pn_matrix = symmetric_positive_matrix - symmetric_negative_matrix
 
-	print('pn_matrix :', pn_matrix, sep = '\n', end = '\n\n')
-	print('symmetric_pn_matrix :', symmetric_pn_matrix, sep = '\n', end = '\n\n')
+	# print('pn_matrix :', pn_matrix, sep='\n', end='\n\n')
+	# print('symmetric_pn_matrix :', symmetric_pn_matrix, sep='\n', end='\n\n')
 
 	return {
 		'pn': matrix_to_graph(pn_matrix),  # Directed
 		'symmetric_pn_sampson': matrix_to_graph(symmetric_pn_matrix),  # Undirected
 		'positive': matrix_to_graph(positive_matrix),  # Positive directed
 		'negative': matrix_to_graph(negative_matrix)  # Negative directed
-		}
+	}
 
 
 def initialize_data():
@@ -167,20 +168,20 @@ def initialize_data():
 		return main_data
 
 	main_data = {}
-	
-	gamapos = read_CSV("res/GAMAPOS.csv")
-	gamaneg = read_CSV("res/GAMANEG.csv")
+
+	gamapos = read_csv("res/GAMAPOS.csv")
+	gamaneg = read_csv("res/GAMANEG.csv")
 	gama = convert_graph(gamapos, gamaneg)
 	symmetrized_gama = convert_graph(gamapos, gamaneg, directed=False)
 
-	samplk3 = read_CSV("res/SAMPLK3.csv", True)
-	sampdlk = read_CSV("res/SAMPDLK.csv", True)
-	sampes = read_CSV("res/SAMPES.csv", True)
-	sampdes = read_CSV("res/SAMPDES.csv", True)
-	sampin = read_CSV("res/SAMPIN.csv", True)
-	sampnin = read_CSV("res/SAMPNIN.csv", True)
-	samppr = read_CSV("res/SAMPPR.csv", True)
-	sampnpr = read_CSV("res/SAMPNPR.csv", True)
+	samplk3 = read_csv("res/SAMPLK3.csv", True)
+	sampdlk = read_csv("res/SAMPDLK.csv", True)
+	sampes = read_csv("res/SAMPES.csv", True)
+	sampdes = read_csv("res/SAMPDES.csv", True)
+	sampin = read_csv("res/SAMPIN.csv", True)
+	sampnin = read_csv("res/SAMPNIN.csv", True)
+	samppr = read_csv("res/SAMPPR.csv", True)
+	sampnpr = read_csv("res/SAMPNPR.csv", True)
 	sampson_graphs = convert_sampson_graph(samplk3, sampdlk, sampes, sampdes, sampin, sampnin, samppr, sampnpr)
 	pn_sampson = sampson_graphs['pn']
 	symmetric_pn_sampson = sampson_graphs['symmetric_pn_sampson']
@@ -188,10 +189,10 @@ def initialize_data():
 	negative_sampson = sampson_graphs['negative']
 
 	# Graphs used by M. Everett and S. Borgatti in their paper :
-	samn = read_CSV("res/SAMN.csv", True)
-	samp = read_CSV("res/SAMP.csv", True)
-	samnsym = read_CSV("res/SAMNSYM.csv", True)
-	sampsym = read_CSV("res/SAMPSYM.csv", True)
+	samn = read_csv("res/SAMN.csv", True)
+	samp = read_csv("res/SAMP.csv", True)
+	samnsym = read_csv("res/SAMNSYM.csv", True)
+	sampsym = read_csv("res/SAMPSYM.csv", True)
 	sampson_paper = convert_graph(samp, samn)
 	symmetric_sampson_paper = convert_graph(sampsym, samnsym)
 
@@ -209,10 +210,10 @@ def initialize_data():
 	graph_2_undirected.add_edge(3, 0)
 	graph_2_undirected.add_edge(4, 0)
 
-	graph_5_directed = read_CSV("res/table_5.csv")
+	graph_5_directed = read_csv("res/table_5.csv")
 	graph_5_directed.to_undirected("collapse", dict(weight="mean", id="first"))
 	graph_5_directed.to_directed()
-	graph_5_undirected = read_CSV("res/table_5.csv")
+	graph_5_undirected = read_csv("res/table_5.csv")
 	graph_5_undirected.to_undirected("collapse", dict(weight="mean", id="first"))
 
 	main_data['graph'] = {
@@ -260,6 +261,10 @@ def initialize_data():
 		'negative_sampson': main_data['matrix']['negative_sampson'].toarray(),
 		'sampson_paper': main_data['matrix']['sampson_paper'].toarray(),
 		'symmetric_sampson_paper': main_data['matrix']['symmetric_sampson_paper'].toarray(),
+		'samn': read_csv("res/SAMN.csv", True, True),
+		'samp': read_csv("res/SAMP.csv", True, True),
+		'samnsym': read_csv("res/SAMNSYM.csv", True, True),
+		'sampsym': read_csv("res/SAMPSYM.csv", True, True),
 		'2_directed': main_data['matrix']['2_directed'].toarray(),
 		'2_undirected': main_data['matrix']['2_undirected'].toarray(),
 		'5_directed': main_data['matrix']['5_directed'].toarray(),
@@ -268,11 +273,11 @@ def initialize_data():
 
 	# Load signnet computed main_data from R script
 
-	write_CSV(pn_sampson, 'res/generated/sampson_directed.csv')
-	write_CSV(symmetric_pn_sampson, 'res/generated/sampson_undirected.csv')
+	write_csv(pn_sampson, 'res/generated/sampson_directed.csv')
+	write_csv(symmetric_pn_sampson, 'res/generated/sampson_undirected.csv')
 
-	write_CSV(gama, 'res/generated/gama_directed.csv')
-	write_CSV(symmetrized_gama, 'res/generated/gama_undirected.csv')
+	write_csv(gama, 'res/generated/gama_directed.csv')
+	write_csv(symmetrized_gama, 'res/generated/gama_undirected.csv')
 
 	main_data['signnet_data'] = load_data(abspath(Path.R_RES), abspath(Path.R_SCRIPT))
 
@@ -290,36 +295,36 @@ class DegreeCentralityTest(unittest.TestCase):
 		self.array = self.data['array']
 		self.signnet_data = self.data['signnet_data']
 
-	# def test_read_graph(self):
-	# 	array_test = array([
-	# 		[0., 1., 0., 1., 0., 0., 0., -1., -1., 0.],
-	# 		[1., 0., 1., -1., 1., -1., -1., 0., 0., 0.],
-	# 		[0., 1., 0., 1., -1., 0., 0., 0., -1., 0.],
-	# 		[1., -1., 1., 0., 1., -1., -1., 0., 0., 0.],
-	# 		[0., 1., -1., 1., 0., 1., 0., -1., 0., -1.],
-	# 		[0., -1., 0., -1., 1., 0., 1., 0., 1., -1.],
-	# 		[0., -1., 0., -1., 0., 1., 0., 1., -1., 1.],
-	# 		[- 1., 0., 0., 0., -1., 0., 1., 0., 1., 0.],
-	# 		[- 1., 0., -1., 0., 0., 1., -1., 1., 0., 1.],
-	# 		[0., 0., 0., 0., -1., -1., 1., 0., 1., 0.]
-	# 		])
-	#
-	# 	for i in range(min(len(array_test), len(self.array['5_directed']))):
-	# 		for j in range(min(len(array_test[i]), len(self.array['5_directed'][i]))):
-	# 			self.assertEqual(self.array['5_directed'][i][j], array_test[i][j])
-	#
-	# def test_convert_sampson_graph(self):
-	# 	test = [self.array['sampson_paper'], self.array['symmetric_sampson_paper']]
-	# 	result = [self.array['pn_sampson'], self.array['symmetric_pn_sampson']]
-	#
-	# 	length = len(test[0])
-	#
-	# 	for n in range(len(test)):
-	# 		print("Matrix", n + 1)
-	# 		for i in range(length):
-	# 			print(test[n][i], result[n][i], sep = '\n', end = '\n\n')
-	# 			for j in range(length):
-	# 				self.assertEqual(test[n][i][j], result[n][i][j])
+	def test_read_graph(self):
+		array_test = array([
+			[0., 1., 0., 1., 0., 0., 0., -1., -1., 0.],
+			[1., 0., 1., -1., 1., -1., -1., 0., 0., 0.],
+			[0., 1., 0., 1., -1., 0., 0., 0., -1., 0.],
+			[1., -1., 1., 0., 1., -1., -1., 0., 0., 0.],
+			[0., 1., -1., 1., 0., 1., 0., -1., 0., -1.],
+			[0., -1., 0., -1., 1., 0., 1., 0., 1., -1.],
+			[0., -1., 0., -1., 0., 1., 0., 1., -1., 1.],
+			[- 1., 0., 0., 0., -1., 0., 1., 0., 1., 0.],
+			[- 1., 0., -1., 0., 0., 1., -1., 1., 0., 1.],
+			[0., 0., 0., 0., -1., -1., 1., 0., 1., 0.]
+			])
+
+		for i in range(min(len(array_test), len(self.array['5_directed']))):
+			for j in range(min(len(array_test[i]), len(self.array['5_directed'][i]))):
+				self.assertEqual(self.array['5_directed'][i][j], array_test[i][j])
+
+	def test_convert_sampson_graph(self):
+		test = [self.array['sampson_paper'], self.array['symmetric_sampson_paper']]
+		result = [self.array['pn_sampson'], self.array['symmetric_pn_sampson']]
+
+		length = len(test[0])
+
+		for n in range(len(test)):
+			# print("Matrix", n + 1)
+			for i in range(length):
+				# print(test[n][i], result[n][i], sep='\n', end='\n\n')
+				for j in range(length):
+					self.assertEqual(test[n][i][j], result[n][i][j])
 
 	def test_positive_centrality_undirected_gamapos(self):
 		"""
@@ -417,8 +422,8 @@ class DegreeCentralityTest(unittest.TestCase):
 
 		print("test in :        ", test_in)
 
-		result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['pn_sampson']))]
-		# result_in = [trunc(x * 10 ** digits) / 10 ** digits for x in degree_centrality.PNCentrality.incoming(matrix_to_graph(self.array['pn_sampson']))]
+		res_in = degree_centrality.PNCentrality.incoming_on_matrices(self.array['samp'], self.array['samn'])
+		result_in = [round(x, digits) for x in res_in]
 
 		print("result in :      ", result_in)
 
@@ -427,13 +432,12 @@ class DegreeCentralityTest(unittest.TestCase):
 	def test_PN_centrality_out_sampson_table_7(self):
 		digits = 2
 
-		test_out = [1.11, 1.03, 0.99, 0.86, 0.88, 0.80, 0.83, 1.01, 0.87, 0.99, 0.88, 0.92, 0.93, 0.90, 0.86, 0.83,
-			0.94, 0.85]
+		test_out = [1.11, 1.03, 0.99, 0.86, 0.88, 0.80, 0.83, 1.01, 0.87, 0.99, 0.88, 0.92, 0.93, 0.90, 0.86, 0.83, 0.94, 0.85]
 
 		print("test out :       ", test_out)
 
-		result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['pn_sampson']))]
-		# result_out = [trunc(x * 10 ** digits) / 10 ** digits for x in degree_centrality.PNCentrality.outgoing(matrix_to_graph(self.array['pn_sampson']))]
+		res_out = degree_centrality.PNCentrality.outgoing_on_matrices(self.array['samp'], self.array['samn'])
+		result_out = [round(x, digits) for x in res_out]
 
 		print("result out :     ", result_out)
 
@@ -442,15 +446,15 @@ class DegreeCentralityTest(unittest.TestCase):
 	def test_PN_centrality_undirected_sampson_table_4(self):
 		digits = 2
 
-		test_undirected = [1.03, 1.16, 1.07, 0.90, 0.77, 0.81, 0.76, 0.94, 0.90, 0.99, 0.85, 0.95, 0.86, 0.85, 0.64,
-			0.39, 0.48, 0.41]
+		test_undirected = [1.03, 1.16, 1.07, 0.90, 0.77, 0.81, 0.76, 0.94, 0.90, 0.99, 0.85, 0.95, 0.86, 0.85, 0.64, 0.39, 0.48, 0.41]
 
 		print("test undirected :", test_undirected)
 
-		result = [round(x, digits) for x in degree_centrality.PNCentrality.undirected(self.graph['symmetric_pn_sampson'])]
-		# result = [trunc(x * 10 ** digits) / 10 ** digits for x in degree_centrality.PNCentrality.undirected(self.graph['symmetric_pn_sampson'])]
+		res = degree_centrality.PNCentrality.undirected_on_matrices(self.array['sampsym'], self.array['samnsym'])
+		result = [round(x, digits) for x in res]
 
 		print("undirected :     ", result)
+		# print("undirected :     ", res)
 
 		self.assertSequenceEqual(result, test_undirected)
 

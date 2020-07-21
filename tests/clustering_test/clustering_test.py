@@ -57,7 +57,7 @@ def init_svm():
 	# Tests :
 	print("---- Training Data ----")
 	print()
-	for input_graph, xml in training_data:
+	for input_graph, xml in training_data.items():
 		print("=>", input_graph)
 		for key, value in xml.items():
 			print(key, ": ", value, sep="")
@@ -67,10 +67,10 @@ def init_svm():
 	print("---- Target Data ----")
 	print()
 	if target_data is not  None:
-		for input_graph, xml in target_data:
+		for input_graph, values in target_data.items():
 			print("=>", input_graph)
-			for key, value in xml.items():
-				print(key, ": ", value, sep="")
+			for value in values:
+				print(value, sep="")
 			print()
 			print()
 	else:

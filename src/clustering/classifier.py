@@ -153,8 +153,15 @@ def count_classes(file_path: str):
 
 	with open(file_path, 'r') as file:
 
+		print(file_path)
+
 		for line in file.readline():
-			id = int(line.strip())
+			id = None
+
+			try:
+				id = int(line.strip())
+			except ValueError:
+				continue
 
 			if id not in class_ids:
 				class_number += 1
@@ -208,20 +215,15 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 
 	write_xml(input_files_paths_xml_file, file_paths)
 
-	# # # Compute the descriptors :
+	# # Compute the descriptors :
 	# print("test :", getcwd())
-	# # Path.load(getcwd())
-	# # print('res :', Path.RES_PATH)
-	# # print('R_SCRIPT :', Path.R_SCRIPT)
-	# call([
-	# 	Path.R_SCRIPT,  # Path to the script to run
-	# 	dirname(Path.R_SCRIPT),  # Current working directory of this script
-	# 	input_files_paths_xml_file  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
-	# ])
-
+	# Path.load(getcwd())
+	# print('res :', Path.RES_PATH)
+	# print('R_SCRIPT :', Path.R_SCRIPT)
 	system(
 		Path.R_SCRIPT + " " +  # Path to the script to run
-		dirname(Path.R_SCRIPT) + " " +  # Current working directory of this script
+		# dirname(Path.R_SCRIPT) + " " +  # Current working directory of this script
+		Path.RES_PATH + " " +  # Current working directory of this script
 		input_files_paths_xml_file  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
 	)
 
@@ -234,8 +236,6 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 		centralities = compute_centralities_mean_stddev(read_graph(input_file_path))
 
 		training_data = {**training_data, input_file_path: {**xml_results, **centralities}}
-
-	target_data = None
 
 	# Compute target data :
 	target_data = {}
@@ -253,13 +253,17 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 
 		for dir_path, file_names in tree.items():
 			for file_name in file_names:
-				class_number = count_classes(dir_path + '/' + file_name)
+				class_number = None
+				if splitext(basename(file_name))[1] == Path.TXT_EXT:
+					class_number = count_classes(dir_path + '/' + file_name)
+				else:
+					continue
 
 				if dir_path in target_data.keys():
 					target_data[dir_path].append(file_name)
 					continue
 
-				target_data = {**target_data, dir_path: class_number}
+				target_data = {**target_data, dir_path: [class_number]}
 
 	return training_data, target_data
 

@@ -16,12 +16,16 @@ from subprocess import call
 from signedcentrality._utils.utils import get_matrix, matrix_to_graph
 
 
-def read_CSV(path, remove_signs = False):
+def read_csv(path, remove_signs=False, return_matrix=False):
 	"""
 	Creates an igraph.Graph from a CSV file
 
 	:param path: the path of the CSV file
 	:type path: str
+	:param remove_signs: True if the signs must be removed
+	:type remove_signs: bool
+	:param return_matrix: True if the function must return the matrix instead of the graph
+	:type return_matrix: bool
 	:return: the graph
 	:rtype: igraph.Graph
 	"""
@@ -45,10 +49,13 @@ def read_CSV(path, remove_signs = False):
 		else:
 			matrix = array([[float(csv[i][j]) for j in range(int(header), len(csv[i]))] for i in range(int(header), len(csv))])  # int(header) is 0 if False and 1 if true
 
+	if return_matrix:
+		return array(matrix)
+
 	return matrix_to_graph(array(matrix))
 
 
-def write_CSV(graph, path):
+def write_csv(graph, path):
 	"""
 	Creates a CSV file from an igraph.Graph
 

@@ -11,6 +11,12 @@ generated_path <- paste0(res_path, '/generated')  # Standard resource folder con
 r_generated_path <- paste0(generated_path, '/R')  # Standard resource folder to write result files.
 input_files_paths_xml_file <- paste0(args[2])  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
 
+# print(paste0(working_directory_path))
+# print(paste0(res_path))
+# print(paste0(generated_path))
+# print(paste0(r_generated_path))
+# print(paste0(input_files_paths_xml_file))
+
 setwd(working_directory_path)
 
 if (! dir.exists(r_generated_path)) {
@@ -45,8 +51,12 @@ write_xml_results <- function (data, new_xml_file_path) {
   dir_path <- ""
 
   for (dir in head(path_list, -1)) {
+    if (dir == "") {
+      next
+    }
+
     if(dir_path == "") {
-      dir_path <- paste(dir)
+      dir_path <- paste0('/', dir)
     }
     else {
       dir_path <- paste(dir_path, dir, sep = '/')
