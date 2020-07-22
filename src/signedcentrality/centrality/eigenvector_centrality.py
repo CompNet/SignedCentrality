@@ -5,8 +5,8 @@ from sys import float_info
 from numpy import real, where, array
 from numpy.linalg import norm
 from scipy.sparse.linalg import eigs
-from signedcentrality import CentralityMeasure
-from signedcentrality._utils.utils import *
+from signedcentrality._utils.utils import get_matrix, get_scale
+from signedcentrality.centrality import CentralityMeasure
 
 """
 This module contains functions related to the measure of eigenvector centrality.
@@ -22,7 +22,7 @@ class EigenvectorCentrality(CentralityMeasure):
 	This class is used to compute eigenvector centralities
 
 	This processing is done in a class because it is used in the classifier.
-	This classifier calls a method "undirected()" for all centrality computing classes which are in the package signedcentrality.
+	This classifier calls a method "undirected()" for all centrality computing classes which are in the package centrality.
 	"""
 
 	@staticmethod

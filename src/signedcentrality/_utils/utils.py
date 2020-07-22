@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
 from sys import float_info
 from igraph import Graph
 from signedcentrality._utils import *  # Import the strings defined in __init__.py.
+from numpy import array, mean, ndarray
 
 """
-This module contains utility functions that are used in the signedcentrality package.
+This module contains utility functions that are used in the centrality package.
 """
 
 
@@ -195,3 +197,40 @@ def matrix_to_graph(matrix, weight_attr=FileIds.WEIGHT):
 					graph.add_edge(row, col, weight=weight)
 
 	return graph
+
+
+def read_csv(path: str, remove_headers=True):
+	"""
+	Create a ndarray matrix from a CSV file
+
+	The matrix isn't necessarily the adjacency matrix of a graph.
+	It can contain all kinds of data.
+
+	:param path: path of the CSV file
+	:type path: str
+	:param remove_headers: True if headers must be removed
+	:type remove_headers: bool
+	:return: the matrix containing data
+	:rtype: list of lists
+	"""
+
+	matrix = None
+	csv = []
+
+	print(path)
+
+	with open(path, 'r') as file:
+
+		dialect = Sniffer().sniff(file.read(1024))
+		file.seek(0)
+
+		header = Sniffer().has_header(file.read(1024))
+		file.seek(0)
+
+		for row in reader(file, dialect):
+			csv.append(row)
+
+		matrix = [[csv[i][j] for j in range(int(header and remove_headers), len(csv[i]))] for i in range(int(header and remove_headers), len(csv))]  # int(bool) is 0 if False and 1 if true. So, int(header and remove_headers) will be 1 only if header and remove_headers are True. If they are True, the header is removed.
+
+	return matrix
+

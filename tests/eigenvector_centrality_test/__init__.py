@@ -4,7 +4,7 @@
 """
 This package contains unit tests for the module eigenvector_centrality.
 
-.. seealso: signedcentrality
+.. seealso: centrality
 .. seealso: eigenvector_centrality
 """
 

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-This package contains unit tests for the modules of the packages signedcentrality and clustering.
+This package contains unit tests for the modules of the packages centrality and clustering.
 
-.. seealso: signedcentrality
+.. seealso: centrality
 .. seealso: clustering
 """
 from os import stat
@@ -13,7 +13,8 @@ from numpy import array
 from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
 from glob import glob
 from subprocess import call
-from signedcentrality._utils.utils import get_matrix, matrix_to_graph
+
+from signedcentrality._utils.utils import matrix_to_graph, get_matrix
 
 
 def read_csv(path, remove_signs=False, return_matrix=False):
@@ -66,8 +67,7 @@ def write_csv(graph, path):
 	"""
 
 	with open(path, 'w') as file:
-
-		csv_writer = writer(file, delimiter = ',', quotechar='"', quoting=QUOTE_MINIMAL)
+		csv_writer = writer(file, delimiter=',', quotechar='"', quoting=QUOTE_MINIMAL)
 		rows = [[str(col) for col in row] for row in get_matrix(graph).toarray().tolist()]
 		for row in rows:
 			csv_writer.writerow(row)

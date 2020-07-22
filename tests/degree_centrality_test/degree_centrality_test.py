@@ -9,7 +9,7 @@ import unittest
 from math import trunc
 from os.path import abspath
 from numpy.linalg import inv
-from signedcentrality import degree_centrality
+from signedcentrality.centrality import degree_centrality
 from csv import reader, Sniffer, writer, QUOTE_MINIMAL
 from numpy import array, transpose, zeros, identity, dot
 from igraph import Graph
@@ -422,8 +422,7 @@ class DegreeCentralityTest(unittest.TestCase):
 
 		print("test in :        ", test_in)
 
-		res_in = degree_centrality.PNCentrality.incoming_on_matrices(self.array['samp'], self.array['samn'])
-		result_in = [round(x, digits) for x in res_in]
+		result_in = [round(x, digits) for x in degree_centrality.PNCentrality.incoming_on_matrices(self.array['samp'], self.array['samn'])]
 
 		print("result in :      ", result_in)
 
@@ -436,8 +435,7 @@ class DegreeCentralityTest(unittest.TestCase):
 
 		print("test out :       ", test_out)
 
-		res_out = degree_centrality.PNCentrality.outgoing_on_matrices(self.array['samp'], self.array['samn'])
-		result_out = [round(x, digits) for x in res_out]
+		result_out = [round(x, digits) for x in degree_centrality.PNCentrality.outgoing_on_matrices(self.array['samp'], self.array['samn'])]
 
 		print("result out :     ", result_out)
 
@@ -450,11 +448,9 @@ class DegreeCentralityTest(unittest.TestCase):
 
 		print("test undirected :", test_undirected)
 
-		res = degree_centrality.PNCentrality.undirected_on_matrices(self.array['sampsym'], self.array['samnsym'])
-		result = [round(x, digits) for x in res]
+		result = [round(x, digits) for x in degree_centrality.PNCentrality.undirected_on_matrices(self.array['sampsym'], self.array['samnsym'])]
 
 		print("undirected :     ", result)
-		# print("undirected :     ", res)
 
 		self.assertSequenceEqual(result, test_undirected)
 

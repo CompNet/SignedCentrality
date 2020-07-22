@@ -33,7 +33,7 @@ if (! dir.exists(r_generated_path)) {
 
 # Functions :
 
-source('../functions.R')
+source('../src/functions.R')
 
 export_results <- function(original_path, output_directory_path, results) {
   output_path <- paste0(output_directory_path, )

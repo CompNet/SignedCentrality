@@ -4,7 +4,7 @@
 """
 This package contains unit tests for the module degree_centrality.
 
-.. seealso: signedcentrality
+.. seealso: centrality
 .. seealso: degree_centrality
 """
 

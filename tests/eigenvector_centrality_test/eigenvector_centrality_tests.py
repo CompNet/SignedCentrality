@@ -6,11 +6,12 @@ This module contains unit tests for the modules eigenvector_centrality and utils
 """
 
 import unittest
+from igraph import Graph
 from scipy.sparse import csr_matrix
 from numpy import trunc, ndarray, array
 # noinspection PyProtectedMember
-from signedcentrality._utils.utils import *
-from signedcentrality.eigenvector_centrality import *
+from signedcentrality._utils.utils import write_graph, read_graph, FileIds, get_matrix, matrix_to_graph, Format
+from signedcentrality.centrality.eigenvector_centrality import compute_eigenvector_centrality
 
 
 def convert_graph(*args):
@@ -51,7 +52,7 @@ def convert_graph(*args):
 		graph.es[FileIds.WEIGHT] = [1 for _ in range(graph.ecount())]
 
 		# Second step :
-		graph.to_undirected("collapse", dict(weight = "max", id = "first"))
+		graph.to_undirected("collapse", dict(weight="max", id="first"))
 
 		# Third step :
 		if new_graph is None:  # If graph is the first of the list ...
@@ -83,19 +84,19 @@ class SignedCentralityTest(unittest.TestCase):
 			'a': read_graph("res/network_a.graphml"),
 			'b': read_graph("res/network_b.graphml"),
 			's': convert_graph(samplk3, sampdlk)
-			}
+		}
 
 		self.matrix = {
 			'a': get_matrix(self.graph['a']),
 			'b': get_matrix(self.graph['b']),
 			's': get_matrix(self.graph['s'])
-			}
+		}
 
 		self.array = {
 			'a': self.matrix['a'].toarray(),
 			'b': self.matrix['b'].toarray(),
 			's': self.matrix['s'].toarray()
-			}
+		}
 
 	def test_get_matrix_network_a(self):
 		matrix = self.matrix['a']
@@ -111,7 +112,7 @@ class SignedCentralityTest(unittest.TestCase):
 				[1, 1, 0, 1, 1],
 				[0, 0, 1, 0, 1],
 				[0, 0, 1, 1, 0]
-				])
+			])
 
 		for i in range(len(array_a)):
 			for j in range(len(array_a[i])):
@@ -131,7 +132,7 @@ class SignedCentralityTest(unittest.TestCase):
 				[1, 1, 0, 1, -1],
 				[0, 0, 1, 0, 1],
 				[0, 0, -1, 1, 0]
-				])
+			])
 
 		for i in range(len(array_b)):
 			for j in range(len(array_b[i])):
@@ -163,7 +164,7 @@ class SignedCentralityTest(unittest.TestCase):
 			[0, 0, -1, -1, -1, -1, -1, 0, 1, -1, 0, -1, 0, -1, 1, 0, 1, 1],
 			[0, 0, -1, -1, -1, 0, -1, 0, 0, 1, -1, 0, 0, -1, 0, 1, 0, 1],
 			[-1, 0, -1, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0]
-			])
+		])
 
 		for i in range(len(array_s)):
 			for j in range(len(array_s[i])):
@@ -181,10 +182,10 @@ class SignedCentralityTest(unittest.TestCase):
 				self.assertEqual(self.array[graph_name][i][j], array_test[i][j])
 
 	def test_compute_eigenvector_centrality_network_a(self):
-		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['a'], scaled = True)], [.43, .43, 1., .74, .74])
+		self.assertSequenceEqual([round(i, 2) for i in compute_eigenvector_centrality(self.graph['a'], scaled=True)], [.43, .43, 1., .74, .74])
 
 	def test_compute_eigenvector_centrality_network_b(self):
-		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], scaled = True)], [.55, .55, 1., .35, -.35])
+		self.assertSequenceEqual([trunc(i * 100) / 100 for i in compute_eigenvector_centrality(self.graph['b'], scaled=True)], [.55, .55, 1., .35, -.35])
 
 	def test_compute_eigenvector_centrality_sampson(self):
 		result = [round(i, 3) for i in compute_eigenvector_centrality(self.graph['s'])]

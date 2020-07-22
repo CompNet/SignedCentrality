@@ -13,8 +13,9 @@ import abc
 from sys import float_info
 from numpy import array, identity, dot, transpose
 from numpy.linalg import inv
-from signedcentrality import CentralityMeasure
-from signedcentrality._utils.utils import *
+
+from signedcentrality._utils.utils import get_matrix, scale_centrality
+from signedcentrality.centrality import CentralityMeasure
 
 
 class DegreeCentrality(CentralityMeasure):
@@ -120,9 +121,9 @@ class PositiveCentrality(DegreeCentrality):
 		n = len(A)
 		I = identity(n)
 		ones = array([1 for _ in range(n)])
-		beta1 = 1. / (2. * n - 2.)
+		beta = 1. / (2. * n - 2.)
 
-		h_star = dot(inv(I - beta1 * A), ones)
+		h_star = dot(inv(I - beta * A), ones)
 
 		if not scaled:
 			return h_star
@@ -177,9 +178,9 @@ class NegativeCentrality(DegreeCentrality):
 		n = len(A)
 		I = identity(n)
 		ones = array([1 for _ in range(n)])
-		beta1 = 1. / (n - 1.)
+		beta = 1. / (n - 1.)
 
-		h_star = dot(inv(I + beta1 * A), ones)
+		h_star = dot(inv(I + beta * A), ones)
 
 		if not scaled:
 			return h_star

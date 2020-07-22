@@ -10,20 +10,14 @@ The dataset "Space of optimal solutions of the Correlation Clustering problem" (
 """
 
 import unittest
-from os import walk, getcwd, chdir
-from os.path import dirname, splitext, basename
-from statistics import mean, stdev
-from subprocess import call
+from collections import OrderedDict
+from os import getcwd, chdir
 from sklearn.svm import SVC
-from clustering import SVCKernel, XMLKeys
-from clustering.classifier import Classifier, load_data
-from signedcentrality import eigenvector_centrality, degree_centrality, CentralityMeasure
+from signedcentrality.clustering import SVCKernel, XMLKeys, ClassifierMode, ClassifierData
+from signedcentrality.clustering.classifier import Classifier, load_data
 from signedcentrality._utils.utils import *
-from signedcentrality.degree_centrality import PNCentrality
-from signedcentrality.eigenvector_centrality import compute_eigenvector_centrality, EigenvectorCentrality
+from signedcentrality.centrality.degree_centrality import PNCentrality
 from tests.clustering_test import Path
-from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
-
 
 main_data = None
 """
@@ -52,31 +46,64 @@ def init_svm():
 	Path.load()
 	# print('res :', Path.RES_PATH)
 
+	# training_data, target_data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_CLUSTERS_PATH)
 	training_data, target_data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH)
 
-	# Tests :
-	print("---- Training Data ----")
-	print()
-	for input_graph, xml in training_data.items():
-		print("=>", input_graph)
-		for key, value in xml.items():
-			print(key, ": ", value, sep="")
-		print()
-		print()
+	# # Tests :
+	# print("---- Training Data ----")
+	# print()
+	# for input_graph, xml in training_data.items():
+	# 	print("\t", input_graph, sep="")
+	# 	for key, value in xml.items():
+	# 		print("\t\t", key, ": ", value, sep="")
+	# 	print()
+	# 	print()
+	#
+	# print("---- Target Data ----")
+	# print()
+	# if target_data is not None:
+	# 	for mode, targets in target_data.items():
+	# 		print('\t', mode, sep='')
+	# 		for input_graph, value in targets.items():
+	# 			print("\t\t", input_graph, ':', sep='')
+	# 			print('\t\t\t=> ', value, sep="")
+	# 			print()
+	# 		print()
+	#
+	# else:
+	# 	print('No target data.')
 
-	print("---- Target Data ----")
-	print()
-	if target_data is not  None:
-		for input_graph, values in target_data.items():
-			print("=>", input_graph)
-			for value in values:
-				print(value, sep="")
-			print()
-			print()
-	else:
-		print('No target data.')
+	data_tuples = {
+		mode: [
+			(
+				[value for key, value in OrderedDict(training_data[path]).items()],
+				target_data[mode][path]
+			) for path in OrderedDict(training_data).keys()
+		] for mode in [
+			ClassifierMode.SINGLE_CLASS,
+			ClassifierMode.CLASSES_NUMBER,
+			ClassifierMode.SINGLE_SOLUTION,
+			ClassifierMode.SOLUTIONS_NUMBER
+		]
+	}
 
-	main_data = (training_data, target_data)
+	data = {
+		mode: {
+			ClassifierData.INPUT: [
+				input_set for input_set, target_set in (data_tuples[mode])
+			],
+			ClassifierData.TARGET: [
+				target_set for input_set, target_set in (data_tuples[mode])
+			],
+		} for mode in [
+			ClassifierMode.SINGLE_CLASS,
+			ClassifierMode.CLASSES_NUMBER,
+			ClassifierMode.SINGLE_SOLUTION,
+			ClassifierMode.SOLUTIONS_NUMBER
+		]
+	}
+
+	main_data = (data, training_data, target_data)
 
 	return main_data
 
@@ -85,11 +112,37 @@ class ClusteringTest(unittest.TestCase):
 	def __init__(self, method_name: str = ...) -> None:
 		super().__init__(method_name)
 
-		self.data = init_svm()
+		self.data, self.training_data, self.target_data = init_svm()
+
+		# Tests :
+		for mode, value in self.data.items():
+			print(mode)
+			for data, v in value.items():
+				print('\t', data, sep='')
+				
+				if data == ClassifierData.INPUT:
+					for descriptors in v:
+						for descriptor in descriptors:
+							print('\t\t', descriptor, sep='')
+						print()
+				
+				else:
+					for target in v:
+						print('\t\t', target, sep='')
+
+	def test_load_data(self):
+		"""
+		Test if the sets have the same keys
+		"""
+
+		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.SINGLE_CLASS].keys())
+		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.CLASSES_NUMBER].keys())
+		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.SINGLE_SOLUTION].keys())
+		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys())
 
 	def test_classifier_default_kernel(self):
 
-		classifier = Classifier(SVC(), *self.data)
+		classifier = Classifier(SVC(), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
 		results = classifier.train()
 
 		for key, result in results:
@@ -97,7 +150,7 @@ class ClusteringTest(unittest.TestCase):
 
 	def test_classifier_linear_kernel(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), *self.data)
+		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
 		results = classifier.train()
 
 		for key, result in results:
@@ -105,7 +158,7 @@ class ClusteringTest(unittest.TestCase):
 
 	def test_classifier_poly_kernel(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.POLY), *self.data)
+		classifier = Classifier(SVC(kernel=SVCKernel.POLY), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
 		results = classifier.train()
 
 		for key, result in results:
@@ -113,7 +166,7 @@ class ClusteringTest(unittest.TestCase):
 
 	def test_classifier_sigmoid_kernel(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), *self.data)
+		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
 		results = classifier.train()
 
 		for key, result in results:
@@ -121,7 +174,7 @@ class ClusteringTest(unittest.TestCase):
 
 	def test_classifier_pre_kernel(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), *self.data)
+		classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
 		results = classifier.train()
 
 		for key, result in results:

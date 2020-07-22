@@ -9,7 +9,7 @@ This package contains unit tests for the module classifier.
 """
 
 import tests
-import clustering
+import signedcentrality.clustering as clustering
 
 
 class Path (clustering.Path):
