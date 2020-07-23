@@ -548,12 +548,6 @@ class Classifier:
 		:return: means for all accuracy, precision and recall scores
 		"""
 
-		# print(
-		# 	"train: ", len(self.__train_data),
-		# 	"test:  ", len(self.__train_target),
-		# 	sep='\n'
-		# )
-
 		self.__classifier.fit(
 			self.__train_data,  # Lists of descriptors
 			self.__train_target  # List of results for each list of descriptors
@@ -565,12 +559,8 @@ class Classifier:
 			test_data = self.__test_data[i]
 			test_target = [self.__test_target[i]]  # It must be an array-like object.
 
-			# print('test data:  ', test_data)
-			# print('test target:', test_target)
-
 			predicted_test_target = self.__classifier.predict([test_data])
 			predicted_test_target_list.append(predicted_test_target)
-			# print('predicted  :', predicted_test_target)
 			self.__accuracy_list.append(accuracy_score(test_target, predicted_test_target))
 			self.__precision_list.append(precision_score(test_target, predicted_test_target))
 			self.__recall_list.append(recall_score(test_target, predicted_test_target))

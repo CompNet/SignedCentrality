@@ -116,42 +116,100 @@ class ClusteringTest(unittest.TestCase):
 		self.assertEqual(len(self.training_data.keys()), len(self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys()))
 		self.assertEqual(self.training_data.keys(), self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys())
 
-	def test_classifier_default_kernel(self):
+	def test_classifier_linear_kernel_single_solution(self):
 
-		# classifier = Classifier(SVC(), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
-		classifier = Classifier(SVC(), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
-		result = classifier.train()
-
-		print(result, end="\n\n")
-
-	def test_classifier_linear_kernel(self):
-
-		# classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
 		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
 		result = classifier.train()
 
 		print(result, end="\n\n")
 
-	def test_classifier_poly_kernel(self):
+	def test_classifier_rbf_kernel_single_solution(self):
 
-		# classifier = Classifier(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		classifier = Classifier(SVC(), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_poly_kernel_single_solution(self):
+
 		classifier = Classifier(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
 		result = classifier.train()
 
 		print(result, end="\n\n")
 
-	def test_classifier_sigmoid_kernel(self):  # Works sometimes
+	def test_classifier_sigmoid_kernel_single_solution(self):
 
-		# classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
 		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
 		result = classifier.train()
 
 		print(result, end="\n\n")
 
-	def test_classifier_pre_kernel(self):  # Doesn't work
+	def test_classifier_rbf_kernel_auto_single_solution(self):
 
-		# classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
-		classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		classifier = Classifier(SVC(kernel='rbf', gamma='auto'), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_poly_kernel_auto_single_solution(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.POLY, gamma='auto'), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_sigmoid_kernel_auto_single_solution(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID, gamma='auto'), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_linear_kernel_single_class(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_rbf_kernel_single_class(self):
+
+		classifier = Classifier(SVC(), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_poly_kernel_single_class(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_sigmoid_kernel_single_class(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_rbf_kernel_auto_single_class(self):
+
+		classifier = Classifier(SVC(kernel='rbf', gamma='auto'), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_poly_kernel_auto_single_class(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.POLY, gamma='auto'), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		result = classifier.train()
+
+		print(result, end="\n\n")
+
+	def test_classifier_sigmoid_kernel_auto_single_class(self):
+
+		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID, gamma='auto'), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
 		result = classifier.train()
 
 		print(result, end="\n\n")
