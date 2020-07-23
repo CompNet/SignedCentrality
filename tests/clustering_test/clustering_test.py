@@ -14,7 +14,7 @@ from collections import OrderedDict
 from os import getcwd, chdir
 from sklearn.svm import SVC
 from signedcentrality.clustering import SVCKernel, XMLKeys, ClassifierMode, ClassifierData
-from signedcentrality.clustering.classifier import Classifier, load_data
+from signedcentrality.clustering.classifier import Classifier, load_data, format_train_test_data
 from signedcentrality._utils.utils import *
 from signedcentrality.centrality.degree_centrality import PNCentrality
 from tests.clustering_test import Path
@@ -73,35 +73,23 @@ def init_svm():
 	# else:
 	# 	print('No target data.')
 
-	data_tuples = {
-		mode: [
-			(
-				[value for key, value in OrderedDict(training_data[path]).items()],
-				target_data[mode][path]
-			) for path in OrderedDict(training_data).keys()
-		] for mode in [
-			ClassifierMode.SINGLE_CLASS,
-			ClassifierMode.CLASSES_NUMBER,
-			ClassifierMode.SINGLE_SOLUTION,
-			ClassifierMode.SOLUTIONS_NUMBER
-		]
-	}
+	data = format_train_test_data(training_data, target_data)
 
-	data = {
-		mode: {
-			ClassifierData.INPUT: [
-				input_set for input_set, target_set in (data_tuples[mode])
-			],
-			ClassifierData.TARGET: [
-				target_set for input_set, target_set in (data_tuples[mode])
-			],
-		} for mode in [
-			ClassifierMode.SINGLE_CLASS,
-			ClassifierMode.CLASSES_NUMBER,
-			ClassifierMode.SINGLE_SOLUTION,
-			ClassifierMode.SOLUTIONS_NUMBER
-		]
-	}
+	# # Tests :
+	# for mode, value in data.items():
+	# 	print(mode)
+	# 	for data, v in value.items():
+	# 		print('\t', data, sep='')
+	#
+	# 		if data == ClassifierData.INPUT:
+	# 			for descriptors in v:
+	# 				for descriptor in descriptors:
+	# 					print('\t\t', descriptor, sep='')
+	# 				print()
+	#
+	# 		else:
+	# 			for target in v:
+	# 				print('\t\t', target, sep='')
 
 	main_data = (data, training_data, target_data)
 
@@ -114,71 +102,59 @@ class ClusteringTest(unittest.TestCase):
 
 		self.data, self.training_data, self.target_data = init_svm()
 
-		# Tests :
-		for mode, value in self.data.items():
-			print(mode)
-			for data, v in value.items():
-				print('\t', data, sep='')
-				
-				if data == ClassifierData.INPUT:
-					for descriptors in v:
-						for descriptor in descriptors:
-							print('\t\t', descriptor, sep='')
-						print()
-				
-				else:
-					for target in v:
-						print('\t\t', target, sep='')
-
 	def test_load_data(self):
 		"""
 		Test if the sets have the same keys
 		"""
 
-		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.SINGLE_CLASS].keys())
-		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.CLASSES_NUMBER].keys())
-		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.SINGLE_SOLUTION].keys())
-		self.assertSequenceEqual(self.training_data.keys(), self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys())
+		self.assertEqual(len(self.training_data.keys()), len(self.target_data[ClassifierMode.SINGLE_CLASS].keys()))
+		self.assertEqual(self.training_data.keys(), self.target_data[ClassifierMode.SINGLE_CLASS].keys())
+		self.assertEqual(len(self.training_data.keys()), len(self.target_data[ClassifierMode.CLASSES_NUMBER].keys()))
+		self.assertEqual(self.training_data.keys(), self.target_data[ClassifierMode.CLASSES_NUMBER].keys())
+		self.assertEqual(len(self.training_data.keys()), len(self.target_data[ClassifierMode.SINGLE_SOLUTION].keys()))
+		self.assertEqual(self.training_data.keys(), self.target_data[ClassifierMode.SINGLE_SOLUTION].keys())
+		self.assertEqual(len(self.training_data.keys()), len(self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys()))
+		self.assertEqual(self.training_data.keys(), self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys())
 
 	def test_classifier_default_kernel(self):
 
-		classifier = Classifier(SVC(), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
-		results = classifier.train()
+		# classifier = Classifier(SVC(), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		classifier = Classifier(SVC(), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
 
-		for key, result in results:
-			print(key, " :\t", result, end="\n\n")
+		print(result, end="\n\n")
 
 	def test_classifier_linear_kernel(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
-		results = classifier.train()
+		# classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
 
-		for key, result in results:
-			print(key, " :\t", result, end="\n\n")
+		print(result, end="\n\n")
 
 	def test_classifier_poly_kernel(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.POLY), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
-		results = classifier.train()
+		# classifier = Classifier(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		classifier = Classifier(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
 
-		for key, result in results:
-			print(key, " :\t", result, end="\n\n")
+		print(result, end="\n\n")
 
-	def test_classifier_sigmoid_kernel(self):
+	def test_classifier_sigmoid_kernel(self):  # Works sometimes
 
-		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
-		results = classifier.train()
+		# classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		classifier = Classifier(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
 
-		for key, result in results:
-			print(key, " :\t", result, end="\n\n")
+		print(result, end="\n\n")
 
-	def test_classifier_pre_kernel(self):
+	def test_classifier_pre_kernel(self):  # Doesn't work
 
-		classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), mode=ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS]))
-		results = classifier.train()
+		# classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), ClassifierMode.SINGLE_CLASS, *(self.data[ClassifierMode.SINGLE_CLASS].values()))
+		classifier = Classifier(SVC(kernel=SVCKernel.PRECOMPUTED), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
+		result = classifier.train()
 
-		for key, result in results:
-			print(key, " :\t", result, end="\n\n")
+		print(result, end="\n\n")
 
 
 if __name__ == '__main__':

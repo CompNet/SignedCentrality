@@ -4,17 +4,17 @@
 """
 This module contains a classifier which uses centralities computed in centrality package.
 """
-
+from collections import OrderedDict
 from os.path import dirname, exists
 from subprocess import call
 from sys import stderr
 from typing import Any
 from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
 from numpy import array, mean, ndarray
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from signedcentrality.clustering import XMLKeys, CSVResultsFileColNames, ClassifierMode
+from signedcentrality.clustering import XMLKeys, CSVResultsFileColNames, ClassifierMode, ClassifierData
 from os import walk, makedirs, getcwd, system
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
@@ -204,9 +204,9 @@ def read_class_results_csv(path, description_processing_function=_get_path_from_
 
 		processed_data = {**processed_data, dir_path: {
 			ClassifierMode.SOLUTIONS_NUMBER: int(data[i][1]),
-			ClassifierMode.SINGLE_SOLUTION: bool(data[i][2]),
+			ClassifierMode.SINGLE_SOLUTION: bool(int(data[i][2])),
 			ClassifierMode.CLASSES_NUMBER: int(data[i][3]),
-			ClassifierMode.SINGLE_CLASS: bool(data[i][4])
+			ClassifierMode.SINGLE_CLASS: bool(int(data[i][4]))
 		}}
 
 	return processed_data
@@ -308,7 +308,7 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 		] for input_file_path in input_files_paths
 	]
 
-	print('input_files_paths_xml_file:', input_files_paths_xml_file)
+	# print('input_files_paths_xml_file:', input_files_paths_xml_file)
 
 	write_xml(input_files_paths_xml_file, file_paths)
 
@@ -346,6 +346,53 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 	return training_data, target_data
 
 
+def format_train_test_data(training_data, target_data):
+	"""
+	Format training data and target data to use it to train the classifier
+
+	the format is a dict containing training and target data for each ClassifierMode.
+	For each mode, there are input data and target data in two lists.
+
+	The input data list is the same object for all modes, because it saves memory and time processing.
+	This list contains descriptors of all graphs, sorted by file paths of graphs.
+	Each descriptors list contains all descriptors of the graph, sorted by descriptor name in training_data.
+
+	The target data list is different for each mode.
+	It contains target data for the mode, sorted by file paths of input graphs.
+
+	To use these data to train the classifier, one has to set as parameter the unpacked value for the right mode.
+
+	:param training_data: input data to train the classifier
+	:param target_data: target data to test the trained classifier
+	:return: formatted data
+	:rtype: dict
+	"""
+
+	paths = OrderedDict(training_data).keys()  # There are the same paths for training data and target data.
+	inputs = [
+				[
+					value for key, value in OrderedDict(training_data[path]).items()
+				] for path in paths
+			]
+
+	data = {
+		mode: {
+			ClassifierData.INPUT: inputs,  # Only the reference is copied, the same object is in all the modes. So, it saves the RAM and spend less time to process.
+			ClassifierData.TARGET: [
+				# target_data[mode][path] for path in paths
+				int(target_data[mode][path]) for path in paths  # int(), because classifier uses int values.
+			],
+		} for mode in [
+			ClassifierMode.SINGLE_CLASS,
+			ClassifierMode.CLASSES_NUMBER,
+			ClassifierMode.SINGLE_SOLUTION,
+			ClassifierMode.SOLUTIONS_NUMBER
+		]
+	}
+
+	return data
+
+
 class Classifier:
 	"""
 	This class computes the number of classes of solutions for a clustering.
@@ -367,19 +414,85 @@ class Classifier:
 				sep='\n', file=stderr
 			)
 
-		self.data = training_vectors
-		self.target = target_values
-
+		self.__data = training_vectors
+		self.__target = target_values
 		self.__classifier = classifier
 		self.__mode = mode
+
+		# Classification metrics for training :
 		self.__accuracy_score = None
+		"""
+		Accuracy score for the training
+		
+		According to the SciKit Learn Documentation, 
+		
+			"In multilabel classification, this function computes subset accuracy: the set of labels predicted for a sample must exactly match the corresponding set of labels in y_true."
+		"""
+
 		self.__precision_score = None
+		"""
+		Precision score for the training
+		
+		According to the SciKit Learn Documentation, 
+		
+			"The precision is the ratio tp / (tp + fp) where tp is the number of true positives and fp the number of false positives. 
+			The precision is intuitively the ability of the classifier not to label as positive a sample that is negative.
+	
+			The best value is 1 and the worst value is 0."
+		"""
+
 		self.__recall_score = None
+		"""
+		Recall score for the training
+		
+		According to the SciKit Learn Documentation, 
+		
+			"The recall is the ratio tp / (tp + fn) where tp is the number of true positives and fn the number of false negatives. 
+			The recall is intuitively the ability of the classifier to find all the positive samples. 
+			
+			The best value is 1 and the worst value is 0."
+		"""
+
 		self.__accuracy_list = []
 		self.__precision_list = []
 		self.__recall_list = []
 
-		self.__train_data, self.__test_data, self.__train_target, self.__test_target = train_test_split(self.data, self.target, test_size=.3)
+		self.training_classification_report = None
+		"""
+		Report about training for classification
+
+		The report shows the main metrics for a classification.
+		"""
+
+		# Regression metrics for training :
+
+		# TODO
+
+		# Initialization of datasets:
+
+		self.__train_data, self.__test_data, self.__train_target, self.__test_target = train_test_split(self.__data, self.__target, test_size=.3)
+
+	@property
+	def training_vectors(self):
+		return self.__data
+
+	@training_vectors.setter
+	def training_vectors(self, vectors):
+		if self.__data is None:
+			self.__data = vectors
+		else:
+			raise ValueError('Training vectors are already set.')
+
+	@property
+	def target_values(self):
+		return self.__target
+
+	@target_values.setter
+	def target_values(self, values):
+		if self.__target is None:
+			self.__target = values
+		else:
+			raise ValueError('Target values are already set.')
 
 	@property
 	def mode(self):
@@ -432,29 +545,58 @@ class Classifier:
 		The classifier in trained with 70% of training data and 30% of test data.
 		Data set is randomly divided.
 
-		:param mode: Mode for which the classifier must be set
 		:return: means for all accuracy, precision and recall scores
 		"""
 
+		# print(
+		# 	"train: ", len(self.__train_data),
+		# 	"test:  ", len(self.__train_target),
+		# 	sep='\n'
+		# )
+
 		self.__classifier.fit(
 			self.__train_data,  # Lists of descriptors
-			self.__test_target  # List of results for each list of descriptors
+			self.__train_target  # List of results for each list of descriptors
 		)
 
-		for test_data in self.__test_data:
-			predicted_test_target = self.__classifier.predict(test_data)
-			self.__accuracy_list.append(accuracy_score(self.__test_target, predicted_test_target))
-			self.__precision_list.append(precision_score(self.__test_target, predicted_test_target))
-			self.__recall_list.append(recall_score(self.__test_target, predicted_test_target))
+		predicted_test_target_list = []
+
+		for i in range(len(self.__test_data)):
+			test_data = self.__test_data[i]
+			test_target = [self.__test_target[i]]  # It must be an array-like object.
+
+			# print('test data:  ', test_data)
+			# print('test target:', test_target)
+
+			predicted_test_target = self.__classifier.predict([test_data])
+			predicted_test_target_list.append(predicted_test_target)
+			# print('predicted  :', predicted_test_target)
+			self.__accuracy_list.append(accuracy_score(test_target, predicted_test_target))
+			self.__precision_list.append(precision_score(test_target, predicted_test_target))
+			self.__recall_list.append(recall_score(test_target, predicted_test_target))
 
 		self.__accuracy_score = mean(self.__accuracy_list)
 		self.__precision_score = mean(self.__precision_list)
 		self.__recall_score = mean(self.__recall_list)
 
-		return {'accuracy': self.__accuracy_score, 'precision': self.__precision_score, 'recall': self.__recall_score}
+		self.training_classification_report = classification_report(self.__test_target, predicted_test_target_list)
 
-	def get_class_number(self, graph):
-		predicted_result = self.__classifier.predict()
+		return self.training_classification_report
+
+	def predict(self, descriptors: list):
+		"""
+		Predict the result for the descriptors of a graph.
+
+		Descriptors must be the same as for the training.
+		The predicted result is the mode which have been set in the constructor.
+		To predict for another mode, one has to train another classifier.
+
+		This function returns an integer value.
+
+		:param descriptors: descriptors of a graph.
+		:return: the predicted result
+		"""
+		predicted_result = self.__classifier.predict(descriptors)
 		print(predicted_result)
 
 		return predicted_result
