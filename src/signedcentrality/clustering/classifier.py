@@ -5,30 +5,20 @@
 This module contains a classifier which uses centralities computed in centrality package.
 """
 from collections import OrderedDict
-from os.path import dirname, exists
-from subprocess import call
-from sys import stderr
-from typing import Any
-from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
-from numpy import array, mean, ndarray
-from sklearn.metrics import accuracy_score, precision_score, recall_score, classification_report
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-from signedcentrality.clustering import XMLKeys, CSVResultsFileColNames, ClassifierMode, ClassifierData
-from os import walk, makedirs, getcwd, system
+from os import walk, makedirs, system
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
-from subprocess import call
+from warnings import warn
+from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
+from sklearn.metrics import accuracy_score, precision_score, recall_score, classification_report, max_error, mean_absolute_error, median_absolute_error, r2_score, f1_score
+from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from signedcentrality.clustering import SVCKernel
-from signedcentrality.centrality import eigenvector_centrality, CentralityMeasure
-from signedcentrality.centrality import degree_centrality
 from signedcentrality._utils.utils import *
+from signedcentrality.centrality import CentralityMeasure
 from signedcentrality.centrality.degree_centrality import PNCentrality
-from signedcentrality.centrality.eigenvector_centrality import compute_eigenvector_centrality, EigenvectorCentrality
-from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
+from signedcentrality.centrality.eigenvector_centrality import EigenvectorCentrality
 from signedcentrality.clustering import Path
-from signedcentrality._utils.utils import *
+from signedcentrality.clustering import XMLKeys, ClassifierMode, ClassifierData
 
 
 def _compute_centrality_mean_stddev(graph, centrality_class):
@@ -283,14 +273,7 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 			for file_name in file_names:
 				targets = {**targets, **read_class_results_csv("/".join([dir_path, file_name]))}
 
-	# # For tests:
-	# for key, val in targets.items():
-	# 	print(key)
-	# 	for k, v in val.items():
-	# 		print('\t', k, ": ", v, sep='')
-
 	# Load input data:
-
 	# Create a file containing paths to the graphs of the dataset:
 	input_files_paths = []
 	for (dir_path, dir_names, file_names) in walk(training_data_directory_path):
@@ -307,8 +290,6 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 				Path.XML_EXT)  # Path to R generated file containing results for input file.
 		] for input_file_path in input_files_paths
 	]
-
-	# print('input_files_paths_xml_file:', input_files_paths_xml_file)
 
 	write_xml(input_files_paths_xml_file, file_paths)
 
@@ -395,10 +376,25 @@ def format_train_test_data(training_data, target_data):
 
 class Classifier:
 	"""
-	This class computes the number of classes of solutions for a clustering.
+	This class computes the number of solutions and classes of solutions for the Optimal Clustering Problem.
+
+	It also computes if there are one or several solutions or classes.
+	It uses a classification or a regression, depending on the chosen mode.
+	Classification is computed using the classifier sklearn.svm.SVC.
+	Regression is computed using the classifier sklearn.svm.SVR.
+
+	There are four mode which define what is computed :
+	- ClassifierMode.SINGLE_CLASS (classification): computes if there are one or several classes.
+	- ClassifierMode.CLASSES_NUMBER (regression): computes the number of classes of solutions.
+	- ClassifierMode.SINGLE_SOLUTION (classification): computes if there are one or several solutions.
+	- ClassifierMode.SOLUTIONS_NUMBER (regression): computes the number of solutions.
+
+	It also gives information about the training using SciKit Learn metrics.
+	There are different metrics for classification and regression.
+	In this class, metrics documentation give information gathered on SciKit learn documentation.
 	"""
 
-	def __init__(self, classifier: SVC, mode: ClassifierMode, training_vectors=None, target_values=None):
+	def __init__(self, classifier, mode: ClassifierMode, training_vectors=None, target_values=None, hide_warnings=False):
 		"""
 		Creates a newly allocated Classifier object.
 
@@ -407,12 +403,20 @@ class Classifier:
 		:param target_values: Class numbers of input descriptors.
 		"""
 
-		if training_vectors is None or target_values is None:
-			print(
-				'The parameters training_vectors and target_values are not set.',
-				'The attributes data and target must be set before the training.',
-				sep='\n', file=stderr
-			)
+		if not hide_warnings and (training_vectors is None or target_values is None):
+			message = 'The parameter{} not set.\nThe attribute{} must be set before the training.'
+			params = "s training_vectors and target_values are"
+			attributes = "s data and target"
+
+			if training_vectors is None and target_values is not None:
+				params = " training_vectors is"
+				attributes = " data"
+			elif target_values is None and training_vectors is not None:
+				params = " target_values is"
+				attributes = " target"
+			# Else, if training_vectors is None or target_values is None, the message is already set.
+
+			warn(message.format(params, attributes))
 
 		self.__data = training_vectors
 		self.__target = target_values
@@ -422,7 +426,7 @@ class Classifier:
 		# Classification metrics for training :
 		self.__accuracy_score = None
 		"""
-		Accuracy score for the training
+		Accuracy score
 		
 		According to the SciKit Learn Documentation, 
 		
@@ -431,7 +435,7 @@ class Classifier:
 
 		self.__precision_score = None
 		"""
-		Precision score for the training
+		Precision score
 		
 		According to the SciKit Learn Documentation, 
 		
@@ -443,19 +447,24 @@ class Classifier:
 
 		self.__recall_score = None
 		"""
-		Recall score for the training
-		
+		Recall score
+
 		According to the SciKit Learn Documentation, 
-		
+
 			"The recall is the ratio tp / (tp + fn) where tp is the number of true positives and fn the number of false negatives. 
 			The recall is intuitively the ability of the classifier to find all the positive samples. 
-			
+
 			The best value is 1 and the worst value is 0."
 		"""
 
-		self.__accuracy_list = []
-		self.__precision_list = []
-		self.__recall_list = []
+		self.__f1_score = None
+		"""
+		Balanced F-score
+
+		According to the SciKit Learn Documentation, 
+
+			"The F1 score can be interpreted as a weighted average of the precision and recall, where an F1 score reaches its best value at 1 and worst score at 0. The relative contribution of precision and recall to the F1 score are equal."
+		"""
 
 		self.training_classification_report = None
 		"""
@@ -466,7 +475,49 @@ class Classifier:
 
 		# Regression metrics for training :
 
-		# TODO
+		self.__max_error = None
+		"""
+		Maximum residual error
+
+		According to the SciKit Learn Documentation, 
+
+			"The max_error function computes the maximum residual error , a metric that captures the worst case error between the predicted value and the true value. In a perfectly fitted single output regression model, max_error would be 0 on the training set and though this would be highly unlikely in the real world, this metric shows the extent of error that the model had when it was fitted.
+			
+			The max_error does not support multioutput."
+		"""
+
+		self.__mean_absolute_error = None
+		"""
+		Mean absolute error
+
+		According to the SciKit Learn Documentation, 
+
+			"The mean_absolute_error function computes mean absolute error, a risk metric corresponding to the expected value of the absolute error loss or l1-norm loss."
+		"""
+
+		self.__median_absolute_error = None
+		"""
+		Median absolute error
+
+		According to the SciKit Learn Documentation, 
+
+			"The median_absolute_error is particularly interesting because it is robust to outliers. The loss is calculated by taking the median of all absolute differences between the target and the prediction.
+
+			The median_absolute_error does not support multioutput."
+		"""
+
+		self.__r2_score = None
+		"""
+		Coefficient of determination
+
+		According to the SciKit Learn Documentation, 
+
+			"The r2_score function computes the coefficient of determination, usually denoted as R².
+			
+			It represents the proportion of variance (of y) that has been explained by the independent variables in the model. It provides an indication of goodness of fit and therefore a measure of how well unseen samples are likely to be predicted by the model, through the proportion of explained variance.
+			
+			As such variance is dataset dependent, R² may not be meaningfully comparable across different datasets. Best possible score is 1.0 and it can be negative (because the model can be arbitrarily worse). A constant model that always predicts the expected value of y, disregarding the input features, would get a R² score of 0.0."
+		"""
 
 		# Initialization of datasets:
 
@@ -511,16 +562,24 @@ class Classifier:
 		return self.__recall_score
 
 	@property
-	def accuracy_list(self):
-		return self.__accuracy_list
+	def f1_score(self):
+		return self.__f1_score
 
 	@property
-	def precision_list(self):
-		return self.__precision_list
+	def max_error(self):
+		return self.__max_error
 
 	@property
-	def recall_list(self):
-		return self.__recall_list
+	def mean_absolute_error(self):
+		return self.__mean_absolute_error
+
+	@property
+	def median_absolute_error(self):
+		return self.__median_absolute_error
+
+	@property
+	def r2_score(self):
+		return self.__r2_score
 
 	@property
 	def train_data(self):
@@ -537,6 +596,53 @@ class Classifier:
 	@property
 	def test_target(self):
 		return self.__test_target
+
+	def __compute_classification_metrics(self, test_target, predicted_test_target):
+		"""
+		Compute the metrics for a classification
+
+		:param test_target: right values
+		:param predicted_test_target: values which have been predicted by the classifier
+		:return: a report showing the metrics
+		"""
+
+		self.__accuracy_score = accuracy_score(test_target, predicted_test_target)
+		self.__precision_score = precision_score(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
+		self.__recall_score = recall_score(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
+		self.__f1_score = f1_score(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
+		self.training_classification_report = classification_report(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
+
+		report = self.training_classification_report
+
+		return report
+
+	def __compute_regression_metrics(self, test_target, predicted_test_target):
+		"""
+		Compute the metrics for a regression
+
+		:param test_target: right values
+		:param predicted_test_target: values which have been predicted by the regression
+		:return: a report showing the metrics
+		"""
+
+		self.__max_error = max_error(test_target, predicted_test_target)
+		self.__mean_absolute_error = mean_absolute_error(test_target, predicted_test_target)
+		self.__median_absolute_error = median_absolute_error(test_target, predicted_test_target)
+		self.__r2_score = r2_score(test_target, predicted_test_target)
+
+		report = '\n'.join([
+			"Maximum residual error:       {}",
+			"Mean absolute error:          {}",
+			"Median absolute error:        {}",
+			"Coefficient of determination: {}"
+		]).format(
+			self.__max_error,
+			self.__mean_absolute_error,
+			self.__median_absolute_error,
+			self.__r2_score
+		)
+
+		return report
 
 	def train(self):
 		"""
@@ -557,21 +663,16 @@ class Classifier:
 
 		for i in range(len(self.__test_data)):
 			test_data = self.__test_data[i]
-			test_target = [self.__test_target[i]]  # It must be an array-like object.
-
 			predicted_test_target = self.__classifier.predict([test_data])
 			predicted_test_target_list.append(predicted_test_target)
-			self.__accuracy_list.append(accuracy_score(test_target, predicted_test_target))
-			self.__precision_list.append(precision_score(test_target, predicted_test_target))
-			self.__recall_list.append(recall_score(test_target, predicted_test_target))
 
-		self.__accuracy_score = mean(self.__accuracy_list)
-		self.__precision_score = mean(self.__precision_list)
-		self.__recall_score = mean(self.__recall_list)
+		report = None
+		if isinstance(self.__classifier, SVC):
+			report = self.__compute_classification_metrics(self.__test_target, predicted_test_target_list)
+		else:  # if isinstance(self.__classifier, SVR)
+			report = self.__compute_regression_metrics(self.__test_target, predicted_test_target_list)
 
-		self.training_classification_report = classification_report(self.__test_target, predicted_test_target_list)
-
-		return self.training_classification_report
+		return report
 
 	def predict(self, descriptors: list):
 		"""
