@@ -13,11 +13,6 @@ import signedcentrality.clustering as clustering
 
 
 class Path (clustering.Path):
-	# # R_SCRIPT = "clustering_test.R"
-	# R_SCRIPT = "../../src/clustering/graph_descriptors.R"
-	# """
-	# Script computing data to load in clustering_test module.
-	# """
 
 	DATASET_PATH = "../../../../clustering_dataset/"
 	"""

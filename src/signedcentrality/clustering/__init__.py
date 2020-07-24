@@ -225,12 +225,6 @@ class XMLKeys:
 	Attribute defining the path to files that contain results computed by the R script.
 	"""
 
-	R_SCRIPT = "clustering_test.R"
-	# R_SCRIPT = "../../src/clustering/graph_descriptors.R"
-	"""
-	Script computing graph descriptors to use with Classifier.
-	"""
-
 
 class CSVResultsFileColNames:
 	"""

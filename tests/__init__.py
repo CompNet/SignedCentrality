@@ -77,7 +77,6 @@ def load_data(res_path, R_script_path):
 	"""
 	Loads data computed using a R script
 
-	The script clustering_test.R is used in order to compute data.
 	It exports data into CSV files which are read by this function.
 
 	:return: data to make tests

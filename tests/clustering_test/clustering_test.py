@@ -89,22 +89,38 @@ def init_svm():
 	return main_data
 
 
-def generic_classifier_test(classifier, mode: ClassifierMode, data, print_result=True):
+def generic_classifier_test(params: dict, mode: ClassifierMode, data, print_result=True):
 	"""
 	Generic test for classifier or regressor
 
-	:param classifier: classifier or regressor
+	:param params: parameters for the classifier or regressor
 	:param mode: Classifier mode
 	:param data: data to use
 	:param print_result: if True, the results are printed
 	:return: the results
 	"""
 
-	classifier = Classifier(classifier, mode, *(data[mode].values()))
+	separator = "".join(['-' for _ in range(79)])
+
+	svm = None
+	if mode == ClassifierMode.SOLUTIONS_NUMBER or mode == ClassifierMode.CLASSES_NUMBER:
+		svm = SVR(**params)
+	else:
+		svm = SVC(**params)
+
+	if print_result:
+		print()
+		print(separator)
+		print(str(mode).replace(str(mode.__class__).replace("<enum '", "").replace("'>", "") + '.', ''), params, sep='\t')
+		print(separator)
+
+	classifier = Classifier(svm, mode, *(data[mode].values()))
 	result = classifier.train()
 
 	if print_result:
-		print(result, end="\n\n")
+		print(result)
+		print(separator)
+		print()
 
 	return result
 
@@ -114,6 +130,51 @@ class ClusteringTest(unittest.TestCase):
 		super().__init__(method_name)
 
 		self.data, self.training_data, self.target_data = init_svm()
+
+		self.main_params_list = [
+			{'kernel': SVCKernel.LINEAR},
+			{'kernel': SVCKernel.RBF, 'gamma': 'scale'},  # 'scale' is default value.
+			{'kernel': SVCKernel.RBF, 'gamma': 'auto'},
+			{'kernel': SVCKernel.POLY, 'gamma': 'scale'},  # 'scale' is default value.
+			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 100_000},  # Because default value is too long to compute.
+			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 1_000_000},  # Because default value is too long to compute.
+			{'kernel': SVCKernel.SIGMOID, 'gamma': 'scale'},  # 'scale' is default value.
+			{'kernel': SVCKernel.SIGMOID, 'gamma': 'auto'}
+		]  # These parameters are the main ones, those which cover the kernel settings.
+
+		additional_parameters = {
+			'tol': 1e-1,  # 1e-3 is default value.
+			'shrinking': False,  # True is default value.
+		}  # These parameters must be combined with all others.
+
+		additional_svc_parameters = {
+			'probability': True,  # False is default value.
+			'decision_function_shape': 'ovo'  # 'ovr' is default value.
+		}  # These parameters must be combined with all others, but only for a SVC classifier.
+
+		additional_svr_parameters = {
+		}  # These parameters must be combined with all others, but only for a SVR regressor.
+
+		for key, value in additional_parameters.items():
+			self.main_params_list = [
+				*self.main_params_list,
+				*[{**params, key: value} for params in self.main_params_list]
+			]
+
+		self.svc_params_list = [*self.main_params_list]
+		self.svr_params_list = [*self.main_params_list]
+
+		for key, value in additional_svc_parameters.items():
+			self.svc_params_list = [
+				*self.svc_params_list,
+				*[{**params, key: value} for params in self.svc_params_list]
+			]
+
+		for key, value in additional_svr_parameters.items():
+			self.svr_params_list = [
+				*self.svr_params_list,
+				*[{**params, key: value} for params in self.svr_params_list]
+			]
 
 	def test_load_data(self):
 		"""
@@ -129,120 +190,48 @@ class ClusteringTest(unittest.TestCase):
 		self.assertEqual(len(self.training_data.keys()), len(self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys()))
 		self.assertEqual(self.training_data.keys(), self.target_data[ClassifierMode.SOLUTIONS_NUMBER].keys())
 
-	def test_classifier_linear_kernel_single_solution(self):
+	def test_classifier_single_solution(self):
 
-		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_SOLUTION, *(self.data[ClassifierMode.SINGLE_SOLUTION].values()))
-		result = classifier.train()
+		params_list = [
+			*self.svc_params_list
+		]  # Additional parameters can be added here only for this test case.
 
-		print(result, end="\n\n")
+		for params in params_list:
+			if params['kernel'] == 'linear' and 'probability' in params.keys() and params['probability']:
+				params = {**params, 'max_iter': 1_000_000}
 
-	def test_classifier_rbf_kernel_single_solution(self):
+			with self.subTest(**params):
+				generic_classifier_test(params, ClassifierMode.SINGLE_SOLUTION, self.data)
 
-		generic_classifier_test(SVC(), ClassifierMode.SINGLE_SOLUTION, self.data)
+	def test_classifier_single_class(self):
 
-	def test_classifier_poly_kernel_single_solution(self):
+		params_list = [
+			*self.svc_params_list
+		]  # Additional parameters can be added here only for this test case.
 
-		generic_classifier_test(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_SOLUTION, self.data)
+		for params in params_list:
+			with self.subTest(**params):
+				generic_classifier_test(params, ClassifierMode.SINGLE_CLASS, self.data)
 
-	def test_classifier_sigmoid_kernel_single_solution(self):
+	def test_classifier_solutions_number(self):
 
-		generic_classifier_test(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_SOLUTION, self.data)
+		params_list = [
+			*self.svr_params_list
+		]  # Additional parameters can be added here only for this test case.
 
-	def test_classifier_rbf_kernel_auto_single_solution(self):
+		for params in params_list:
+			with self.subTest(**params):
+				generic_classifier_test(params, ClassifierMode.SOLUTIONS_NUMBER, self.data)
 
-		generic_classifier_test(SVC(kernel='rbf', gamma='auto'), ClassifierMode.SINGLE_SOLUTION, self.data)
+	def test_classifier_classes_number(self):
 
-	def test_classifier_poly_kernel_auto_single_solution(self):
+		params_list = [
+			*self.svr_params_list
+		]  # Additional parameters can be added here only for this test case.
 
-		generic_classifier_test(SVC(kernel=SVCKernel.POLY, gamma='auto'), ClassifierMode.SINGLE_SOLUTION, self.data)
-
-	def test_classifier_sigmoid_kernel_auto_single_solution(self):
-
-		generic_classifier_test(SVC(kernel=SVCKernel.SIGMOID, gamma='auto'), ClassifierMode.SINGLE_SOLUTION, self.data)
-
-	def test_classifier_linear_kernel_single_class(self):
-
-		generic_classifier_test(SVC(kernel=SVCKernel.LINEAR), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_rbf_kernel_single_class(self):
-
-		generic_classifier_test(SVC(), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_poly_kernel_single_class(self):
-
-		generic_classifier_test(SVC(kernel=SVCKernel.POLY), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_sigmoid_kernel_single_class(self):
-
-		generic_classifier_test(SVC(kernel=SVCKernel.SIGMOID), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_rbf_kernel_auto_single_class(self):
-
-		generic_classifier_test(SVC(kernel='rbf', gamma='auto'), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_poly_kernel_auto_single_class(self):
-
-		generic_classifier_test(SVC(kernel=SVCKernel.POLY, gamma='auto'), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_sigmoid_kernel_auto_single_class(self):
-
-		generic_classifier_test(SVC(kernel=SVCKernel.SIGMOID, gamma='auto'), ClassifierMode.SINGLE_CLASS, self.data)
-
-	def test_classifier_linear_kernel_solutions_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.LINEAR), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_rbf_kernel_solutions_number(self):
-
-		generic_classifier_test(SVR(), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_poly_kernel_solutions_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.POLY), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_sigmoid_kernel_solutions_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.SIGMOID), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_rbf_kernel_auto_solutions_number(self):
-
-		generic_classifier_test(SVR(kernel='rbf', gamma='auto'), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_poly_kernel_auto_solutions_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.POLY, gamma='auto'), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_sigmoid_kernel_auto_solutions_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.SIGMOID, gamma='auto'), ClassifierMode.SOLUTIONS_NUMBER, self.data)
-
-	def test_classifier_linear_kernel_classes_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.LINEAR), ClassifierMode.CLASSES_NUMBER, self.data)
-
-	def test_classifier_rbf_kernel_classes_number(self):
-
-		generic_classifier_test(SVR(), ClassifierMode.CLASSES_NUMBER, self.data)
-
-	def test_classifier_poly_kernel_classes_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.POLY), ClassifierMode.CLASSES_NUMBER, self.data)
-
-	def test_classifier_sigmoid_kernel_classes_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.SIGMOID), ClassifierMode.CLASSES_NUMBER, self.data)
-
-	def test_classifier_rbf_kernel_auto_classes_number(self):
-
-		generic_classifier_test(SVR(kernel='rbf', gamma='auto'), ClassifierMode.CLASSES_NUMBER, self.data)
-
-	def test_classifier_poly_kernel_auto_classes_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.POLY, gamma='auto'), ClassifierMode.CLASSES_NUMBER, self.data)
-
-	def test_classifier_sigmoid_kernel_auto_classes_number(self):
-
-		generic_classifier_test(SVR(kernel=SVCKernel.SIGMOID, gamma='auto'), ClassifierMode.CLASSES_NUMBER, self.data)
+		for params in params_list:
+			with self.subTest(**params):
+				generic_classifier_test(params, ClassifierMode.CLASSES_NUMBER, self.data)
 
 
 if __name__ == '__main__':
