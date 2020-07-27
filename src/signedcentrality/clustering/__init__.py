@@ -28,6 +28,12 @@ This enum defines the names of the training datasets.
 """
 
 
+ClassifierTraining = Enum('ClassifierData', 'TRAIN VALIDATION TEST')
+"""
+This enum defines the prediction task of the training datasets.
+"""
+
+
 class SVCKernel:
 	"""
 	This class defines the names of the kernels that can be used in SVC.

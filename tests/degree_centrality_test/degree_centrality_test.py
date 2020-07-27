@@ -18,7 +18,7 @@ from tests import load_data, write_csv, read_csv
 from tests.degree_centrality_test import Path
 
 
-main_data = None
+global_comparator = None
 """
 Datasets to train the classifier.
 
@@ -162,10 +162,10 @@ def initialize_data():
 	:return: the data
 	"""
 
-	global main_data
+	global global_comparator
 
-	if main_data is not None:
-		return main_data
+	if global_comparator is not None:
+		return global_comparator
 
 	main_data = {}
 

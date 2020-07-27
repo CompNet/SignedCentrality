@@ -17,7 +17,7 @@ from signedcentrality._utils.utils import *
 from signedcentrality.centrality import CentralityMeasure
 from signedcentrality.centrality.degree_centrality import PNCentrality
 from signedcentrality.centrality.eigenvector_centrality import EigenvectorCentrality
-from signedcentrality.clustering import Path
+from signedcentrality.clustering import Path, ClassifierTraining
 from signedcentrality.clustering import XMLKeys, ClassifierMode, ClassifierData
 
 
@@ -202,42 +202,6 @@ def read_class_results_csv(path, description_processing_function=_get_path_from_
 	return processed_data
 
 
-def count_classes(file_path: str):
-	"""
-	Count class number in text files
-
-	Text files must contain a number per line, which represent the class id for a node of the graph.
-	This function counts the number of these class ids.
-
-	:param file_path: path of the file
-	:type file_path: str
-	:return: class number
-	:rtype: int
-	"""
-
-	class_ids = []
-	class_number = 0
-
-	with open(file_path, 'r') as file:
-
-		print(file_path)
-
-		for line in file.readline():
-			id = None
-
-			try:
-				id = int(line.strip())
-			except ValueError:
-				continue
-
-			if id not in class_ids:
-				class_number += 1
-
-			class_ids.append(id)
-
-	return class_number
-
-
 def load_data(training_data_directory_path: str, target_directory_path: str = None, input_files_paths_xml_file: str = None):
 	"""
 	Load dataset to train and test a Classifier.
@@ -327,51 +291,52 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 	return training_data, target_data
 
 
-def format_train_test_data(training_data, target_data):
+def initialize_data():
 	"""
-	Format training data and target data to use it to train the classifier
+	Initilaize dataset to train the classifier
 
-	the format is a dict containing training and target data for each ClassifierMode.
-	For each mode, there are input data and target data in two lists.
-
-	The input data list is the same object for all modes, because it saves memory and time processing.
-	This list contains descriptors of all graphs, sorted by file paths of graphs.
-	Each descriptors list contains all descriptors of the graph, sorted by descriptor name in training_data.
-
-	The target data list is different for each mode.
-	It contains target data for the mode, sorted by file paths of input graphs.
-
-	To use these data to train the classifier, one has to set as parameter the unpacked value for the right mode.
-
-	:param training_data: input data to train the classifier
-	:param target_data: target data to test the trained classifier
-	:return: formatted data
-	:rtype: dict
+	:return: the data
 	"""
 
-	paths = OrderedDict(training_data).keys()  # There are the same paths for training data and target data.
+	training_data, target_data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH)
+
+	paths = list(OrderedDict(training_data).keys())  # There are the same paths for training data and target data.
 	inputs = [
 				[
 					value for key, value in OrderedDict(training_data[path]).items()
 				] for path in paths
 			]
 
+	target_indexes = [
+		indexes for indexes in range(len(paths))
+	]  # Indexes are used because the datasets must have results for the same inputs in the same order for each prediction task.
+
+	# Now, inputs and target_indexes are ordered such that both of them are alphabetically sorted by the name of the paths. They don't contain these paths.
+
+	train_data, validation_test_data, train_target_indexes, validation_test_target_indexes = train_test_split(inputs, target_indexes, test_size=.3)
+	validation_data, test_data, validation_target_indexes, test_target_indexes = train_test_split(validation_test_data, validation_test_target_indexes, test_size=.5)
+
 	data = {
-		mode: {
-			ClassifierData.INPUT: inputs,  # Only the reference is copied, the same object is in all the modes. So, it saves the RAM and spend less time to process.
-			ClassifierData.TARGET: [
-				# target_data[mode][path] for path in paths
-				int(target_data[mode][path]) for path in paths  # int(), because classifier uses int values.
-			],
-		} for mode in [
-			ClassifierMode.SINGLE_CLASS,
-			ClassifierMode.CLASSES_NUMBER,
-			ClassifierMode.SINGLE_SOLUTION,
-			ClassifierMode.SOLUTIONS_NUMBER
-		]
+		prediction_task: {
+			mode: {
+				ClassifierData.INPUT: data[0],
+				ClassifierData.TARGET: [
+					int(target_data[mode][paths[i]]) for i in data[1]  # int(), because classifier uses int values.
+				],
+			} for mode in [
+				ClassifierMode.SINGLE_CLASS,
+				ClassifierMode.CLASSES_NUMBER,
+				ClassifierMode.SINGLE_SOLUTION,
+				ClassifierMode.SOLUTIONS_NUMBER
+			]
+		} for prediction_task, data in {
+			ClassifierTraining.TRAIN: (train_data, train_target_indexes),
+			ClassifierTraining.VALIDATION: (validation_data, validation_target_indexes),
+			ClassifierTraining.TEST: (test_data, test_target_indexes)
+		}.items()
 	}
 
-	return data
+	return (data[ClassifierTraining.TRAIN], data[ClassifierTraining.VALIDATION], data[ClassifierTraining.TEST]), training_data, target_data
 
 
 class Classifier:
@@ -394,7 +359,7 @@ class Classifier:
 	In this class, metrics documentation give information gathered on SciKit learn documentation.
 	"""
 
-	def __init__(self, classifier, mode: ClassifierMode, training_vectors=None, target_values=None, hide_warnings=False):
+	def __init__(self, classifier, mode: ClassifierMode, train_data, train_target, validation_data, validation_target):
 		"""
 		Creates a newly allocated Classifier object.
 
@@ -403,59 +368,15 @@ class Classifier:
 		:param target_values: Class numbers of input descriptors.
 		"""
 
-		if not hide_warnings and (training_vectors is None or target_values is None):
-			message = 'The parameter{} not set.\nThe attribute{} must be set before the training.'
-			params = "s training_vectors and target_values are"
-			attributes = "s data and target"
+		self.__train_data = train_data
+		self.__validation_data = validation_data
+		self.__train_target = train_target
+		self.__validation_target = validation_target
 
-			if training_vectors is None and target_values is not None:
-				params = " training_vectors is"
-				attributes = " data"
-			elif target_values is None and training_vectors is not None:
-				params = " target_values is"
-				attributes = " target"
-			# Else, if training_vectors is None or target_values is None, the message is already set.
-
-			warn(message.format(params, attributes))
-
-		self.__data = training_vectors
-		self.__target = target_values
 		self.__classifier = classifier
 		self.__mode = mode
 
 		# Classification metrics for training :
-		self.__accuracy_score = None
-		"""
-		Accuracy score
-		
-		According to the SciKit Learn Documentation, 
-		
-			"In multilabel classification, this function computes subset accuracy: the set of labels predicted for a sample must exactly match the corresponding set of labels in y_true."
-		"""
-
-		self.__precision_score = None
-		"""
-		Precision score
-		
-		According to the SciKit Learn Documentation, 
-		
-			"The precision is the ratio tp / (tp + fp) where tp is the number of true positives and fp the number of false positives. 
-			The precision is intuitively the ability of the classifier not to label as positive a sample that is negative.
-	
-			The best value is 1 and the worst value is 0."
-		"""
-
-		self.__recall_score = None
-		"""
-		Recall score
-
-		According to the SciKit Learn Documentation, 
-
-			"The recall is the ratio tp / (tp + fn) where tp is the number of true positives and fn the number of false negatives. 
-			The recall is intuitively the ability of the classifier to find all the positive samples. 
-
-			The best value is 1 and the worst value is 0."
-		"""
 
 		self.__f1_score = None
 		"""
@@ -464,13 +385,6 @@ class Classifier:
 		According to the SciKit Learn Documentation, 
 
 			"The F1 score can be interpreted as a weighted average of the precision and recall, where an F1 score reaches its best value at 1 and worst score at 0. The relative contribution of precision and recall to the F1 score are equal."
-		"""
-
-		self.training_classification_report = None
-		"""
-		Report about training for classification
-
-		The report shows the main metrics for a classification.
 		"""
 
 		# Regression metrics for training :
@@ -506,60 +420,25 @@ class Classifier:
 			The median_absolute_error does not support multioutput."
 		"""
 
-		self.__r2_score = None
-		"""
-		Coefficient of determination
-
-		According to the SciKit Learn Documentation, 
-
-			"The r2_score function computes the coefficient of determination, usually denoted as R².
-			
-			It represents the proportion of variance (of y) that has been explained by the independent variables in the model. It provides an indication of goodness of fit and therefore a measure of how well unseen samples are likely to be predicted by the model, through the proportion of explained variance.
-			
-			As such variance is dataset dependent, R² may not be meaningfully comparable across different datasets. Best possible score is 1.0 and it can be negative (because the model can be arbitrarily worse). A constant model that always predicts the expected value of y, disregarding the input features, would get a R² score of 0.0."
-		"""
-
-		# Initialization of datasets:
-
-		self.__train_data, self.__test_data, self.__train_target, self.__test_target = train_test_split(self.__data, self.__target, test_size=.3)
+	@property
+	def train_data(self):
+		return self.__train_data
 
 	@property
-	def training_vectors(self):
-		return self.__data
-
-	@training_vectors.setter
-	def training_vectors(self, vectors):
-		if self.__data is None:
-			self.__data = vectors
-		else:
-			raise ValueError('Training vectors are already set.')
+	def train_target(self):
+		return self.__train_target
 
 	@property
-	def target_values(self):
-		return self.__target
+	def validation_data(self):
+		return self.__validation_data
 
-	@target_values.setter
-	def target_values(self, values):
-		if self.__target is None:
-			self.__target = values
-		else:
-			raise ValueError('Target values are already set.')
+	@property
+	def validation_target(self):
+		return self.__validation_target
 
 	@property
 	def mode(self):
 		return self.__mode
-
-	@property
-	def accuracy_score(self):
-		return self.__accuracy_score
-
-	@property
-	def precision_score(self):
-		return self.__precision_score
-
-	@property
-	def recall_score(self):
-		return self.__recall_score
 
 	@property
 	def f1_score(self):
@@ -578,16 +457,12 @@ class Classifier:
 		return self.__median_absolute_error
 
 	@property
-	def r2_score(self):
-		return self.__r2_score
-
-	@property
 	def train_data(self):
 		return self.__train_data
 
 	@property
 	def test_data(self):
-		return self.__test_data
+		return self.__validation_data
 
 	@property
 	def train_target(self):
@@ -595,7 +470,7 @@ class Classifier:
 
 	@property
 	def test_target(self):
-		return self.__test_target
+		return self.__validation_target
 
 	def __compute_classification_metrics(self, test_target, predicted_test_target):
 		"""
@@ -606,13 +481,8 @@ class Classifier:
 		:return: a report showing the metrics
 		"""
 
-		self.__accuracy_score = accuracy_score(test_target, predicted_test_target)
-		self.__precision_score = precision_score(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
-		self.__recall_score = recall_score(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
 		self.__f1_score = f1_score(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
-		self.training_classification_report = classification_report(test_target, predicted_test_target, zero_division=0)  # 0 is the worst score.
-
-		report = self.training_classification_report
+		report = self.__f1_score
 
 		return report
 
@@ -628,19 +498,14 @@ class Classifier:
 		self.__max_error = max_error(test_target, predicted_test_target)
 		self.__mean_absolute_error = mean_absolute_error(test_target, predicted_test_target)
 		self.__median_absolute_error = median_absolute_error(test_target, predicted_test_target)
-		self.__r2_score = r2_score(test_target, predicted_test_target)
 
-		report = '\n'.join([
-			"Maximum residual error:       {}",
-			"Mean absolute error:          {}",
-			"Median absolute error:        {}",
-			"Coefficient of determination: {}"
-		]).format(
-			self.__max_error,
-			self.__mean_absolute_error,
-			self.__median_absolute_error,
-			self.__r2_score
-		)
+		# report = (
+		# 	self.__max_error,
+		# 	self.__mean_absolute_error,
+		# 	self.__median_absolute_error
+		# )
+
+		report = self.__mean_absolute_error
 
 		return report
 
@@ -661,16 +526,16 @@ class Classifier:
 
 		predicted_test_target_list = []
 
-		for i in range(len(self.__test_data)):
-			test_data = self.__test_data[i]
+		for i in range(len(self.__validation_data)):
+			test_data = self.__validation_data[i]
 			predicted_test_target = self.__classifier.predict([test_data])
 			predicted_test_target_list.append(predicted_test_target)
 
 		report = None
 		if isinstance(self.__classifier, SVC):
-			report = self.__compute_classification_metrics(self.__test_target, predicted_test_target_list)
+			report = self.__compute_classification_metrics(self.__validation_target, predicted_test_target_list)
 		else:  # if isinstance(self.__classifier, SVR)
-			report = self.__compute_regression_metrics(self.__test_target, predicted_test_target_list)
+			report = self.__compute_regression_metrics(self.__validation_target, predicted_test_target_list)
 
 		return report
 
