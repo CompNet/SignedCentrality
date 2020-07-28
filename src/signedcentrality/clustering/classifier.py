@@ -336,7 +336,30 @@ def initialize_data():
 		}.items()
 	}
 
-	return (data[ClassifierTraining.TRAIN], data[ClassifierTraining.VALIDATION], data[ClassifierTraining.TEST]), training_data, target_data
+	graph_ids = {
+		prediction_task: [
+			paths[i] for i in indexes_list
+		] for prediction_task, indexes_list in {
+			ClassifierTraining.TRAIN: train_target_indexes,
+			ClassifierTraining.VALIDATION: validation_target_indexes,
+			ClassifierTraining.TEST: test_target_indexes
+		}.items()
+	}
+
+	return (
+		(
+			data[ClassifierTraining.TRAIN],
+			data[ClassifierTraining.VALIDATION],
+			data[ClassifierTraining.TEST]
+		),
+		(
+			graph_ids[ClassifierTraining.TRAIN],
+			graph_ids[ClassifierTraining.VALIDATION],
+			graph_ids[ClassifierTraining.TEST]
+		),
+		training_data,
+		target_data
+	)
 
 
 class Classifier:
@@ -359,19 +382,29 @@ class Classifier:
 	In this class, metrics documentation give information gathered on SciKit learn documentation.
 	"""
 
-	def __init__(self, classifier, mode: ClassifierMode, train_data, train_target, validation_data, validation_target):
+	def __init__(self, classifier, mode: ClassifierMode, train_data, train_target, validation_data, validation_target, train_graph_ids=None, validation_graph_ids=None):
 		"""
 		Creates a newly allocated Classifier object.
 
+		The optional last parameters represent ids of graphs which are used for the training.
+		So, the results of the validation can be associated with the graphs.
+
 		:param classifier: SVC classifier which must be used as classifier.
-		:param training_vectors: Input descriptors to train the classifier.
-		:param target_values: Class numbers of input descriptors.
+		:param mode: Classifier mode
+		:param train_data: input data to train the classifier
+		:param train_target: target data to train the classifier
+		:param validation_data: input data to validate the training of the classifier
+		:param validation_target: target data to validate the training of the classifier
+		:param train_graph_ids: ids of train graphs
+		:param validation_graph_ids: ids of validation graphs
 		"""
 
 		self.__train_data = train_data
 		self.__validation_data = validation_data
 		self.__train_target = train_target
 		self.__validation_target = validation_target
+		self.__train_graph_ids = train_graph_ids
+		self.__validation_graph_ids = validation_graph_ids
 
 		self.__classifier = classifier
 		self.__mode = mode
@@ -421,6 +454,10 @@ class Classifier:
 		"""
 
 	@property
+	def classifier(self):
+		return self.__classifier
+
+	@property
 	def train_data(self):
 		return self.__train_data
 
@@ -457,16 +494,8 @@ class Classifier:
 		return self.__median_absolute_error
 
 	@property
-	def train_data(self):
-		return self.__train_data
-
-	@property
 	def test_data(self):
 		return self.__validation_data
-
-	@property
-	def train_target(self):
-		return self.__train_target
 
 	@property
 	def test_target(self):
@@ -509,7 +538,7 @@ class Classifier:
 
 		return report
 
-	def train(self):
+	def train(self, detailed=False):
 		"""
 		Train and test the classifier
 
@@ -524,18 +553,31 @@ class Classifier:
 			self.__train_target  # List of results for each list of descriptors
 		)
 
-		predicted_test_target_list = []
+		predicted_validation_target_list = []
+		length = len(self.__validation_data)
 
-		for i in range(len(self.__validation_data)):
-			test_data = self.__validation_data[i]
-			predicted_test_target = self.__classifier.predict([test_data])
-			predicted_test_target_list.append(predicted_test_target)
+		print(length)
+
+		for i in range(length):
+			validation_data = self.__validation_data[i]
+			predicted_validation_target = self.__classifier.predict([validation_data])
+			predicted_validation_target_list.append(predicted_validation_target)
 
 		report = None
 		if isinstance(self.__classifier, SVC):
-			report = self.__compute_classification_metrics(self.__validation_target, predicted_test_target_list)
+			report = self.__compute_classification_metrics(self.__validation_target, predicted_validation_target_list)
 		else:  # if isinstance(self.__classifier, SVR)
-			report = self.__compute_regression_metrics(self.__validation_target, predicted_test_target_list)
+			report = self.__compute_regression_metrics(self.__validation_target, predicted_validation_target_list)
+
+		results = {}
+		if detailed:
+			for i in range(length):
+				results = {
+					**results,
+					self.__validation_graph_ids[i]: predicted_validation_target_list[i]
+				}
+
+			return report, results
 
 		return report
 
@@ -552,7 +594,6 @@ class Classifier:
 		:param descriptors: descriptors of a graph.
 		:return: the predicted result
 		"""
-		predicted_result = self.__classifier.predict(descriptors)
-		print(predicted_result)
 
+		predicted_result = self.__classifier.predict([descriptors])
 		return predicted_result

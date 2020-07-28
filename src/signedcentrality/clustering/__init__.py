@@ -122,6 +122,11 @@ class Path:
 	Script computing data to load in clustering_test module.
 	"""
 
+	PREDICTED_RESULTS = 'predicted_results'
+	"""
+	Name of the directory containing predicted results
+	"""
+
 	CSV_EXT = ".csv"
 	"""
 	Pattern to use .csv files

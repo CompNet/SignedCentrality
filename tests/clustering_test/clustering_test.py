@@ -12,7 +12,8 @@ The dataset "Space of optimal solutions of the Correlation Clustering problem" (
 import unittest
 from os import getcwd, chdir
 from sklearn.svm import SVC, SVR
-from signedcentrality.clustering import SVCKernel, ClassifierMode
+from signedcentrality.clustering import SVCKernel, ClassifierMode, ClassifierData
+from signedcentrality.clustering.classifier import Classifier
 from signedcentrality.clustering.classifier_comparison import ClassifierComparator
 from tests.clustering_test import Path
 
@@ -53,6 +54,17 @@ class ClusteringTest(unittest.TestCase):
 
 	def test_comparator(self):
 		self.comparator.compare_classifiers()
+
+	def test_optimal_classifier(self):
+		mode = ClassifierMode.SINGLE_CLASS
+		train_data = self.comparator.train[mode][ClassifierData.INPUT]
+		train_target = self.comparator.train[mode][ClassifierData.TARGET]
+		validation_data = self.comparator.validation[mode][ClassifierData.INPUT]
+		validation_target = self.comparator.validation[mode][ClassifierData.TARGET]
+
+		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), mode, train_data, train_target, validation_data, validation_target)
+		classifier.train()
+		self.comparator.classifier_test(classifier)
 
 
 if __name__ == '__main__':
