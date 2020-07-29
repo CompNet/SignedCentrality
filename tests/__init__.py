@@ -7,13 +7,14 @@ This package contains unit tests for the modules of the packages centrality and 
 .. seealso: centrality
 .. seealso: clustering
 """
+
+from csv import reader, Sniffer, writer, QUOTE_MINIMAL
+from glob import glob
 from os import stat
 from os.path import dirname, exists, basename, splitext
-from numpy import array
-from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
-from glob import glob
 from subprocess import call
-
+from numpy import array
+# noinspection PyProtectedMember
 from signedcentrality._utils.utils import matrix_to_graph, get_matrix
 
 

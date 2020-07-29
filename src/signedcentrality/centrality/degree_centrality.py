@@ -10,10 +10,9 @@ The measure is computed by following the method of Martin Everett and Stephen Bo
 """
 
 import abc
-from sys import float_info
 from numpy import array, identity, dot, transpose
 from numpy.linalg import inv
-
+# noinspection PyProtectedMember
 from signedcentrality._utils.utils import get_matrix, scale_centrality
 from signedcentrality.centrality import CentralityMeasure
 

@@ -39,9 +39,11 @@ def init_svm():
 
 	# Change the path of unit tests working directory:
 	chdir("/".join([getcwd(), Path.TESTS_RES_PATH]))
-	Path.load()
+	Path.load()  # Uses sample tests
+	# Path.load(DEFAULT_SAMPLE_INPUTS_PATH=Path.DATASET_PATH)  # Uses full tests
 
-	global_comparator = ClassifierComparator()
+	global_comparator = ClassifierComparator(False, ClassifierMode.SINGLE_CLASS)
+	# global_comparator = ClassifierComparator(False, ClassifierMode.SINGLE_CLASS, compute_descriptors=False)  # If graph descriptors have been already computed.
 
 	return global_comparator
 
@@ -53,7 +55,7 @@ class ClusteringTest(unittest.TestCase):
 		self.comparator = init_svm()
 
 	def test_comparator(self):
-		self.comparator.compare_classifiers()
+		self.comparator.compare_classifiers(True)
 
 	def test_optimal_classifier(self):
 		mode = ClassifierMode.SINGLE_CLASS
@@ -63,7 +65,7 @@ class ClusteringTest(unittest.TestCase):
 		validation_target = self.comparator.validation[mode][ClassifierData.TARGET]
 
 		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), mode, train_data, train_target, validation_data, validation_target)
-		classifier.train()
+		classifier.train(print_progress=True)
 		self.comparator.classifier_test(classifier)
 
 

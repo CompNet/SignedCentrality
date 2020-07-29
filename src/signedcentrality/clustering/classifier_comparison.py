@@ -28,16 +28,14 @@ def _write_result_file(file_base_name, *results):
 	:type path: str
 	"""
 
-	print(Path.DEFAULT_SAMPLE_INPUTS_PATH)
 	file_base_name = file_base_name.replace(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.PREDICTED_RESULTS)
 	path = Path.GENERATED_RES_PATH + '/' + file_base_name + Path.CSV_EXT
 
 	split_path = dirname(file_base_name).split('/')
-	print(split_path)
 	if len(split_path) > 0:
 		tmp_path = '' + Path.GENERATED_RES_PATH
-		for dir in split_path:
-			tmp_path += '/' + dir
+		for directory in split_path:
+			tmp_path += '/' + directory
 			makedirs(tmp_path, exist_ok=True)
 
 	with open(path, 'w') as file:
@@ -46,12 +44,16 @@ def _write_result_file(file_base_name, *results):
 
 
 class ClassifierComparator:
-	def __init__(self):
+	def __init__(self, combine_parameters=True, tasks=None, compute_descriptors=True):
 		"""
 		Initialize a new ClassifierComparator object
+
+		:param combine_parameters: if True, parameters are combined
+		:param tasks: prediction tasks
+		:param compute_descriptors: if True, descriptors are computed before the training
 		"""
 
-		self.__data, self.__graph_ids, self.__input, self.__target = initialize_data()
+		self.__data, self.__graph_ids, self.__input, self.__target = initialize_data(compute_descriptors=compute_descriptors)
 		self.__train, self.__validation, self.__test = self.__data
 		self.__train_graph_ids, self.__validation_graph_ids, self.__test_graph_ids = self.__graph_ids
 
@@ -79,26 +81,58 @@ class ClassifierComparator:
 		additional_svr_parameters = {
 		}  # These parameters must be combined with all others, but only for a SVR regressor.
 
-		for key, value in additional_parameters.items():
-			self.__main_params_list = [
-				*self.__main_params_list,
-				*[{**params, key: value} for params in self.__main_params_list]
-			]
+		if combine_parameters:
+			for key, value in additional_parameters.items():
+				self.__main_params_list = [
+					*self.__main_params_list,
+					*[{**params, key: value} for params in self.__main_params_list]
+				]
 
-		self.__svc_params_list = [*self.__main_params_list]
-		self.__svr_params_list = [*self.__main_params_list]
+			self.__svc_params_list = [*self.__main_params_list]
+			self.__svr_params_list = [*self.__main_params_list]
 
-		for key, value in additional_svc_parameters.items():
-			self.__svc_params_list = [
-				*self.__svc_params_list,
-				*[{**params, key: value} for params in self.__svc_params_list]
-			]
+			for key, value in additional_svc_parameters.items():
+				self.__svc_params_list = [
+					*self.__svc_params_list,
+					*[{**params, key: value} for params in self.__svc_params_list]
+				]
 
-		for key, value in additional_svr_parameters.items():
-			self.__svr_params_list = [
-				*self.__svr_params_list,
-				*[{**params, key: value} for params in self.__svr_params_list]
-			]
+			for key, value in additional_svr_parameters.items():
+				self.__svr_params_list = [
+					*self.__svr_params_list,
+					*[{**params, key: value} for params in self.__svr_params_list]
+				]
+
+		else:
+			for key, value in additional_parameters.items():
+				self.__main_params_list.append({key: value})
+
+			self.__svc_params_list = [*self.__main_params_list]
+			self.__svr_params_list = [*self.__main_params_list]
+
+			for key, value in additional_svc_parameters.items():
+				self.__svc_params_list.append({key: value})
+
+			for key, value in additional_svr_parameters.items():
+				self.__svr_params_list.append({key: value})
+
+		self.tasks = {
+			ClassifierMode.SINGLE_SOLUTION: self.__svc_params_list,
+			ClassifierMode.SINGLE_CLASS: self.__svc_params_list,
+			ClassifierMode.SOLUTIONS_NUMBER: self.__svr_params_list,
+			ClassifierMode.CLASSES_NUMBER: self.__svr_params_list
+		}
+
+		if tasks is not None:
+			if isinstance(tasks, ClassifierMode):
+				self.tasks = {tasks: self.tasks[tasks]}
+			else:
+				tasks_dict = {}
+				for task in tasks:
+					tasks_dict = {
+						**tasks_dict,
+						task: self.tasks[task]
+					}
 
 	@property
 	def input(self):
@@ -121,7 +155,7 @@ class ClassifierComparator:
 		return self.__test
 
 	@staticmethod
-	def generic_classifier_comparison(params: dict, mode: ClassifierMode, training_data, validation_data, training_data_graph_ids=None, validation_data_graph_ids=None, print_result=False):
+	def generic_classifier_comparison(params: dict, mode: ClassifierMode, training_data, validation_data, training_data_graph_ids=None, validation_data_graph_ids=None, print_result=False, print_progress=False):
 		"""
 		Generic comparison for classifier or regressor
 
@@ -132,6 +166,7 @@ class ClassifierComparator:
 		:param print_result: if True, the results are printed
 		:param training_data_graph_ids: ids of train graphs
 		:param validation_data_graph_ids: ids of validation graphs
+		:param print_progress: if True, the method train() prints its progress
 		:return: the results
 		"""
 
@@ -153,7 +188,7 @@ class ClassifierComparator:
 			print(separator)
 
 		classifier = Classifier(svm, mode, *(training_data[mode].values()), *(validation_data[mode].values()), training_data_graph_ids, validation_data_graph_ids)
-		report, result = classifier.train(detailed=True)
+		report, result = classifier.train(detailed=True, print_progress=print_progress)
 
 		if print_result:
 			print(separator)
@@ -167,21 +202,36 @@ class ClassifierComparator:
 
 		return result
 
-	def compare_classifiers(self):
+	def compare_classifiers(self, print_progress=False):
 		"""
 		Compare training results for all prediction tasks.
 		"""
 
-		tasks = {
-			ClassifierMode.SINGLE_SOLUTION: self.__svc_params_list,
-			ClassifierMode.SINGLE_CLASS: self.__svc_params_list,
-			ClassifierMode.SOLUTIONS_NUMBER: self.__svr_params_list,
-			ClassifierMode.CLASSES_NUMBER: self.__svr_params_list
-		}
+		tasks = self.tasks
+
+		tests_number = 0
+		for task, params_list in tasks.items():
+			for _ in params_list:
+				tests_number += 1
+
+		test_counter = 0
+		progress = 0
+		if print_progress:
+			print('Number of tests : {}'.format(tests_number), 'Comparison progress : ', '0 %', sep='\n')
 
 		for task, params_list in tasks.items():
 			for params in params_list:
-				ClassifierComparator.generic_classifier_comparison(params, task, self.__train, self.__validation, self.__train_graph_ids, self.__validation_graph_ids)
+				if print_progress:
+					test_counter += 1
+
+				ClassifierComparator.generic_classifier_comparison(params, task, self.__train, self.__validation, self.__train_graph_ids, self.__validation_graph_ids, print_progress=print_progress)
+
+				if print_progress:
+					# progress = (test_counter / tests_number) * 100
+					progress = round((test_counter / tests_number) * 100, 2)
+					print(progress, '%')
+					print()
+					print()
 
 	def classifier_test(self, classifier: Classifier, print_result=False):
 		"""
@@ -218,5 +268,6 @@ if __name__ == '__main__':
 	Path.load()
 
 	comparator = ClassifierComparator()
-	comparator.compare_classifiers()
+	# comparator = ClassifierComparator(compute_descriptors=False)  # If graph descriptors have been already computed.
+	comparator.compare_classifiers(True)
 

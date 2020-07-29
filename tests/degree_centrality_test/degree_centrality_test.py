@@ -6,17 +6,14 @@ This module contains unit tests for the module degree_centrality.
 """
 
 import unittest
-from math import trunc
 from os.path import abspath
-from numpy.linalg import inv
-from signedcentrality.centrality import degree_centrality
-from csv import reader, Sniffer, writer, QUOTE_MINIMAL
-from numpy import array, transpose, zeros, identity, dot
 from igraph import Graph
+from numpy import transpose, zeros
+# noinspection PyProtectedMember
 from signedcentrality._utils.utils import *
+from signedcentrality.centrality import degree_centrality
 from tests import load_data, write_csv, read_csv
 from tests.degree_centrality_test import Path
-
 
 global_comparator = None
 """

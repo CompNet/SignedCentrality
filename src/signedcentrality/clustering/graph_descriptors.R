@@ -161,4 +161,4 @@ for (node in nodes) {
   compute_descriptors(input_file_path, results_file_path)
 }
 
-
+print(paste0('R computed descriptors exported successfully.'))

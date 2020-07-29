@@ -8,11 +8,11 @@ from collections import OrderedDict
 from os import walk, makedirs, system
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
-from warnings import warn
 from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
-from sklearn.metrics import accuracy_score, precision_score, recall_score, classification_report, max_error, mean_absolute_error, median_absolute_error, r2_score, f1_score
+from sklearn.metrics import max_error, mean_absolute_error, median_absolute_error, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+# noinspection PyProtectedMember
 from signedcentrality._utils.utils import *
 from signedcentrality.centrality import CentralityMeasure
 from signedcentrality.centrality.degree_centrality import PNCentrality
@@ -75,14 +75,18 @@ def compute_centralities_mean_stddev(graph):
 	return results
 
 
-def read_xml(path):
+def read_xml(path, additional_descriptors=None):
 	"""
 	Read an XML file
 
 	This file must contain results written by the R script.
 
+	If additional_descriptors are set, the file will contain its descriptors and the additional ones.
+
 	:param path: path of the XML file
 	:type path: str
+	:param additional_descriptors: descriptors to add to the XML file
+	:type additional_descriptors: dict
 	:return: results
 	:rtype: dict
 	"""
@@ -95,6 +99,17 @@ def read_xml(path):
 		descriptor_value = descriptor.get(XMLKeys.VALUE)
 
 		results[descriptor_type] = descriptor_value
+
+	if additional_descriptors is None:
+		return results
+
+	results = {**results, **additional_descriptors}
+
+	for descriptor_name, descriptor_value in additional_descriptors.items():
+		SubElement(root, XMLKeys.DESCRIPTOR, **{"" + str(XMLKeys.TYPE): str(descriptor_name), "" + str(XMLKeys.VALUE): str(descriptor_value)})
+
+	xml_tree = ElementTree(root)
+	xml_tree.write(path, encoding='utf-8', xml_declaration=True)
 
 	return results
 
@@ -202,7 +217,7 @@ def read_class_results_csv(path, description_processing_function=_get_path_from_
 	return processed_data
 
 
-def load_data(training_data_directory_path: str, target_directory_path: str = None, input_files_paths_xml_file: str = None):
+def load_data(training_data_directory_path: str, target_directory_path: str = None, input_files_paths_xml_file: str = None, compute_descriptors=True):
 	"""
 	Load dataset to train and test a Classifier.
 
@@ -217,12 +232,16 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 	The parameter target_directory_path must be set only if this method is used to compute a training dataset.
 	If the computed dataset is real data to classify, classifying methods don't need target data.
 
+	The parameter compute_descriptors must be used only if descriptors have already been computed.
+
 	:param training_data_directory_path: Path of training dataset
 	:type training_data_directory_path: str
 	:param target_directory_path: Path of target dataset
 	:type target_directory_path: str
 	:param input_files_paths_xml_file: Path to the XML file to write
 	:type input_files_paths_xml_file: str
+	:param compute_descriptors: If  false, descriptors are not computed.
+	:type compute_descriptors: bool
 	:return: the loaded and parsed data in a tuple containing training data and target data
 	"""
 
@@ -255,24 +274,30 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 		] for input_file_path in input_files_paths
 	]
 
-	write_xml(input_files_paths_xml_file, file_paths)
+	if compute_descriptors:
+		write_xml(input_files_paths_xml_file, file_paths)
 
-	# Compute the descriptors :
-	system(
-		Path.R_SCRIPT + " " +  # Path to the script to run
-		Path.RES_PATH + " " +  # Current working directory of this script
-		input_files_paths_xml_file  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
-	)
+		# Compute the descriptors :
+		system(
+			Path.R_SCRIPT + " " +  # Path to the script to run
+			Path.RES_PATH + " " +  # Current working directory of this script
+			input_files_paths_xml_file  # Path to the XML file containing the paths to files whose descriptors must be computed, and files to write the computed descriptors.
+		)
 
 	training_data = {}
 	for io_paths in file_paths:
 		input_file_path = io_paths[0]
 		result_file_path = io_paths[1]
 
-		xml_results = read_xml(result_file_path)
-		centralities = compute_centralities_mean_stddev(read_graph(input_file_path))
+		descriptors = None
+		if compute_descriptors:
+			centralities = compute_centralities_mean_stddev(read_graph(input_file_path))
+			descriptors = read_xml(result_file_path, centralities)
 
-		training_data = {**training_data, input_file_path: {**xml_results, **centralities}}
+		else:
+			descriptors = read_xml(result_file_path)
+
+		training_data = {**training_data, input_file_path: descriptors}
 
 	# Compute target data :
 	target_data = {
@@ -282,23 +307,33 @@ def load_data(training_data_directory_path: str, target_directory_path: str = No
 		ClassifierMode.SOLUTIONS_NUMBER: {}
 	}
 
-	for input_file_path in training_data.keys():
+	del_keys = []  # If training files don't have target, they must be removed.
+	for input_file_path in training_data.keys():  # If target data doesn't have training file, it won't be added.
+		if dirname(input_file_path) not in targets:
+			del_keys.append(input_file_path)  # Add key to removed files list.
+			continue
+
 		target_data[ClassifierMode.SINGLE_CLASS] = {**target_data[ClassifierMode.SINGLE_CLASS], input_file_path: targets[dirname(input_file_path)][ClassifierMode.SINGLE_CLASS]}
 		target_data[ClassifierMode.CLASSES_NUMBER] = {**target_data[ClassifierMode.CLASSES_NUMBER], input_file_path: targets[dirname(input_file_path)][ClassifierMode.CLASSES_NUMBER]}
 		target_data[ClassifierMode.SINGLE_SOLUTION] = {**target_data[ClassifierMode.SINGLE_SOLUTION], input_file_path: targets[dirname(input_file_path)][ClassifierMode.SINGLE_SOLUTION]}
 		target_data[ClassifierMode.SOLUTIONS_NUMBER] = {**target_data[ClassifierMode.SOLUTIONS_NUMBER], input_file_path: targets[dirname(input_file_path)][ClassifierMode.SOLUTIONS_NUMBER]}
 
+	for key in del_keys:
+		del training_data[key]  # Remove training data which don't have target.
+
 	return training_data, target_data
 
 
-def initialize_data():
+def initialize_data(compute_descriptors=True):
 	"""
-	Initilaize dataset to train the classifier
+	Initialize dataset to train the classifier
 
+	:param compute_descriptors: If  false, descriptors are not computed.
+	:type compute_descriptors: bool
 	:return: the data
 	"""
 
-	training_data, target_data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH)
+	training_data, target_data = load_data(Path.DEFAULT_SAMPLE_INPUTS_PATH, Path.DEFAULT_SAMPLE_RESULTS_PATH, compute_descriptors=compute_descriptors)
 
 	paths = list(OrderedDict(training_data).keys())  # There are the same paths for training data and target data.
 	inputs = [
@@ -538,30 +573,53 @@ class Classifier:
 
 		return report
 
-	def train(self, detailed=False):
+	def train(self, detailed=False, print_progress=False):
 		"""
 		Train and test the classifier
 
 		The classifier in trained with 70% of training data and 30% of test data.
 		Data set is randomly divided.
 
+		:param print_progress: if True, the method prints its progress
 		:return: means for all accuracy, precision and recall scores
 		"""
+
+		if print_progress:
+			print('\tTraining in progress ...')
 
 		self.__classifier.fit(
 			self.__train_data,  # Lists of descriptors
 			self.__train_target  # List of results for each list of descriptors
 		)
 
+		if print_progress:
+			print('\tTraining has been done successfully.')
+
 		predicted_validation_target_list = []
 		length = len(self.__validation_data)
 
-		print(length)
+		test_counter = 0
+		progress = 0
+		if print_progress:
+			print('\tNumber of tests : {}'.format(length), '\tValidation progress : ', '\t0 %', sep='\n')
+			print()
 
 		for i in range(length):
+			if print_progress:
+				test_counter += 1
+
 			validation_data = self.__validation_data[i]
 			predicted_validation_target = self.__classifier.predict([validation_data])
 			predicted_validation_target_list.append(predicted_validation_target)
+
+			if print_progress:
+				new_progress = round((test_counter / length) * 100, 2)
+				if new_progress > progress:
+					progress = new_progress
+					print('\t', progress, '%', sep='')
+
+		if print_progress:
+			print()
 
 		report = None
 		if isinstance(self.__classifier, SVC):

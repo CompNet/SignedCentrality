@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from csv import reader, Sniffer, unix_dialect, writer, QUOTE_MINIMAL
+from csv import reader, Sniffer
 from sys import float_info
 from igraph import Graph
 from signedcentrality._utils import *  # Import the strings defined in __init__.py.
-from numpy import array, mean, ndarray
 
 """
 This module contains utility functions that are used in the centrality package.
@@ -216,8 +215,6 @@ def read_csv(path: str, remove_headers=True):
 
 	matrix = None
 	csv = []
-
-	print(path)
 
 	with open(path, 'r') as file:
 

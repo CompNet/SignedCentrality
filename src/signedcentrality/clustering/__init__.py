@@ -73,11 +73,14 @@ class Path:
 	"""
 
 	@staticmethod
-	def load(current_working_directory=None):
+	def load(current_working_directory=None, **kwargs):
 		"""
 		Load paths with current working directory as base path
 
+		The parameter kwargs lets user set values for file paths.
+
 		:param current_working_directory: Current working directory
+		:param kwargs: user defined paths
 		:type current_working_directory: str
 		"""
 
@@ -96,6 +99,9 @@ class Path:
 		Path.DEFAULT_SAMPLE_INPUTS_PATH = '/'.join([Path.DEFAULT_DATASET_SAMPLE_PATH, "inputs"])
 		Path.DEFAULT_SAMPLE_CLUSTERS_PATH = '/'.join([Path.DEFAULT_DATASET_SAMPLE_PATH, "clusters"])
 		Path.DEFAULT_SAMPLE_RESULTS_PATH = '/'.join([Path.DEFAULT_DATASET_SAMPLE_PATH, "results"])
+
+		for key, value in kwargs.items():
+			setattr(Path, key, value)
 
 	RES_PATH = getcwd()
 	"""

@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sys import float_info
-from numpy import real, where, array
-from numpy.linalg import norm
-from scipy.sparse.linalg import eigs
-from signedcentrality._utils.utils import get_matrix, get_scale
-from signedcentrality.centrality import CentralityMeasure
-
 """
 This module contains functions related to the measure of eigenvector centrality.
 
@@ -15,6 +8,13 @@ The measure is computed by following the method of Phillip Bonacich and Paulette
 
 .. note: P. Bonacich & P. Lloyd. (2004). Calculating status with negative relations. SocialNetworks, 26, 331-338. 10.1016/j.socnet.2004.08.007
 """
+
+from numpy import real
+from numpy.linalg import norm
+from scipy.sparse.linalg import eigs
+# noinspection PyProtectedMember
+from signedcentrality._utils.utils import get_matrix, get_scale
+from signedcentrality.centrality import CentralityMeasure
 
 
 class EigenvectorCentrality(CentralityMeasure):
