@@ -64,7 +64,7 @@ class ClusteringTest(unittest.TestCase):
 		validation_data = self.comparator.validation[mode][ClassifierData.INPUT]
 		validation_target = self.comparator.validation[mode][ClassifierData.TARGET]
 
-		classifier = Classifier(SVC(kernel=SVCKernel.LINEAR), mode, train_data, train_target, validation_data, validation_target)
+		classifier = Classifier(SVC(kernel=SVCKernel.RBF), mode, train_data, train_target, validation_data, validation_target)
 		classifier.train(print_progress=True)
 		self.comparator.classifier_test(classifier)
 

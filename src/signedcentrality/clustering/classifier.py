@@ -445,7 +445,6 @@ class Classifier:
 		self.__mode = mode
 
 		# Classification metrics for training :
-
 		self.__f1_score = None
 		"""
 		Balanced F-score
@@ -456,18 +455,6 @@ class Classifier:
 		"""
 
 		# Regression metrics for training :
-
-		self.__max_error = None
-		"""
-		Maximum residual error
-
-		According to the SciKit Learn Documentation, 
-
-			"The max_error function computes the maximum residual error , a metric that captures the worst case error between the predicted value and the true value. In a perfectly fitted single output regression model, max_error would be 0 on the training set and though this would be highly unlikely in the real world, this metric shows the extent of error that the model had when it was fitted.
-			
-			The max_error does not support multioutput."
-		"""
-
 		self.__mean_absolute_error = None
 		"""
 		Mean absolute error
@@ -475,17 +462,6 @@ class Classifier:
 		According to the SciKit Learn Documentation, 
 
 			"The mean_absolute_error function computes mean absolute error, a risk metric corresponding to the expected value of the absolute error loss or l1-norm loss."
-		"""
-
-		self.__median_absolute_error = None
-		"""
-		Median absolute error
-
-		According to the SciKit Learn Documentation, 
-
-			"The median_absolute_error is particularly interesting because it is robust to outliers. The loss is calculated by taking the median of all absolute differences between the target and the prediction.
-
-			The median_absolute_error does not support multioutput."
 		"""
 
 	@property
@@ -559,16 +535,7 @@ class Classifier:
 		:return: a report showing the metrics
 		"""
 
-		self.__max_error = max_error(test_target, predicted_test_target)
 		self.__mean_absolute_error = mean_absolute_error(test_target, predicted_test_target)
-		self.__median_absolute_error = median_absolute_error(test_target, predicted_test_target)
-
-		# report = (
-		# 	self.__max_error,
-		# 	self.__mean_absolute_error,
-		# 	self.__median_absolute_error
-		# )
-
 		report = self.__mean_absolute_error
 
 		return report
@@ -581,6 +548,7 @@ class Classifier:
 		Data set is randomly divided.
 
 		:param print_progress: if True, the method prints its progress
+		:param detailed: if True, results contain more details
 		:return: means for all accuracy, precision and recall scores
 		"""
 
@@ -613,7 +581,7 @@ class Classifier:
 			predicted_validation_target_list.append(predicted_validation_target)
 
 			if print_progress:
-				new_progress = round((test_counter / length) * 100, 2)
+				new_progress = round((test_counter / length) * 100, 0)
 				if new_progress > progress:
 					progress = new_progress
 					print('\t', progress, '%', sep='')

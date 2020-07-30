@@ -58,63 +58,72 @@ class ClassifierComparator:
 		self.__train_graph_ids, self.__validation_graph_ids, self.__test_graph_ids = self.__graph_ids
 
 		self.__main_params_list = [
-			{'kernel': SVCKernel.LINEAR},
+			{'kernel': SVCKernel.LINEAR, 'max_iter': 10_000},  # Because linear kernel doesn't converge.
+			{'kernel': SVCKernel.LINEAR, 'max_iter': 100_000},  # Because linear kernel doesn't converge.
+			{'kernel': SVCKernel.LINEAR, 'max_iter': 1_000_000},  # Because linear kernel doesn't converge.
+			# {'kernel': SVCKernel.LINEAR, 'max_iter': 10_000_000},  # Because linear kernel doesn't converge.
 			{'kernel': SVCKernel.RBF, 'gamma': 'scale'},  # 'scale' is default value.
 			{'kernel': SVCKernel.RBF, 'gamma': 'auto'},
 			{'kernel': SVCKernel.POLY, 'gamma': 'scale'},  # 'scale' is default value.
-			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 100_000},  # Because default value is too long to compute.
-			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 1_000_000},  # Because default value is too long to compute.
+			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 10_000},  # Because poly kernel doesn't converge if gamma=auto.
+			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 100_000},  # Because poly kernel doesn't converge if gamma=auto.
+			{'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 1_000_000},  # Because poly kernel doesn't converge if gamma=auto.
+			# {'kernel': SVCKernel.POLY, 'gamma': 'auto', 'max_iter': 10_000_000},  # Because poly kernel doesn't converge if gamma=auto.
 			{'kernel': SVCKernel.SIGMOID, 'gamma': 'scale'},  # 'scale' is default value.
 			{'kernel': SVCKernel.SIGMOID, 'gamma': 'auto'}
 		]  # These parameters are the main ones, those which cover the kernel settings.
 
-		additional_parameters = {
-			'tol': 1e-1,  # 1e-3 is default value.
-			'shrinking': False,  # True is default value.
-		}  # These parameters must be combined with all others.
+		additional_parameters = [
+			{'tol': 1},  # 1e-3 is default value.
+			{'tol': 1e-1},  # 1e-3 is default value.
+			{'tol': 1e-6},  # 1e-3 is default value.
+			{'tol': 1e-9},  # 1e-3 is default value.
+			{'tol': 1e-12},  # 1e-3 is default value.
+			{'shrinking': False},  # True is default value.
+		]  # These parameters must be combined with all others.
 
-		additional_svc_parameters = {
-			# 'probability': True,  # False is default value.
-			'decision_function_shape': 'ovo'  # 'ovr' is default value.
-		}  # These parameters must be combined with all others, but only for a SVC classifier.
+		additional_svc_parameters = [
+			# {'probability': True},  # False is default value.
+			{'decision_function_shape': 'ovo'}  # 'ovr' is default value.
+		]  # These parameters must be combined with all others, but only for a SVC classifier.
 
-		additional_svr_parameters = {
-		}  # These parameters must be combined with all others, but only for a SVR regressor.
+		additional_svr_parameters = [
+		]  # These parameters must be combined with all others, but only for a SVR regressor.
 
 		if combine_parameters:
-			for key, value in additional_parameters.items():
+			for additional_parameter in additional_parameters:
 				self.__main_params_list = [
 					*self.__main_params_list,
-					*[{**params, key: value} for params in self.__main_params_list]
+					*[{**params, **additional_parameter} for params in self.__main_params_list]
 				]
 
 			self.__svc_params_list = [*self.__main_params_list]
 			self.__svr_params_list = [*self.__main_params_list]
 
-			for key, value in additional_svc_parameters.items():
+			for additional_parameter in additional_svc_parameters:
 				self.__svc_params_list = [
 					*self.__svc_params_list,
-					*[{**params, key: value} for params in self.__svc_params_list]
+					*[{**params, **additional_parameter} for params in self.__svc_params_list]
 				]
 
-			for key, value in additional_svr_parameters.items():
+			for additional_parameter in additional_svr_parameters:
 				self.__svr_params_list = [
 					*self.__svr_params_list,
-					*[{**params, key: value} for params in self.__svr_params_list]
+					*[{**params, **additional_parameter} for params in self.__svr_params_list]
 				]
 
 		else:
-			for key, value in additional_parameters.items():
-				self.__main_params_list.append({key: value})
+			for additional_parameter in additional_parameters:
+				self.__main_params_list.append(additional_parameter)
 
 			self.__svc_params_list = [*self.__main_params_list]
 			self.__svr_params_list = [*self.__main_params_list]
 
-			for key, value in additional_svc_parameters.items():
-				self.__svc_params_list.append({key: value})
+			for additional_parameter in additional_svc_parameters:
+				self.__svc_params_list.append(additional_parameter)
 
-			for key, value in additional_svr_parameters.items():
-				self.__svr_params_list.append({key: value})
+			for additional_parameter in additional_svr_parameters:
+				self.__svr_params_list.append(additional_parameter)
 
 		self.tasks = {
 			ClassifierMode.SINGLE_SOLUTION: self.__svc_params_list,
@@ -186,9 +195,12 @@ class ClassifierComparator:
 			# print(str(mode).replace(str(mode.__class__).replace("<enum '", "").replace("'>", "") + '.', ''), params, sep='\t')
 			print(score_file_name)
 			print(separator)
+		elif print_progress:
+			print('>', score_file_name)
 
 		classifier = Classifier(svm, mode, *(training_data[mode].values()), *(validation_data[mode].values()), training_data_graph_ids, validation_data_graph_ids)
-		report, result = classifier.train(detailed=True, print_progress=print_progress)
+		# report, result = classifier.train(detailed=True, print_progress=print_progress)
+		report, result = classifier.train(detailed=True, print_progress=None)
 
 		if print_result:
 			print(separator)
@@ -217,7 +229,7 @@ class ClassifierComparator:
 		test_counter = 0
 		progress = 0
 		if print_progress:
-			print('Number of tests : {}'.format(tests_number), 'Comparison progress : ', '0 %', sep='\n')
+			print('Number of tests : {}'.format(tests_number), 'Comparison progress : ', '0 %', sep='\n', end='\n\n')
 
 		for task, params_list in tasks.items():
 			for params in params_list:
