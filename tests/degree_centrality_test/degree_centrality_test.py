@@ -8,7 +8,7 @@ This module contains unit tests for the module degree_centrality.
 import unittest
 from os.path import abspath
 from igraph import Graph
-from numpy import transpose, zeros
+from numpy import transpose, zeros, array
 # noinspection PyProtectedMember
 from signedcentrality._utils.utils import *
 from signedcentrality.centrality import degree_centrality
@@ -322,21 +322,6 @@ class DegreeCentralityTest(unittest.TestCase):
 				# print(test[n][i], result[n][i], sep='\n', end='\n\n')
 				for j in range(length):
 					self.assertEqual(test[n][i][j], result[n][i][j])
-
-	def test_positive_centrality_undirected_gamapos(self):
-		"""
-		Test values have been computed using pn_index() function from package signnet in R.
-		"""
-		digits = 6
-
-		test_undirected = [1.111111, 1.111111, 1.159564, 1.079804, 1.115326, 1.199719, 1.272832, 1.234552, 1.111397, 1.075419, 1.162314, 1.162314, 1.151173, 1.075550, 1.111111, 1.111111]
-
-		result = [round(x, digits) for x in degree_centrality.PositiveCentrality.undirected(self.graph['gamapos'])]
-
-		print("test undirected : ", test_undirected)
-		print("result :          ", result)
-
-		self.assertSequenceEqual(result, test_undirected)
 
 	def test_negative_centrality_undirected_gamaneg(self):  # Works correctly
 		digits = 2
