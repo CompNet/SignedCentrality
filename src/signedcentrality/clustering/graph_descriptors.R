@@ -89,7 +89,7 @@ get_graph_from_path <- function (file_name, format = 'graphml') {
 }
 
 compute_nodes_number <- function (graph) {
-  size <- gsize(graph)
+  size <- vcount(graph)
 
   return(size)
 }
@@ -108,7 +108,7 @@ compute_negative_ties_ratio <- function (graph) {
     }
   }
 
-  ratio <- (positive_ties_number + negative_ties_number) / negative_ties_number
+  ratio <- negative_ties_number / (positive_ties_number + negative_ties_number)
 
   return(ratio)
 }

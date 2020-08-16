@@ -9,6 +9,12 @@ import unittest
 from igraph import Graph
 from scipy.sparse import csr_matrix
 from numpy import trunc, ndarray, array
+from os.path import dirname, abspath, join
+import sys
+
+sys.path.insert(0, abspath(join(dirname(__file__), '../../src')))
+sys.path.insert(0, abspath(join(dirname(__file__), '../..')))
+
 # noinspection PyProtectedMember
 from signedcentrality._utils.utils import write_graph, read_graph, FileIds, get_matrix, matrix_to_graph, Format
 from signedcentrality.centrality.eigenvector_centrality import compute_eigenvector_centrality

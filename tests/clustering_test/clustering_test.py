@@ -11,6 +11,12 @@ The dataset "Space of optimal solutions of the Correlation Clustering problem" (
 
 import unittest
 from os import getcwd, chdir
+from os.path import dirname, abspath, join
+import sys
+
+sys.path.insert(0, abspath(join(dirname(__file__), '../../src')))
+sys.path.insert(0, abspath(join(dirname(__file__), '../..')))
+
 from sklearn.svm import SVC, SVR
 from signedcentrality.clustering import SVCKernel, ClassifierMode, ClassifierData
 from signedcentrality.clustering.classifier import Classifier

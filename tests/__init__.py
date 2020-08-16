@@ -11,9 +11,13 @@ This package contains unit tests for the modules of the packages centrality and 
 from csv import reader, Sniffer, writer, QUOTE_MINIMAL
 from glob import glob
 from os import stat
-from os.path import dirname, exists, basename, splitext
+from os.path import dirname, exists, basename, splitext, abspath, join
+import sys
 from subprocess import call
 from numpy import array
+
+sys.path.insert(0, abspath(join(dirname(__file__), '../src')))
+
 # noinspection PyProtectedMember
 from signedcentrality._utils.utils import matrix_to_graph, get_matrix
 

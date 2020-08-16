@@ -9,6 +9,12 @@ import unittest
 from os.path import abspath
 from igraph import Graph
 from numpy import transpose, zeros, array
+from os.path import dirname, abspath, join
+import sys
+
+sys.path.insert(0, abspath(join(dirname(__file__), '../../src')))
+sys.path.insert(0, abspath(join(dirname(__file__), '../..')))
+
 # noinspection PyProtectedMember
 from signedcentrality._utils.utils import *
 from signedcentrality.centrality import degree_centrality

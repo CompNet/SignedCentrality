@@ -14,6 +14,12 @@ from os import getcwd, chdir, makedirs
 from os.path import dirname
 from sklearn.metrics import mean_absolute_error, f1_score
 from sklearn.svm import SVC, SVR
+from os.path import dirname, abspath, join
+import sys
+
+sys.path.insert(0, abspath(join(dirname(__file__), '../../src')))
+sys.path.insert(0, abspath(join(dirname(__file__), '../..')))
+
 from signedcentrality.clustering import SVCKernel, ClassifierMode, ClassifierData, Path
 from signedcentrality.clustering.classifier import Classifier, initialize_data
 
