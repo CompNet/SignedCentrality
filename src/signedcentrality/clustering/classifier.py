@@ -9,7 +9,7 @@ from os import walk, makedirs, system
 from os.path import dirname, splitext, basename
 from statistics import mean, stdev
 from xml.etree.ElementTree import parse, Element, ElementTree, SubElement
-from sklearn.metrics import max_error, mean_absolute_error, median_absolute_error, f1_score
+from sklearn.metrics import mean_squared_error, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 # noinspection PyProtectedMember
@@ -455,13 +455,13 @@ class Classifier:
 		"""
 
 		# Regression metrics for training :
-		self.__mean_absolute_error = None
+		self.__mean_squared_error = None
 		"""
 		Mean absolute error
 
 		According to the SciKit Learn Documentation, 
 
-			"The mean_absolute_error function computes mean absolute error, a risk metric corresponding to the expected value of the absolute error loss or l1-norm loss."
+			"The mean_squared_error function computes mean squared error, a risk metric corresponding to the expected value of the squared (quadratic) error or loss."
 		"""
 
 	@property
@@ -493,16 +493,8 @@ class Classifier:
 		return self.__f1_score
 
 	@property
-	def max_error(self):
-		return self.__max_error
-
-	@property
-	def mean_absolute_error(self):
-		return self.__mean_absolute_error
-
-	@property
-	def median_absolute_error(self):
-		return self.__median_absolute_error
+	def mean_squared_error(self):
+		return self.__mean_squared_error
 
 	@property
 	def test_data(self):
@@ -535,8 +527,8 @@ class Classifier:
 		:return: a report showing the metrics
 		"""
 
-		self.__mean_absolute_error = mean_absolute_error(test_target, predicted_test_target)
-		report = self.__mean_absolute_error
+		self.__mean_squared_error = mean_squared_error(test_target, predicted_test_target)
+		report = self.__mean_squared_error
 
 		return report
 
