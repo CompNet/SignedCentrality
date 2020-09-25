@@ -14,11 +14,11 @@ import collect.collect_outputs
 import prediction.classification
 
 # =====================================
-GRAPH_SIZES = [16,20,24,28,32,36]
-L0_VALS = [2,3,4]
-PROP_MISPLS = [x/20 for x in range(0, 11)] # float range from 0.0 to 1.0 with decimal steps
+GRAPH_SIZES = [20,24]
+L0_VALS = [3]
+PROP_MISPLS = [0.2, 0.3] #[x/20 for x in range(0, 11)] # float range from 0.0 to 1.0 with decimal steps
 DENSITY = 1
-INPUT_NETWORKS = range(1,101)
+INPUT_NETWORKS = range(1,11)
 PROP_NEGS = None # when density=1, this equals 'None'
 #PROP_NEGS = [0.3, 0.5, 0.7] # do not uncomment !
 
@@ -48,17 +48,18 @@ FORCE = False
 
 
 if __name__ == '__main__':
-    centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                                INPUT_NETWORKS, NETWORK_DESC, CENTRALITIES, FORCE)
+
+     centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
+                                                 INPUT_NETWORKS, NETWORK_DESC, CENTRALITIES, FORCE)
+          
+     stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
+                                                 INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE)
        
-    stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                                INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE)
-      
     collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
                                                INPUT_NETWORKS, NETWORK_DESC, CENTRALITIES, STATS, FORCE)
-             
-    collect.collect_outputs.collect_all_outputs(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                               INPUT_NETWORKS, NETWORK_DESC, OUTPUTS, FORCE)
+              
+     collect.collect_outputs.collect_all_outputs(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
+                                                INPUT_NETWORKS, NETWORK_DESC, OUTPUTS, FORCE)
      
     
     features_list = [
