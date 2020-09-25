@@ -54,15 +54,14 @@ if __name__ == '__main__':
           
      stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
                                                  INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE)
-       
-    collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
+     
+     collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
                                                INPUT_NETWORKS, NETWORK_DESC, CENTRALITIES, STATS, FORCE)
-              
+     
      collect.collect_outputs.collect_all_outputs(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
                                                 INPUT_NETWORKS, NETWORK_DESC, OUTPUTS, FORCE)
      
-    
-    features_list = [
+     features_list = [
         consts.COL_NAMES[consts.STATS_NB_NODES],
         consts.COL_NAMES[consts.STATS_POS_PROP], 
         consts.COL_NAMES[consts.STATS_NEG_PROP],
@@ -74,11 +73,12 @@ if __name__ == '__main__':
         [consts.PREFIX_MEAN+consts.CENTR_EIGEN], 
         [consts.PREFIX_STD+consts.CENTR_EIGEN]
     ]
-    features = list(itertools.chain.from_iterable(features_list))
-    print(features)
-    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    print(output)
-    kernel = consts.PREDICTION_KERNEL_LINEAR
-    print(kernel)
-    prediction.classification.perform_classification(features, output, kernel)
+     
+     features = list(itertools.chain.from_iterable(features_list))
+     print(features)
+     output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
+     print(output)
+     kernel = consts.PREDICTION_KERNEL_LINEAR
+     print(kernel)
+     prediction.classification.perform_classification(features, output, kernel)
     
