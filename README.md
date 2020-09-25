@@ -62,7 +62,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
 * Download this project from GitHub
 
-  You also need to retrieve the data from Figshare. Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place the contents of them into folders `in` and `output`, respectively. Finally, configure the input parameters in `src/main.py` and then run it.
+  You also need to retrieve the data from Figshare. Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place the contents of them into folders `in` and `output`, respectively. Finally, configure the input parameters in `src/main.py` and then run it inside the folder `src`.
 
 
 
