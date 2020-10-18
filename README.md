@@ -2,7 +2,9 @@
 
 Centrality measures and prediction tasks for signed networks
 
-* ?? Virgile Sucal ??
+* Alexandre Faure [alexandre.faure@alumni.univ-avignon.fr](mailto:alexandre.faure@alumni.univ-avignon.fr)
+* Laurent Pereira [laurent.pereira-da-silva-quintas@alumni.univ-avignon.fr](mailto:laurent.pereira-da-silva-quintas@alumni.univ-avignon.fr)
+* Virgile Sucal  [virgile.sucal@alumni.univ-avignon.fr](mailto:virgile.sucal@alumni.univ-avignon.fr)
 * Nejat Arinik [nejat.arinik@univ-avignon.fr](mailto:nejat.arinik@univ-avignon.fr)
 * Vincent Labatut [vincent.labatut@univ-avignon.fr](mailto:vincent.labatut@univ-avignon.fr)
 * Rosa Figueiredo [rosa.figueiredo@univ-avignon.fr](mailto:rosa.figueiredo@univ-avignon.fr)
