@@ -24,22 +24,43 @@ returns the list "pi" containing the centrality values for each node
 '''
     print("launching troll-trust algorithm...")
     t = 0
-    pi = [0 for x in range(graph.taille)]
-    for y in range (graph.taille):
-        pi[y] = beta
+    convergedValues = 0
     lambda0 = -(math.log(beta/(1-beta)))
-    while t != limit:
+    
+    piT1 = [0 for w in range(graph.taille)]
+    piT2 = [0 for x in range(graph.taille)]
+
+    for y in range (graph.taille):
+        piT1[y] = beta
+        piT2[y] = beta
+
+    while t < limit:
+
         n1, n2, d1, d2 = 0, 1, 0, 1
+        
         for i in range(graph.taille):
             for j in range(graph.taille):
                 if graph.W[j][i] != 0:
-                    n1 += pi[j] * (1 / (1 + math.e **(lambda0-lambda1) * graph.W[i][j]))
-                    n2 *= 1-pi[j]
-                    d1 += pi[j]
-                    d2 *= 1-pi[j]
-                    pi[i] = (n1 + beta * n2) / (d1 + d2)
+                    n1 += piT1[j] * (1 / (1 + math.e **(lambda0 - lambda1 * graph.W[i][j])))
+                    n2 *= 1-piT1[j]
+                    d1 += piT1[j]
+                    d2 *= 1-piT1[j]
+            piT2[i] = (n1 + beta * n2) / (d1 + d2)
+
+        for k in range(graph.taille):
+            if abs(piT2[k] - piT1[k]) < 0.000000000000001:
+                convergedValues += 1
+                
+        if convergedValues == graph.taille:
+            return piT2
+        else:
+            convergedValues = 0
+            
+        for l in range(graph.taille):
+            piT1[l] = piT2[l]
         t += 1
-    return pi
+
+    return piT2
 
 
 # MAIN:
