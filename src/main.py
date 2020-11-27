@@ -12,6 +12,7 @@ import stats.runner
 import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
+import prediction.regression
 
 # =====================================
 GRAPH_SIZES = [20,24]
@@ -80,5 +81,23 @@ if __name__ == '__main__':
      print(output)
      kernel = consts.PREDICTION_KERNEL_LINEAR
      print(kernel)
+     # classification task : one or more solutions
      prediction.classification.perform_classification(features, output, kernel)
+
+     # regression task : number of solutions
+     output1 = [consts.OUTPUT_NB_SOLUTIONS]
+     print(output1)
+     prediction.regression.perform_regression(features, output1, kernel)
+
+     # classification task : one or more classes of solution
+     output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+     print(output2)
+     prediction.classification.perform_classification(features, output2, kernel)
+
+     # regression task : number of classes of solution
+     output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
+     print(output3)
+     prediction.regression.perform_regression(features, output3, kernel)
+
+
     

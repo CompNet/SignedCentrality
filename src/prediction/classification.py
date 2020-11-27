@@ -23,6 +23,7 @@ from sklearn import metrics
 # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
 # https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
 # https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+# https://scikit-learn.org/stable/modules/model_evaluation.html#clustering-metrics
 
 # TODO: 
 # - k fold test
