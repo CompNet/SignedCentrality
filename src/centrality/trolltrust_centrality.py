@@ -158,6 +158,9 @@ def logistic_regression(graph):
     '''
     trains a regressor to predict the sign from the links of a graph
     '''
+
+
+    print("R2 = ", prediction.regression.perform_regression(features, output3, kernel))
     
     return
 
