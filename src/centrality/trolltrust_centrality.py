@@ -59,21 +59,23 @@ class TrollTrust(CentralityMeasure):
         calculates a list of Optimistim Values for each nodes
         '''
 
-        opt = [0 for w in range(graph.size)]
+        opt = [0 for w in range(graph.vs)]
+        curs = 0
         
-        for i in range(graph.size):
+        for i in graph.es:
 
             o1, o2 = 0, 0, 0, 0
 
-            for j in range(graph.size):
+            if graph.es['weight'][i] > 0:
+                o1 += pi[i.target]
+            elif graph.es['weight'][i] < 0:
+                o2 += pi[i.target]
 
-                if graph.W[j][i] > 0:
-                    o1 += pi[j]
-                elif graph.W[j][i] < 0:
-                    o2 += pi[j]
-
-            opt[i] = (o1 - o2) / (o1 + o2)
+            opt[curs] = (o1 - o2) / (o1 + o2)
+            curs += 1
         graph.es['opt'] = opt
+
+
         
 
     def troll_trust(graph, beta, lambda1, iter_max, delta_min):
@@ -165,13 +167,10 @@ class TrollTrust(CentralityMeasure):
                 beta = j
 
                 print("lambda1 = ", lambda1, "beta = ", beta)
-                print("pi:")
                 
-                for c1 in range(len(graph.vs)):
-                    print(c1, " => ", pi[c1])
 
                 graph_10_percent = Graph()
-                graph_10_percent.add_vertices(graph.vs)
+                graph_10_percent.add_vertices(len(graph.vs))
                 graph_10_percent.degree(mode="in")
                 graph_10_percent.es['weight'] = graph.es['weight']
                 
@@ -179,12 +178,17 @@ class TrollTrust(CentralityMeasure):
                 
                 edge_number_to_remove = len(graph.es) / 10
                 while edge_number_to_remove != 0:
-                    v1, v2 = random.sample(range(g.vcount()), 2)
+                    v1, v2 = random.sample(range(graph.vcount()), 2)
                     graph_10_percent.add_edges(graph_90_percent.es.select(_between = (v1, v2)))                                        
                     graph_90_percent.delete_edges([(v1, v2)])
 
                 pi = TrollTrust.troll_trust(graph_90_percent, beta, lambda1, iter_max, delta_min)
+
+                print("pi:")
                 
+                for c1 in range(len(graph.vs)):
+                    print(c1, " => ", pi[c1])
+                                
                 TrollTrust.calculate_rep_values(graph_90_percent, pi)
                 TrollTrust.calculate_opt_values(graph_90_percent, pi)
                 
@@ -234,6 +238,6 @@ print(A)
 iter_max = 1000
 delta_min = 0
 
-TrollTrust.chooseParameters(Gtest, iter_max, delta_min)
+TrollTrust.choose_parameters(Gtest, iter_max, delta_min)
 
 
