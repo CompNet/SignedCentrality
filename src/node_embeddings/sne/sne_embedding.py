@@ -249,5 +249,12 @@ class SNEEmbedding(CentralityMeasure):
 			model.train()
 			emb_vertex = model.get_sne()
 
-		return emb_vertex
+		mean_emb_vertex = [
+			sum([
+				float(emb_vertex[i][j]) for i in range(len(emb_vertex))
+			]) / SNEEmbedding.EMBEDDING_SIZE for j in range(SNEEmbedding.EMBEDDING_SIZE)
+		]
+
+		return mean_emb_vertex
+
 
