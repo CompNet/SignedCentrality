@@ -202,8 +202,9 @@ def write_walks_to_disk(G, f, num_paths, path_length, alpha, rand):
     return f
 
 
+if __name__ == '__main__':
 
-number_walks = 20
-walk_length = 40
-G = load_edgelist('data/wiki_edit.txt')
-f = write_walks_to_disk(G, f='data/wiki_edit_num_40.walk', num_paths=number_walks, path_length=walk_length, alpha=0, rand=random.Random(1024))
+    number_walks = 20
+    walk_length = 40
+    G = load_edgelist('data/wiki_edit.txt')
+    f = write_walks_to_disk(G, f='data/wiki_edit_num_40.walk', num_paths=number_walks, path_length=walk_length, alpha=0, rand=random.Random(1024))

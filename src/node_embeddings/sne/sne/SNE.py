@@ -13,21 +13,23 @@ matplotlib.use('Agg')
 from itertools import tee
 from six.moves import xrange
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+# import tensorflow as tf
 
 flags = tf.app.flags
-
-flags.DEFINE_string("save_path", './', "Directory to write the model and training sammaries.")
-flags.DEFINE_string("train_data", 'data/wiki_edit.txt', "Training text file.")
-flags.DEFINE_string("label_data", 'data/wiki_usr_labels.txt', "Nodes labels text file.")
-flags.DEFINE_string("walks_data", 'data/wiki_edit_num_40.walk', "Random walks on data")
-flags.DEFINE_integer("embedding_size", 100, "The embedding dimension size.")
-flags.DEFINE_integer("samples_to_train", 25, "Number of samples to train(*Million).")
-flags.DEFINE_float("learning_rate", 0.025, "Initial learning rate.")
-flags.DEFINE_integer("num_sampled", 512, "The number of classes to randomly sample per batch.")
-flags.DEFINE_integer("context_size", 3, "The number of context nodes .")
-flags.DEFINE_integer("batch_size", 50, "Number of training examples processed per step.")
-flags.DEFINE_boolean("is_train", True, "Train or restore")
+# # These line can't be set when sne_embedding module is working:
+# flags.DEFINE_string("save_path", './', "Directory to write the model and training sammaries.")
+# flags.DEFINE_string("train_data", 'data/wiki_edit.txt', "Training text file.")
+# flags.DEFINE_string("label_data", 'data/wiki_usr_labels.txt', "Nodes labels text file.")
+# flags.DEFINE_string("walks_data", 'data/wiki_edit_num_40.walk', "Random walks on data")
+# flags.DEFINE_integer("embedding_size", 100, "The embedding dimension size.")
+# flags.DEFINE_integer("samples_to_train", 25, "Number of samples to train(*Million).")
+# flags.DEFINE_float("learning_rate", 0.025, "Initial learning rate.")
+# flags.DEFINE_integer("num_sampled", 512, "The number of classes to randomly sample per batch.")
+# flags.DEFINE_integer("context_size", 3, "The number of context nodes .")
+# flags.DEFINE_integer("batch_size", 50, "Number of training examples processed per step.")
+# flags.DEFINE_boolean("is_train", True, "Train or restore")
+# # TODO: Let it be uncommented when sne_embedding module is working.
 FLAGS = flags.FLAGS
 
 
@@ -259,6 +261,23 @@ class SNE(object):
                 break
         print("")
 
+    def get_sne(self):
+        """
+        Get the SNE which was trained in order to create the prediction model
+
+        :return: The embedding
+        :rtype: list
+        """
+        return self._emb_vertex.eval()
+
+    def get_options(self):
+        """
+        Get the options which are used to train SNE
+
+        :return: The options
+        :rtype: Options
+        """
+        return self._options
 
     def save_model(self,):
         with open(os.path.join(self._options.save_path, "lbl_wiki_edit_emb.pkl"), 'wb') as f:

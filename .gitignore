@@ -1,2 +1,5 @@
 .project
 .pydevproject
+out/embeddings/sne/data
+src/node_embeddings/sne/sne/data/*.walk
+src/node_embeddings/sne/sne/*.pkl

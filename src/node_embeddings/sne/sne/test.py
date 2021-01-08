@@ -1,5 +1,7 @@
+import sys
 import numpy as np
-from sklearn.cross_validation import KFold
+import sklearn
+from sklearn.model_selection import KFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import classification_report
@@ -64,7 +66,7 @@ def construct_dataset(edge_sign, id2vertex):
 
 
 def link_prediction(x, y, emb_vertex, emb_context, op):
-    kf = KFold(len(x), n_folds=10)
+    kf = KFold(n_splits=10)
     s_idx, t_idx, signs = [], [], []
     for (s, t), y in zip(x ,y):
         s_idx.append(s)
@@ -74,7 +76,8 @@ def link_prediction(x, y, emb_vertex, emb_context, op):
     t_emb = emb_context[t_idx]
     signs = np.asarray(signs)
     kf_accu = []
-    for i, (train_index, test_index) in enumerate(kf):
+
+    for i, (train_index, test_index) in enumerate(kf.split(x)):
         y_train, y_test = signs[train_index], signs[test_index]
         s_train, s_test = s_emb[train_index], s_emb[test_index]
         t_train, t_test = t_emb[train_index], t_emb[test_index]
@@ -84,8 +87,9 @@ def link_prediction(x, y, emb_vertex, emb_context, op):
         clf.fit(x_train, y_train)
         test_preds = clf.predict(x_test)
         accuracy = np.mean(test_preds == y_test)
-        print("Folder:%i, Accuracy: %f" % (i, accuracy))
+        print("Folder:%i, Accuracy: %f" % (i, accuracy))  # PRINT
         kf_accu.append(accuracy)
+
     print("Average Accuracy: %f" % (np.mean(kf_accu)))
 
 
@@ -93,10 +97,11 @@ def node_classification(node_labels, emb_vertex, emb_context, id2vertex, op):
     labels = []
     for uid in id2vertex:
         labels.append(node_labels[uid])
-    kf = KFold(len(labels), n_folds=10, shuffle=True)
+    kf = KFold(n_splits=10, shuffle=True)
     kf_accu = []
     labels = np.asarray(labels)
-    for i, (train_index, test_index) in enumerate(kf):
+
+    for i, (train_index, test_index) in enumerate(kf.split(labels)):
         y_train, y_test = labels[train_index], labels[test_index]
         s_train, s_test = emb_vertex[train_index], emb_vertex[test_index]
         t_train, t_test = emb_context[train_index], emb_context[test_index]
@@ -106,22 +111,38 @@ def node_classification(node_labels, emb_vertex, emb_context, id2vertex, op):
         clf.fit(x_train, y_train)
         test_preds = clf.predict(x_test)
         accuracy = clf.score(x_test, y_test)
-        print("Folder:%i, Accuracy: %f" % (i, accuracy))
-        print(classification_report(y_test, test_preds))
+        print("Folder:%i, Accuracy: %f" % (i, accuracy))  # PRINT
+        print(classification_report(y_test, test_preds))  # PRINT
         kf_accu.append(accuracy)
+
     print("Average Accuracy: %f" % (np.mean(kf_accu)))
+    # Average Accuracy: 0.823590
 
 
+if __name__ == '__main__':
 
+    emb_vertex, sign_w, proj_w, id2vertex, vertex2id, edge_source_id, edge_target_id, edge_sign, node_labels = \
+        load_model('lbl_wiki_edit_emb.pkl')
 
-emb_vertex, sign_w, proj_w, id2vertex, vertex2id, edge_source_id, edge_target_id, edge_sign, node_labels = \
-    load_model('lbl_wiki_edit_emb.pkl')
+    print("=========== Node Classification ===========")
 
-node_classification(emb_vertex=emb_vertex, emb_context=proj_w, node_labels=node_labels, id2vertex=id2vertex, op=concate)
-print("==============Link Prediction==============")
+    node_classification(emb_vertex=emb_vertex, emb_context=proj_w, node_labels=node_labels, id2vertex=id2vertex, op=concate)
 
-link_x, link_y = construct_dataset(edge_sign=edge_sign, id2vertex=id2vertex)
-link_prediction(x=link_x, y=link_y, emb_vertex=emb_vertex, emb_context=proj_w, op=hadamard)
+    print("============= Link Prediction =============")
+
+    link_x, link_y = construct_dataset(edge_sign=edge_sign, id2vertex=id2vertex)
+
+    print("\n", "     ------ Operator : Hadamard ------     ", sep="")
+    link_prediction(x=link_x, y=link_y, emb_vertex=emb_vertex, emb_context=proj_w, op=hadamard)
+
+    print("\n", "     ------ Operator : L1 Weight -----     ", sep="")
+    link_prediction(x=link_x, y=link_y, emb_vertex=emb_vertex, emb_context=proj_w, op=l1_weight)
+
+    print("\n", "     ------ Operator : L2 Weight -----     ", sep="")
+    link_prediction(x=link_x, y=link_y, emb_vertex=emb_vertex, emb_context=proj_w, op=l2_weight)
+
+    print("\n", "     ------- Operator : Average ------     ", sep="")
+    link_prediction(x=link_x, y=link_y, emb_vertex=emb_vertex, emb_context=proj_w, op=average)
 
 
 
