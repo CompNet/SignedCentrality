@@ -90,4 +90,16 @@ PREDICTION_KERNEL_POLY = "poly"
 PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
 
+# embeddings
+SNE_SAVE_PATH_NAME = "save_path"
+SNE_TRAIN_DATA_NAME = "train_data"
+SNE_LABEL_DATA_NAME = "label_data"
+SNE_WALKS_DATA_NAME = "walks_data"
+SNE_EMBEDDING_SIZE_NAME = "embedding_size"
+SNE_SAMPLES_TO_TRAIN_NAME = "samples_to_train"
+SNE_LEARNING_RATE_NAME = "learning_rate"
+SNE_NUM_SAMPLED_NAME = "num_sampled"
+SNE_CONTEXT_SIZE_NAME = "context_size"
+SNE_BATCH_SIZE_NAME = "batch_size"
+SNE_IS_TRAIN_NAME = "is_train"
 
