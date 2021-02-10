@@ -247,7 +247,7 @@ edge = []
 weights = []
 
 for i in range(7):
-    for j in range(2):#requises, utilisées, (nécessaires), 
+    for j in range(2):
         edge.append(edge_values[i][j])
     weights.append(edge_values[i][2])
 
