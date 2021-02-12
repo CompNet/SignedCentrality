@@ -89,8 +89,6 @@ class TrollTrust(CentralityMeasure):
                 opt[i] = (o1 - o2) / (o1 + o2)
                 
         graph.es['opt'] = opt
-
-
         
 
     def troll_trust(graph, beta, lambda1, iter_max, delta_min):
@@ -142,8 +140,11 @@ class TrollTrust(CentralityMeasure):
         trains a regressor to predict the sign from the links of a graph
         '''
 
-        df = pandas.DataFrame(graph_90_percent.es['opt'],columns=['opt'])
-        df += pandas.DataFrame(graph_90_percent.es['rep'],columns=['rep'])
+        df = pandas.DataFrame({
+            'opt' : graph_90_percent.es['opt'],
+            'rep' : graph_90_percent.es['rep']
+        })
+
         Y = df.to_numpy()
 
         df2 = pandas.DataFrame(graph_10_percent.es['weight'],columns=['weight'])
@@ -154,6 +155,14 @@ class TrollTrust(CentralityMeasure):
         scaler.fit(X)
         X = scaler.transform(X)
 
+        X = X.transpose()
+        
+        X = X.reshape(X.shape[1:])
+        
+        Y = Y.transpose()
+
+        print(X.shape)
+        print(Y.shape)
         
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3,
                                                             random_state=109)
