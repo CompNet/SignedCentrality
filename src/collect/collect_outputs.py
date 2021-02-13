@@ -76,6 +76,15 @@ def collect_outputs(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
                     result = [nb_solution_classes] # a list of a single value
                 if output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES:
                     result = [int(nb_solution_classes==1)] # a list of a single value
+
+            elif output_desc == consts.OUTPUT_GRAPH_IMBALANCE or output_desc == consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE:
+                result_filepath = os.path.join(eval_partitions_folder_path, "imbalance.csv")
+                imbalance = int(pd.read_csv(result_filepath, usecols=['imbalance count']).values)
+                imbalance_percentage = float(pd.read_csv(result_filepath, usecols=['imbalance percentage']).values)
+                if output_desc == consts.OUTPUT_GRAPH_IMBALANCE:
+                    result = [imbalance] # a list of a single value
+                if output_desc == consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE:
+                    result = [imbalance_percentage] # a list of a single value
                 
             df = pd.DataFrame(data=result, index=consts.COL_NAMES[output_desc]).transpose() # row vector
             outputs = pd.concat([outputs, df], axis=1)

@@ -41,7 +41,9 @@ OUTPUTS = [
     consts.OUTPUT_NB_SOLUTIONS,
     consts.OUTPUT_IS_SINGLE_SOLUTION,
     consts.OUTPUT_NB_SOLUTION_CLASSES,
-    consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES
+    consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
+    consts.OUTPUT_GRAPH_IMBALANCE,
+    consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE
 ]
 
 FORCE = False
@@ -98,6 +100,17 @@ if __name__ == '__main__':
      output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
      print(output3)
      prediction.regression.perform_regression(features, output3, kernel)
+
+     # regression task : graph imbalance
+     output4 = [consts.OUTPUT_GRAPH_IMBALANCE]
+     print(output4)
+     prediction.regression.perform_regression(features, output4, kernel)
+
+     output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
+     print(output5)
+     prediction.regression.perform_regression(features, output5, kernel)
+
+
 
 
     

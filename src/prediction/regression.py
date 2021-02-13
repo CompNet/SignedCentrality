@@ -33,13 +33,22 @@ def perform_regression(features, output, kernel):
     """
 
     # =======================================================
-    # Read features and output from file
+    # Read features and output from file (original code)
     # =======================================================
     df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=output)
     Y = df.to_numpy()
 
     df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES + ".csv"), usecols=features)
     X = df.to_numpy()
+
+    # =======================================================
+    # Read features and output from file (test code)
+    # =======================================================
+    # df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + "_full.csv"), usecols=output)
+    # Y = df.to_numpy()
+
+    # df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES + "_full.csv"), usecols=features)
+    # X = df.to_numpy()
 
     scaler = StandardScaler()
     # scaler.fit(X[:,0].reshape(-1,1))
@@ -57,18 +66,33 @@ def perform_regression(features, output, kernel):
     # =======================================================
     #  Train: Create a svm Regressor
     # =======================================================
-    # >> other params: gamma, max_iter, degree, decision_function_shape, shrinking
-    reg = svm.SVR(kernel=kernel)
+    # >> other params: gamma, max_iter, degree, shrinking
+    # reg = svm.SVC(kernel=kernel) # original code
+    reg = svm.SVR(kernel='linear')
     reg.fit(X_train, Y_train)
 
     # =======================================================
     # Test: Predict the response for test dataset
     # =======================================================
-    Y_pred = reg.predict(X_test)
+    Y_pred = reg.predict(X_test) # Returns a numpy.ndarray
+
+
+    # print("Predicted dataset before rounding:", Y_pred) # I want to transform decimal values to integer values
+    # i = 0
+    # for val in Y_pred:
+    #     print("Value before rounding:", val)
+    #     Y_pred[i] = round(val)
+    #     print("Value after rounding:",Y_pred[i])
+    #     i += 1
+    # print("Predicted dataset after rounding:", Y_pred)
 
     # =======================================================
     # Metrics
     # =======================================================
+    # print("Test dataset:", Y_test)
+    # print("Predicted dataset:", Y_pred)
     print("R2 score:", metrics.r2_score(Y_test, Y_pred))
-    #print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))
+
+
+    print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred),"\n")
 
