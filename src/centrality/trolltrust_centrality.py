@@ -47,7 +47,7 @@ class TrollTrust(CentralityMeasure):
         W = get_matrix(graph).toarray()
 
         for i in range(len(graph.vs)):
-
+        
             o1, o2 = 0, 0
 
             for j in range(len(graph.vs)):
@@ -56,12 +56,12 @@ class TrollTrust(CentralityMeasure):
                     o1 += pi[j]
                 elif W[i][j] < 0:
                     o2 += pi[j]
-
+                
             if (o1+o2 == 0):
                 rep[i] = 0
             else:                
                 rep[i] = (o1 - o2) / (o1 + o2)
-        graph.es['rep'] = rep
+        graph.vs['rep'] = rep
         
             
     def calculate_opt_values(graph, pi):
@@ -88,7 +88,7 @@ class TrollTrust(CentralityMeasure):
             else:                
                 opt[i] = (o1 - o2) / (o1 + o2)
                 
-        graph.es['opt'] = opt
+        graph.vs['opt'] = opt
         
 
     def troll_trust(graph, beta, lambda1, iter_max, delta_min):
@@ -131,7 +131,7 @@ class TrollTrust(CentralityMeasure):
             for l in range(len(graph.vs)):
                 piT1[l] = piT2[l]
             iter_number += 1
-        print("iter_number = ", iter_number)
+            
         return piT2
 
 
@@ -140,32 +140,82 @@ class TrollTrust(CentralityMeasure):
         trains a regressor to predict the sign from the links of a graph
         '''
 
-        df = pandas.DataFrame({
-            'opt' : graph_90_percent.es['opt'],
-            'rep' : graph_90_percent.es['rep']
+        opt_source = []
+        rep_source = []
+        opt_target = []
+        rep_target = []
+
+        for i in graph_10_percent.es:
+            opt_source.append(graph_10_percent.vs['opt'][i.source])
+            rep_source.append(graph_10_percent.vs['rep'][i.source])
+            opt_target.append(graph_10_percent.vs['opt'][i.target])
+            rep_target.append(graph_10_percent.vs['rep'][i.target])
+            
+            
+        df_y_train = pandas.DataFrame({
+            'opt_source' : opt_source,
+            'rep_source' : rep_source,
+            'opt_target' : opt_target,
+            'rep_target' : rep_target
         })
 
-        Y = df.to_numpy()
+        Y_train = df_y_train.to_numpy()
 
-        df2 = pandas.DataFrame(graph_10_percent.es['weight'],columns=['weight'])
-        X = df2.to_numpy()
+        df_y_test = pandas.DataFrame({
+            'weights' : graph_10_percent.es['weight']
+        })
+
+        Y_test = df_y_test.to_numpy()
+
+        opt_source = []
+        rep_source = []
+        opt_target = []
+        rep_target = []
+
+
+
+        for j in graph_90_percent.es:
+            print(j.source, " ", j.target)
+            opt_source.append(graph_90_percent.vs['opt'][j.source])
+            rep_source.append(graph_90_percent.vs['rep'][j.source])
+            opt_target.append(graph_90_percent.vs['opt'][j.target])
+            rep_target.append(graph_90_percent.vs['rep'][j.target])
+
+        df_x_train = pandas.DataFrame({
+            'opt_source' : opt_source,
+            'rep_source' : rep_source,
+            'opt_target' : opt_target,
+            'rep_target' : rep_target
+        })
+        
+        X_train = df_x_train.to_numpy()
+
+        df_x_test = pandas.DataFrame({
+            'weights' : graph_90_percent.es['weight']
+        })
+
+        X_test = df_x_test.to_numpy()
 
         scaler = StandardScaler()
 
-        scaler.fit(X)
-        X = scaler.transform(X)
+        scaler.fit(X_train)
+##        X = scaler.transform(X)
+##
+##        X_train = X_train.transpose()
+##        Y_train = Y_train.transpose()
+##      
+##        X = X.reshape(X.shape[1:])
+##        
+##        Y = Y.transpose()
+        
+        print("X_train", X_train.shape)
+        print("X_test", X_test.shape)
+        
+        print("Y_train", Y_train.shape)
+        print("Y_test", Y_test.shape)
+        
+##        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=109)
 
-        X = X.transpose()
-        
-        X = X.reshape(X.shape[1:])
-        
-        Y = Y.transpose()
-
-        print(X.shape)
-        print(Y.shape)
-        
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3,
-                                                            random_state=109)
         Y_train = Y_train.ravel()
         reg = svm.SVR(kernel=kernel)
         reg.fit(X_train, Y_train)
@@ -222,8 +272,9 @@ class TrollTrust(CentralityMeasure):
 
                 graph_10_percent.add_edges(edges_10_percent)
                 graph_10_percent.es['weight'] = weights_10_percent
-                print("ok")
+                print("ok ", len(graph_10_percent.vs))
                 pi = TrollTrust.troll_trust(graph_90_percent, beta, lambda1, iter_max, delta_min)
+                pi2 = TrollTrust.troll_trust(graph_10_percent, beta, lambda1, iter_max, delta_min)
 
                 print("pi:")
                 
@@ -232,6 +283,10 @@ class TrollTrust(CentralityMeasure):
                                 
                 TrollTrust.calculate_rep_values(graph_90_percent, pi)
                 TrollTrust.calculate_opt_values(graph_90_percent, pi)
+
+                TrollTrust.calculate_rep_values(graph_10_percent, pi2)
+                TrollTrust.calculate_opt_values(graph_10_percent, pi2)
+                
                 kernel = consts.PREDICTION_KERNEL_LINEAR
                 new_score = TrollTrust.logistic_regression(graph_10_percent, graph_90_percent, kernel)
                 if score < new_score:
