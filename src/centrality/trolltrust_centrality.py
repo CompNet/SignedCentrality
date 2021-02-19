@@ -8,12 +8,9 @@ import numpy
 import sys
 import random
 import csv
-#Import svm model
 from sklearn import svm
-#Import scikit-learn metrics module for accuracy calculation
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
-# Import train_test_split function
 from sklearn.model_selection import train_test_split
 
 
@@ -37,10 +34,13 @@ class TrollTrust(CentralityMeasure):
 
 
     def calculate_rep_values(graph, pi):
-        '''
-        calculates a list of Reputation Values for each nodes
-        '''
+        """This method calculates a list of Reputation Values for each nodes.
 
+        :param graph: i-graph object
+        :type graph: i-graph object
+        :param pi: list containing Troll-Trust centrality values for each nodes
+        :type pi: int list
+        """
 
         rep = [0 for w in range(len(graph.vs))]
 
@@ -65,9 +65,13 @@ class TrollTrust(CentralityMeasure):
         
             
     def calculate_opt_values(graph, pi):
-        '''
-        calculates a list of Optimistim Values for each nodes
-        '''
+        """This method calculates a list of Optimization Values for each nodes.
+
+        :param graph: i-graph object
+        :type graph: i-graph object
+        :param pi: list containing Troll-Trust centrality values for each nodes
+        :type pi: int list
+        """
 
         opt = [0 for w in range(len(graph.vs))]
 
@@ -92,12 +96,21 @@ class TrollTrust(CentralityMeasure):
         
 
     def troll_trust(graph, beta, lambda1, iter_max, delta_min):
-        '''
-        returns a list pi containing centrality values for each nodes from the
-        graph
-        '''
+        """This method returns a list pi containing centrality values for each
+        nodes from the graph.
 
-        #W = graph.get_adjacency(type=GET_ADJACENCY_BOTH, eids=False)
+        :param graph: i-graph object
+        :type graph: i-graph object
+        :param beta: 
+        :type beta: float
+        :param lambda1:
+        :type lambda1: float
+        :param iter_max: indicates the maximum number of iteration of the while loop
+        :type iter_max: int
+        :param delta_min: 
+        :type delta_min: float
+        """
+
         W = get_matrix(graph).toarray()
         iter_number = 0
 
@@ -135,7 +148,7 @@ class TrollTrust(CentralityMeasure):
         return piT2
 
 
-    def logistic_regression(graph_10_percent, graph_90_percent, kernel):
+    def logistic_regression(graph, kernel):
         '''
         trains a regressor to predict the sign from the links of a graph
         '''
@@ -145,78 +158,36 @@ class TrollTrust(CentralityMeasure):
         opt_target = []
         rep_target = []
 
-        for i in graph_10_percent.es:
-            opt_source.append(graph_10_percent.vs['opt'][i.source])
-            rep_source.append(graph_10_percent.vs['rep'][i.source])
-            opt_target.append(graph_10_percent.vs['opt'][i.target])
-            rep_target.append(graph_10_percent.vs['rep'][i.target])
-            
-            
-        df_y_train = pandas.DataFrame({
-            'opt_source' : opt_source,
-            'rep_source' : rep_source,
-            'opt_target' : opt_target,
-            'rep_target' : rep_target
-        })
+        for j in graph.es:
+            opt_source.append(graph.vs['opt'][j.source])
+            rep_source.append(graph.vs['rep'][j.source])
+            opt_target.append(graph.vs['opt'][j.target])
+            rep_target.append(graph.vs['rep'][j.target])
 
-        Y_train = df_y_train.to_numpy()
-
-        df_y_test = pandas.DataFrame({
-            'weights' : graph_10_percent.es['weight']
-        })
-
-        Y_test = df_y_test.to_numpy()
-
-        opt_source = []
-        rep_source = []
-        opt_target = []
-        rep_target = []
-
-
-
-        for j in graph_90_percent.es:
-            print(j.source, " ", j.target)
-            opt_source.append(graph_90_percent.vs['opt'][j.source])
-            rep_source.append(graph_90_percent.vs['rep'][j.source])
-            opt_target.append(graph_90_percent.vs['opt'][j.target])
-            rep_target.append(graph_90_percent.vs['rep'][j.target])
-
-        df_x_train = pandas.DataFrame({
+        df_x = pandas.DataFrame({
             'opt_source' : opt_source,
             'rep_source' : rep_source,
             'opt_target' : opt_target,
             'rep_target' : rep_target
         })
         
-        X_train = df_x_train.to_numpy()
+        X = df_x.to_numpy()
 
-        df_x_test = pandas.DataFrame({
-            'weights' : graph_90_percent.es['weight']
+        df_y = pandas.DataFrame({
+            'weights' : graph.es['weight']
         })
 
-        X_test = df_x_test.to_numpy()
+        Y = df_y.to_numpy()
 
         scaler = StandardScaler()
 
-        scaler.fit(X_train)
-##        X = scaler.transform(X)
-##
-##        X_train = X_train.transpose()
-##        Y_train = Y_train.transpose()
-##      
-##        X = X.reshape(X.shape[1:])
-##        
-##        Y = Y.transpose()
-        
-        print("X_train", X_train.shape)
-        print("X_test", X_test.shape)
-        
-        print("Y_train", Y_train.shape)
-        print("Y_test", Y_test.shape)
-        
-##        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=109)
+        scaler.fit(X)
 
-        Y_train = Y_train.ravel()
+
+        Y = Y.ravel()
+
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, train_size=0.9, random_state=109, shuffle=True)
+
         reg = svm.SVR(kernel=kernel)
         reg.fit(X_train, Y_train)
 
@@ -244,51 +215,19 @@ class TrollTrust(CentralityMeasure):
 
                 print("lambda1 = ", lambda1, "beta = ", beta)
                 
-                graph_10_percent = Graph(directed = True)
-                graph_10_percent.add_vertices(len(graph.vs))
-                graph_10_percent.degree(mode="in")
-
-                
-                graph_90_percent = graph
-                
-                edge_number_to_remove = len(graph.es) / 10
-
-                W = get_matrix(graph_90_percent).toarray()
-                print(W)
-                edges_10_percent = []
-                weights_10_percent = []
-                edge_number_to_remove += 1
-                print(edge_number_to_remove)
-                
-                while edge_number_to_remove > 0:
-                    v1, v2 = random.sample(range(graph.vcount()), 2)
-                    if (graph_90_percent.get_eid(v1, v2, directed=True, error=False) != -1):
-                        print(graph.get_eid(v1, v2, directed=True, error=False))
-                        edges_10_percent.append((v1, v2))
-                        weights_10_percent.append(W[v1][v2])                                   
-                        graph_90_percent.delete_edges([(v1, v2)])
-                        edge_number_to_remove -= 1
-                print(edges_10_percent)
-
-                graph_10_percent.add_edges(edges_10_percent)
-                graph_10_percent.es['weight'] = weights_10_percent
-                print("ok ", len(graph_10_percent.vs))
-                pi = TrollTrust.troll_trust(graph_90_percent, beta, lambda1, iter_max, delta_min)
-                pi2 = TrollTrust.troll_trust(graph_10_percent, beta, lambda1, iter_max, delta_min)
+                pi = TrollTrust.troll_trust(graph, beta, lambda1, iter_max, delta_min)
 
                 print("pi:")
                 
                 for c1 in range(len(graph.vs)):
                     print(c1, " => ", pi[c1])
                                 
-                TrollTrust.calculate_rep_values(graph_90_percent, pi)
-                TrollTrust.calculate_opt_values(graph_90_percent, pi)
 
-                TrollTrust.calculate_rep_values(graph_10_percent, pi2)
-                TrollTrust.calculate_opt_values(graph_10_percent, pi2)
-                
+                TrollTrust.calculate_rep_values(graph, pi)
+                TrollTrust.calculate_opt_values(graph, pi)
+
                 kernel = consts.PREDICTION_KERNEL_LINEAR
-                new_score = TrollTrust.logistic_regression(graph_10_percent, graph_90_percent, kernel)
+                new_score = TrollTrust.logistic_regression(graph, kernel)
                 if score < new_score:
                     score = new_score
                     final_lambda1 = lambda1
