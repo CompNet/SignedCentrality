@@ -102,7 +102,7 @@ if __name__ == '__main__':
      prediction.regression.perform_regression(features, output3, kernel)
 
      # regression task : graph imbalance
-     output4 = [consts.OUTPUT_GRAPH_IMBALANCE]
+     output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
      print(output4)
      prediction.regression.perform_regression(features, output4, kernel)
 
