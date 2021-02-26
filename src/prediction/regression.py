@@ -17,6 +17,8 @@ from sklearn import svm
 #Import scikit-learn metrics module for accuracy calculation
 from sklearn import metrics
 
+import collect.collect_graphics
+
 # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
 # https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
 # https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics
@@ -95,4 +97,8 @@ def perform_regression(features, output, kernel):
 
 
     print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred),"\n")
+
+    # Saving graphics to file
+    # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
+    # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
 

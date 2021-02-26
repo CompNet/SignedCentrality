@@ -18,6 +18,8 @@ from sklearn import svm
 #Import scikit-learn metrics module for accuracy calculation
 from sklearn import metrics
 
+import collect.collect_graphics
+
 
 # https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
 # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
@@ -103,5 +105,9 @@ def perform_classification(features, output, kernel):
     
     # Regression metrics for training : mean_squared_error
     #print("mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))
+
+    # Saving graphics to file
+    # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
+    # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
 
     

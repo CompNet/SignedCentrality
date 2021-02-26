@@ -17,6 +17,7 @@ CSV_FOLDER = os.path.join(OUT_FOLDER, "csv")
 CENTR_FOLDER = os.path.join(OUT_FOLDER, "centralities")
 STAT_FOLDER = os.path.join(OUT_FOLDER, "stats")
 PLOT_FOLDER = os.path.join(OUT_FOLDER, "plots")
+GRAPHICS_FOLDER = os.path.join(OUT_FOLDER, "graphics")
 
 
 # ===========================
