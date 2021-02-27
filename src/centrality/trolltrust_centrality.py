@@ -13,9 +13,6 @@ from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-
-
-import sys
 import os
 
 PACKAGE_PARENT = '..'
@@ -32,9 +29,8 @@ import consts
 
 class TrollTrust(CentralityMeasure):
 
-
     def calculate_rep_values(graph, pi):
-        """This method calculates a list of Reputation Values for each nodes.
+        """This method calculates a list of Reputation values for each nodes.
 
         :param graph: i-graph object
         :type graph: i-graph object
@@ -65,7 +61,7 @@ class TrollTrust(CentralityMeasure):
         
             
     def calculate_opt_values(graph, pi):
-        """This method calculates a list of Optimization Values for each nodes.
+        """This method calculates a list of Optimization values for each nodes.
 
         :param graph: i-graph object
         :type graph: i-graph object
@@ -107,7 +103,7 @@ class TrollTrust(CentralityMeasure):
         :type lambda1: float
         :param iter_max: indicates the maximum number of iteration of the while loop
         :type iter_max: int
-        :param delta_min: 
+        :param delta_min: indicates the acceptable convergence limit delta 
         :type delta_min: float
         """
 
@@ -150,7 +146,13 @@ class TrollTrust(CentralityMeasure):
 
     def logistic_regression(graph, kernel):
         '''
-        trains a regressor to predict the sign from the links of a graph
+        This method trains a regressor to predict the sign from the links of a
+        graph
+
+        :param graph: i-graph object
+        :type graph: i-graph object
+        :param kernel: indicates the kernel type wanted to perform the regression
+        :type kernel: string
         '''
 
         opt_source = []
@@ -183,7 +185,6 @@ class TrollTrust(CentralityMeasure):
 
         scaler.fit(X)
 
-
         Y = Y.ravel()
 
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, train_size=0.9, random_state=109, shuffle=True)
@@ -199,8 +200,15 @@ class TrollTrust(CentralityMeasure):
 
     def choose_parameters(graph, iter_max, delta_min):
         '''
-        returns the optimal parameters to perform the troll-trust algorithm on a
+        This method returns the optimal parameters to perform the troll-trust algorithm on a
         given graph
+
+        :param graph: i-graph object
+        :type graph: i-graph object
+        :param iter_max: indicates the maximum number of iteration of the while loop
+        :type iter_max: int
+        :param delta_min: indicates the acceptable convergence limit delta 
+        :type delta_min: float
         '''
         score = 0
         final_lambda1 = 0
@@ -227,7 +235,9 @@ class TrollTrust(CentralityMeasure):
                 TrollTrust.calculate_opt_values(graph, pi)
 
                 kernel = consts.PREDICTION_KERNEL_LINEAR
+
                 new_score = TrollTrust.logistic_regression(graph, kernel)
+
                 if score < new_score:
                     score = new_score
                     final_lambda1 = lambda1
@@ -235,45 +245,64 @@ class TrollTrust(CentralityMeasure):
 
         return final_lambda1, final_beta
 
+
+    def perform_troll_trust(graph, iter_max, delta_min):
+        '''
+        This method returns the best centrality values for the nodes of a graph
+
+        :param graph: i-graph object
+        :type graph: i-graph object
+        :param iter_max: indicates the maximum number of iteration of the while loop
+        :type iter_max: int
+        :param delta_min: indicates the acceptable convergence limit delta 
+        :type delta_min: float
+        '''
+        
+        lambda_1, beta = TrollTrust.choose_parameters(graph, iter_max, delta_min)
+        pi = TrollTrust.troll_trust(graph, beta, lambda1, iter_max, delta_min)
+        graph.vs['pi'] = pi
+        
+        return graph
+
 # MAIN:
 
-''' test values : '''
-W = [[0    ,   0    ,  -0.1  ,  0.1],
-     [1.0  ,   0    ,  -0.9  ,  0  ],
-     [0    ,  -0.6  ,   0    ,  0  ],
-     [0.8  ,   0    ,   0.7  ,  0  ]]
-
-edge_values = [(0, 2, -0.1), (0, 3, 0.1), (1, 0, 1.0), (1, 2, -0.9), (2, 1, -0.6),
-              (3, 0, 0.8), (3, 2, 0.7)]
-
-edge = []
-weights = []
-
-for i in range(7):
-    for j in range(2):
-        edge.append(edge_values[i][j])
-    weights.append(edge_values[i][2])
-
-edges = [(i,j) for i,j in zip(edge[::2], edge[1::2])]
-
-list1 = []
-for i in range(len(edges)):
-    list1.append((edges[i][0], edges[i][1]))
-
-Gtest = Graph(directed=True)
-
-Gtest.add_vertices(4)
-Gtest.add_edges(list1)
-Gtest.degree(mode="in")
-Gtest.es['weight'] = weights
-
-A = get_matrix(Gtest).toarray()
-print(A)
-
-
-iter_max = 1000
-delta_min = 0
-
-TrollTrust.choose_parameters(Gtest, iter_max, delta_min)
-
+##''' test values : '''
+##W = [[0    ,   0    ,  -0.1  ,  0.1],
+##     [1.0  ,   0    ,  -0.9  ,  0  ],
+##     [0    ,  -0.6  ,   0    ,  0  ],
+##     [0.8  ,   0    ,   0.7  ,  0  ]]
+##
+##edge_values = [(0, 2, -0.1), (0, 3, 0.1), (1, 0, 1.0), (1, 2, -0.9), (2, 1, -0.6),
+##              (3, 0, 0.8), (3, 2, 0.7)]
+##
+##edge = []
+##weights = []
+##
+##for i in range(7):
+##    for j in range(2):
+##        edge.append(edge_values[i][j])
+##    weights.append(edge_values[i][2])
+##
+##edges = [(i,j) for i,j in zip(edge[::2], edge[1::2])]
+##
+##list1 = []
+##for i in range(len(edges)):
+##    list1.append((edges[i][0], edges[i][1]))
+##
+##Gtest = Graph(directed=True)
+##
+##Gtest.add_vertices(4)
+##Gtest.add_edges(list1)
+##Gtest.degree(mode="in")
+##Gtest.es['weight'] = weights
+##
+##A = get_matrix(Gtest).toarray()
+##print(A)
+##
+##
+##iter_max = 1000
+##delta_min = 0
+##
+##TrollTrust.perform_troll_trust(Gtest, iter_max, delta_min)
+##
 
