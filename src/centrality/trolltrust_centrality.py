@@ -28,6 +28,7 @@ import consts
 
 
 class TrollTrust(CentralityMeasure):
+    
 
     def calculate_rep_values(graph, pi):
         """This method calculates a list of Reputation values for each nodes.
@@ -147,7 +148,8 @@ class TrollTrust(CentralityMeasure):
     def logistic_regression(graph, kernel):
         '''
         This method trains a regressor to predict the sign from the links of a
-        graph
+        graph and returns the mean squared error to indicate how well did the
+        regressor perform.
 
         :param graph: i-graph object
         :type graph: i-graph object
@@ -194,11 +196,11 @@ class TrollTrust(CentralityMeasure):
 
         Y_pred = reg.predict(X_test)
 
-        print("R2 score:", metrics.r2_score(Y_test, Y_pred))
-        return metrics.r2_score(Y_test, Y_pred)
+        print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred),"\n")
+        return metrics.mean_squared_error(Y_test, Y_pred)
 
 
-    def choose_parameters(graph, iter_max, delta_min):
+    def choose_parameters(graph, iter_max, delta_min, lambda1_step, beta_step):
         '''
         This method returns the optimal parameters to perform the troll-trust algorithm on a
         given graph
@@ -209,26 +211,25 @@ class TrollTrust(CentralityMeasure):
         :type iter_max: int
         :param delta_min: indicates the acceptable convergence limit delta 
         :type delta_min: float
+        :param lambda1_step: indicates at which step the algorithm will go through the values for lambda1
+        :type lambda1_step: float
+        :param beta_step: indicates at which step the algorithm will go through the values for beta
+        :type beta_step: float
         '''
         score = 0
         final_lambda1 = 0
         final_beta = 0
-        for i in numpy.arange(0.01, 1, 0.01):
+        for i in numpy.arange(lambda1_step, 1, lambda1_step):
         
             lambda1 = i
 
-            for j in numpy.arange(0.001, 1, 0.001):
+            for j in numpy.arange(beta_step, 1, beta_step):
 
                 beta = j
 
-                print("lambda1 = ", lambda1, "beta = ", beta)
+                print("lambda1 =", lambda1, " ;  beta =", beta)
                 
                 pi = TrollTrust.troll_trust(graph, beta, lambda1, iter_max, delta_min)
-
-                print("pi:")
-                
-                for c1 in range(len(graph.vs)):
-                    print(c1, " => ", pi[c1])
                                 
 
                 TrollTrust.calculate_rep_values(graph, pi)
@@ -246,7 +247,7 @@ class TrollTrust(CentralityMeasure):
         return final_lambda1, final_beta
 
 
-    def perform_troll_trust(graph, iter_max, delta_min):
+    def perform_troll_trust(graph, iter_max, delta_min, lambda1_step, beta_step):
         '''
         This method returns the best centrality values for the nodes of a graph
 
@@ -256,15 +257,23 @@ class TrollTrust(CentralityMeasure):
         :type iter_max: int
         :param delta_min: indicates the acceptable convergence limit delta 
         :type delta_min: float
+        :param lambda1_step: indicates at which step the algorithm will go through the values for lambda1
+        :type lambda1_step: float
+        :param beta_step: indicates at which step the algorithm will go through the values for beta
+        :type beta_step: float
         '''
         
-        lambda_1, beta = TrollTrust.choose_parameters(graph, iter_max, delta_min)
+        lambda_1, beta = TrollTrust.choose_parameters(graph, iter_max, delta_min, lambda1_step, beta_step)
         pi = TrollTrust.troll_trust(graph, beta, lambda1, iter_max, delta_min)
         graph.vs['pi'] = pi
         
+        print("!!!!!!!!!!!! over !!!!!!!!!!!!")
+        
         return graph
 
-# MAIN:
+    
+
+# TESTS:
 
 ##''' test values : '''
 ##W = [[0    ,   0    ,  -0.1  ,  0.1],
@@ -305,4 +314,53 @@ class TrollTrust(CentralityMeasure):
 ##
 ##TrollTrust.perform_troll_trust(Gtest, iter_max, delta_min)
 ##
+
+
+
+##W = [[0    ,   0.8    ,  -0.1  ,  0.1 , 0.4 ],
+##     [1.0  ,   0    ,  -0.9  ,  0.3 , -0.1 ],
+##     [-0.9    ,  -0.6  ,   0    ,  -1 , -0.6 ],
+##     [0.9    ,  -0.6  ,   0.5    ,  0 , 0.2  ],
+##     [0.8  ,   0.3    ,   0.7  ,  0.3 , 0 ]]
+##
+##edge_values = [(0, 1, 0.8), (0, 2, -0.1), (0, 3, 0.1), (0, 4, 0.4), (0, 5, 0.4), (0, 6, 0.4), (0, 7, 0.4), (0, 8, 0.4), (0, 9, 0.4),
+##               (1, 0, 1.0), (1, 2, -0.9), (1, 3, 0.3), (1, 4, -0.1), (1, 5, -0.1), (1, 6, -0.1), (1, 7, -0.1), (1, 8, -0.1), (1, 9, -0.1),
+##               (2, 0 , -0.9), (2, 1, -0.6), (2, 3, -1), (2, 4, -0.6), (2, 5, -0.6), (2, 6, -0.6), (2, 7, -0.6), (2, 8, -0.6), (2, 9, -0.6),
+##               (3, 0, 0.9), (3, 1, -0.6), (3, 2, 0.5), (3, 4, 0.2), (3, 5, 0.2), (3, 6, 0.2), (3, 7, 0.2), (3, 8, 0.2), (3, 9, 0.2),
+##               (4, 0, 0.8), (4, 1, 0.3), (4, 2, 0.7), (4, 3, 0.3), (4, 5, 0.2), (4, 6, 0.2), (4, 7, 0.2), (4, 8, 0.2), (4, 9, 0.2),
+##               (5, 0, 0.8), (5, 1, 0.3), (5, 2, 0.7), (5, 3, 0.3), (5, 4, 0.2), (5, 6, 0.2), (5, 7, 0.2), (5, 8, 0.2), (5, 9, 0.2),
+##               (6, 0, 0.8), (6, 1, 0.3), (6, 2, 0.7), (6, 3, 0.3), (6, 4, 0.2), (6, 5, 0.2), (6, 7, 0.2), (6, 8, 0.2), (6, 9, 0.2),
+##               (7, 0, 0.8), (7, 1, 0.3), (7, 2, 0.7), (7, 3, 0.3), (7, 5, 0.2), (7, 6, 0.2), (7, 8, 0.2), (7, 9, 0.2),
+##               (8, 0, 0.8), (8, 1, 0.3), (8, 2, 0.7), (8, 3, 0.3), (8, 4, 0.2), (8, 5, 0.2), (8, 6, 0.2), (8, 7, 0.2), (8, 9, 0.2),
+##               (9, 0, 0.8), (9, 1, 0.3), (9, 2, 0.7), (9, 3, 0.3), (9, 5, 0.2), (9, 6, 0.2), (9, 7, 0.2), (9, 8, 0.2), (9, 4, 0.2)]
+##
+##edge = []
+##weights = []
+##
+##for i in range(89):
+##    for j in range(2):
+##        edge.append(edge_values[i][j])
+##    weights.append(edge_values[i][2])
+##
+##edges = [(i,j) for i,j in zip(edge[::2], edge[1::2])]
+##
+##list1 = []
+##for i in range(len(edges)):
+##    list1.append((edges[i][0], edges[i][1]))
+##
+##Gtest = Graph(directed=True)
+##
+##Gtest.add_vertices(10)
+##Gtest.add_edges(list1)
+##Gtest.degree(mode="in")
+##Gtest.es['weight'] = weights
+##
+##A = get_matrix(Gtest).toarray()
+##print(A)
+##
+##
+##iter_max = 1000
+##delta_min = 0
+##
+##TrollTrust.perform_troll_trust(Gtest, iter_max, delta_min, 0.01, 0.01)
 
