@@ -300,3 +300,19 @@ def read_csv(path: str, remove_headers=True):
 
     return matrix
 
+
+def write_csv(path: str, matrix):
+    """
+    Create a CSV file from a matrix
+
+    :param path: path of the CSV file
+    :type path: str
+    :param matrix: matrix to write
+    :type matrix: list of lists
+    :return: the matrix containing data
+    :rtype: None
+    """
+
+    with open(path, 'w') as file:
+        file.writelines(matrix)
+
