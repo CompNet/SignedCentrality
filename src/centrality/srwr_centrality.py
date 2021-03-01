@@ -29,8 +29,6 @@ def perform_srwr(graph, seed = 0, c = 0.15, epsilon = 1e-9, beta = 0.5, gamma = 
     '''
 
     srwr = SRWR()
-    
-    
    
     f = open("srwr_temp.txt","w+")
     cursor = 0
