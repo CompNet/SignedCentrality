@@ -54,7 +54,7 @@ def perform_srwr(graph, seed = 0, c = 0.15, epsilon = 1e-9, beta = 0.5, gamma = 
     if os.path.exists("srwr_temp.txt"):
         os.remove("srwr_temp.txt")
     
-    return graph
+    return srwr_graph
 
 
 #TESTS:
