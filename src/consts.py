@@ -109,3 +109,18 @@ SNE_CONTEXT_SIZE_NAME = "context_size"
 SNE_BATCH_SIZE_NAME = "batch_size"
 SNE_IS_TRAIN_NAME = "is_train"
 
+
+# MLP hyper parameters
+class MLP:
+    IDENTITY = 'identity'
+    LOGISTIC = 'logistic'
+    TANH = 'tanh'
+    RELU = 'relu'
+    LBFGS = 'lbfgs'
+    SGD = 'sgd'
+    ADAM = 'adam'
+    CONSTANT = 'constant'
+    INVSCALING = 'invscaling'
+    ADAPTIVE = 'adaptive'
+    AUTO = 'auto'
+

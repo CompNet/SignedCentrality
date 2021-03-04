@@ -77,6 +77,7 @@ All the modules listed below are the python modules
 * scipy 1.3.1
 * sklearn 0.21.3
 * pandas 0.25.1
+* deprecated 1.2.11
 
 
 
