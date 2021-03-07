@@ -6,6 +6,7 @@ Created on Feb 25, 2021
 import os
 import consts
 import path
+import util
 
 import numpy
 import matplotlib.pyplot as plt
@@ -22,6 +23,7 @@ def generate_plot(x_values, y_values, graphic_title):
     :type graphic_title: string
     """
     graphic_title = str(graphic_title)
+    graphic_title = util.prediction_name_refactor(graphic_title)
     filename = graphic_title+"_plot.png"
     path_to_file = os.path.join(path.get_graphics_folder_path(), filename)
 
@@ -48,6 +50,7 @@ def generate_boxplot(x_values, y_values, graphic_title):
     print(type(y_values))
     print(y_values.shape) # the shape are not the same, so I need to add something for it to work (see below)
     graphic_title = str(graphic_title)
+    graphic_title = util.prediction_name_refactor(graphic_title)
     filename = graphic_title+"_boxplot.png"
     path_to_file = os.path.join(path.get_graphics_folder_path(), filename)
 

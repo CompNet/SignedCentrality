@@ -23,6 +23,7 @@ def collect_predicted_values(predicted_values, prediction_name):
 
     # preparations of multiples variables
     prediction_name = str(prediction_name)
+    prediction_name = util.prediction_name_refactor(prediction_name)
     csv_folder_path = path.get_csv_folder_path()
     os.makedirs(csv_folder_path, exist_ok=True)
     result_filename = prediction_name + "_predicted_values.csv"
@@ -36,14 +37,13 @@ def collect_predicted_values(predicted_values, prediction_name):
         print(x, end=' ')"""
 
     if not os.path.exists(result_filepath):
-        print("Work in progress")
         for x in np.nditer(predicted_values):  # method to select all values inside the ndarray
             result = None
             result = [x]
-            print(result)
-            df = pd.DataFrame(data=result, index=None)
+            # print(result)
+            df = pd.DataFrame(data=result, index=[prediction_name]).transpose()
             predicted_dataset = predicted_dataset.append(df)
-            print(predicted_dataset)
+            # print(predicted_dataset)
         # predicted_dataset.append(predicted_values)
         predicted_dataset.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
@@ -60,13 +60,32 @@ def collect_predicted_values_with_graph_name(predicted_values, prediction_name):
     """ graph_names = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS+"_full.csv"), usecols=0)
     graph_names = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=0)
     predicted_dataset = pd.DataFrame([])
+
+    # preparations of multiples variables
+    prediction_name = str(prediction_name)
+    prediction_name = util.prediction_name_refactor(prediction_name)
     csv_folder_path = path.get_csv_folder_path()
     os.makedirs(csv_folder_path, exist_ok=True)
-    result_filename = prediction_name + "_predicted_values_updated.csv"
+    result_filename = prediction_name + "_predicted_values.csv"
     result_filepath = os.path.join(csv_folder_path, result_filename)
+    print(predicted_values)
+    for x in np.nditer(predicted_values): # method to select all values inside the ndarray
+        print(type(x), end=' ')
+        print(x, end=' ')
+        x = float(x)
+        print(type(x), end=' ')
+        print(x, end=' ')
 
     if not os.path.exists(result_filepath):
-        print("work in progress")
+        for x in np.nditer(predicted_values):  # method to select all values inside the ndarray
+            result = None
+            result = [x]
+            # print(result)
+            df = pd.DataFrame(data=result, index=[prediction_name]).transpose()
+            predicted_dataset = predicted_dataset.append(df)
+            # print(predicted_dataset)
+        # predicted_dataset.append(predicted_values)
+        predicted_dataset.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
         print(result_filepath + " already exists")
     """

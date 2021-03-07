@@ -316,3 +316,19 @@ def write_csv(path: str, matrix):
     with open(path, 'w') as file:
         file.writelines(matrix)
 
+
+def prediction_name_refactor(prediction_name):
+    refactored_name = None
+    if prediction_name == "['nb_solutions']":
+        refactored_name = consts.OUTPUT_NB_SOLUTIONS
+    elif prediction_name == "['single_solution']":
+        refactored_name = consts.OUTPUT_IS_SINGLE_SOLUTION
+    elif prediction_name == "['nb_solution_classes']":
+        refactored_name = consts.OUTPUT_NB_SOLUTION_CLASSES
+    elif prediction_name == "['single_solution_class']":
+        refactored_name = consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES
+    elif prediction_name == "['imbalance_count']":
+        refactored_name = consts.OUTPUT_GRAPH_IMBALANCE_COUNT
+    elif prediction_name == "['imbalance_percentage']":
+        refactored_name = consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE
+    return refactored_name
