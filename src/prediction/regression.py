@@ -18,6 +18,7 @@ from sklearn import svm
 from sklearn import metrics
 
 import collect.collect_graphics
+import collect.collect_predicted_values
 
 # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
 # https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
@@ -97,6 +98,9 @@ def perform_regression(features, output, kernel):
 
 
     print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred),"\n")
+
+    # Saving predicted values to file
+    collect.collect_predicted_values.collect_predicted_values(Y_pred, output)
 
     # Saving graphics to file
     # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)

@@ -19,6 +19,7 @@ from sklearn import svm
 from sklearn import metrics
 
 import collect.collect_graphics
+import collect.collect_predicted_values
 
 
 # https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
@@ -105,6 +106,9 @@ def perform_classification(features, output, kernel):
     
     # Regression metrics for training : mean_squared_error
     #print("mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))
+
+    # Saving predicted values to file
+    collect.collect_predicted_values.collect_predicted_values(Y_pred, output)
 
     # Saving graphics to file
     # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
