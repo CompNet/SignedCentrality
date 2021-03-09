@@ -1,96 +1,25 @@
-'''
-Created on Sep 23, 2020
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+This module contains functions related regression computing.
+
+.. note: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+.. note: https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
+.. note: https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics
 
 @author: nejat
-'''
-import os
-import itertools
+@author: Virgile Sucal
+"""
+
 from sys import stderr
-
-import consts
-import pandas as pd
-import numpy as np
-
+from deprecated import deprecated
+from sklearn import metrics
+from sklearn import svm
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import StandardScaler
-# Import train_test_split function
-from sklearn.model_selection import train_test_split
-#Import svm model
-from sklearn import svm
-#Import scikit-learn metrics module for accuracy calculation
-from sklearn import metrics
-from path import get_csv_folder_path
-from deprecated import deprecated
-
-import collect.collect_graphics
-
-# https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
-# https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
-# https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics
-
-
-def initialize_data(features, output):
-    """
-    Initialize input and output sets for training and tests
-
-    :param features: a list of features
-    :type features: string list
-    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :type output: string
-    """
-
-    # =======================================================
-    # Read features and output from file (original code)
-    # =======================================================
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=output)
-    Y = df.to_numpy()
-
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + ".csv"), usecols=features)
-    X = df.to_numpy()
-
-    # =======================================================
-    # Read features and output from file (test code)
-    # =======================================================
-    # df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + "_full.csv"), usecols=output)
-    # Y = df.to_numpy()
-
-    # df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES + "_full.csv"), usecols=features)
-    # X = df.to_numpy()
-
-    scaler = StandardScaler()
-    # scaler.fit(X[:,0].reshape(-1,1))
-    # X[:,0] = scaler.transform(X[:,0].reshape(-1,1)).reshape(-1)
-    scaler.fit(X)
-    X = scaler.transform(X)
-
-    # =======================================================
-    # Split data intro train and test sets
-    # =======================================================
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=109)  # 70% training and 30% test
-    Y_train = Y_train.ravel()  # convert into 1D array, due to the warning from 'train_test_split'
-
-    return X_train, X_test, Y_train, Y_test
-
-
-def initialize_hyper_parameters(default_values, user_defined_values):
-    """
-    Compute hyper parameters merging default values and user defined values
-
-    :param default_values: default values for hyper parameters
-    :param user_defined_values: user defined values for hyper parameters
-    :return: merged hyper parameters
-    """
-
-    hyper_parameters = {}
-    for key, value in default_values.items():
-        param_value = value
-        if key in user_defined_values:
-            param_value = user_defined_values[key]
-        hyper_parameters = {**hyper_parameters, key: param_value}
-
-    return hyper_parameters
-
+import consts
+from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 
 
 def test_regression(reg, X_test, Y_test):
@@ -105,17 +34,7 @@ def test_regression(reg, X_test, Y_test):
     # =======================================================
     # Test: Predict the response for test dataset
     # =======================================================
-    Y_pred = reg.predict(X_test) # Returns a numpy.ndarray
-
-
-    # print("Predicted dataset before rounding:", Y_pred) # I want to transform decimal values to integer values
-    # i = 0
-    # for val in Y_pred:
-    #     print("Value before rounding:", val)
-    #     Y_pred[i] = round(val)
-    #     print("Value after rounding:",Y_pred[i])
-    #     i += 1
-    # print("Predicted dataset after rounding:", Y_pred)
+    Y_pred = reg.predict(X_test)  # Returns a numpy.ndarray
 
     # =======================================================
     # Metrics
@@ -126,9 +45,7 @@ def test_regression(reg, X_test, Y_test):
     print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))  # Best value: 0
     print("Mean absolute error:", metrics.mean_absolute_error(Y_test, Y_pred), "\n")  # Best value: 0
 
-    # Saving graphics to file
-    # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
-    # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
+    process_graphics(Y_test, Y_pred)
 
 
 def perform_svr_regression(features, output, **kwargs):
@@ -268,5 +185,3 @@ def perform_mlp_regression(features, output, **kwargs):
     #  Tests
     # =======================================================
     test_regression(model, X_test, Y_test)
-
-
