@@ -101,8 +101,10 @@ def perform_regression(features, output, kernel):
 
     # Saving predicted values to file
     collect.collect_predicted_values.collect_predicted_values(Y_pred, output)
+    # collect.collect_predicted_values.collect_predicted_values_with_graph_name(Y_pred, output)
 
     # Saving graphics to file
     # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
     # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
+    # collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
 
