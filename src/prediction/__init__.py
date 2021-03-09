@@ -66,7 +66,7 @@ def initialize_hyper_parameters(default_values, user_defined_values):
     return hyper_parameters
 
 
-def process_graphics(Y_test, Y_pred):
+def process_graphics(Y_test, Y_pred, output):
     """
     Process graphical display for test results
     """

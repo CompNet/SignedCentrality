@@ -19,10 +19,11 @@ from sklearn import svm
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 import consts
+from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 
 
-def test_regression(reg, X_test, Y_test):
+def test_regression(reg, X_test, Y_test, output):
     """
     Perform validation tests
 
@@ -45,7 +46,11 @@ def test_regression(reg, X_test, Y_test):
     print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))  # Best value: 0
     print("Mean absolute error:", metrics.mean_absolute_error(Y_test, Y_pred), "\n")  # Best value: 0
 
-    process_graphics(Y_test, Y_pred)
+    # Save predicted values into a file
+    collect_predicted_values(Y_pred, output)
+
+    # Save graphics into a file
+    process_graphics(Y_test, Y_pred, output)
 
 
 def perform_svr_regression(features, output, **kwargs):
@@ -79,7 +84,7 @@ def perform_svr_regression(features, output, **kwargs):
     # =======================================================
     #  Tests
     # =======================================================
-    test_regression(reg, X_test, Y_test)
+    test_regression(reg, X_test, Y_test, output)
 
 
 @deprecated("This function is deprecated, use 'perform_svr_regression()' instead")
@@ -130,7 +135,7 @@ def perform_linear_regression(features, output, **kwargs):
     # =======================================================
     #  Tests
     # =======================================================
-    test_regression(model, X_test, Y_test)
+    test_regression(model, X_test, Y_test, output)
 
 
 def perform_mlp_regression(features, output, **kwargs):
@@ -184,4 +189,4 @@ def perform_mlp_regression(features, output, **kwargs):
     # =======================================================
     #  Tests
     # =======================================================
-    test_regression(model, X_test, Y_test)
+    test_regression(model, X_test, Y_test, output)
