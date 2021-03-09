@@ -13,6 +13,7 @@ import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
 import prediction.regression
+import prediction.random_forest_classification
 
 # =====================================
 GRAPH_SIZES = [20,24]
@@ -83,6 +84,10 @@ if __name__ == '__main__':
      print(output)
      kernel = consts.PREDICTION_KERNEL_LINEAR
      print(kernel)
+
+     # random forest classification task
+     prediction.random_forest_classification.perform_random_forest_classification(features, output, 100)
+     
      # classification task : one or more solutions
      prediction.classification.perform_classification(features, output, kernel)
 
