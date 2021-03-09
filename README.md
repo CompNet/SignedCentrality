@@ -61,6 +61,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * scipy 1.3.1
   * sklearn 0.21.3
   * pandas 0.25.1
+  * deprecated 1.2.11
 
 * Download this project from GitHub
 
