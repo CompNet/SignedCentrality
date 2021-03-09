@@ -53,7 +53,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
 ## Installation
 
-* Install Python (the tested version is Python 3.7.4)
+* Install Python (the tested version are Python 3.7.4 and Python 3.8.4)
 
 * Install the following python modules
   * igraph 0.8.2
@@ -61,6 +61,8 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * scipy 1.3.1
   * sklearn 0.21.3
   * pandas 0.25.1
+  * tensorflow 2.4.0
+  * torch 1.7.1
 
 * Download this project from GitHub
 
@@ -77,6 +79,8 @@ All the modules listed below are the python modules
 * scipy 1.3.1
 * sklearn 0.21.3
 * pandas 0.25.1
+* tensorflow 2.4.0
+* torch 1.7.1
 
 
 
