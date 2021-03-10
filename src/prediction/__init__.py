@@ -12,6 +12,11 @@ from path import get_csv_folder_path
 
 """
 This package contains functions related to the classification and regression.
+
+.. note: Authors are given here only for this module.
+
+@author: nejat
+@author: Virgile Sucal
 """
 
 
@@ -102,6 +107,39 @@ def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_resul
         process_graphics(Y_test, Y_pred, output)
 
     return prediction_metrics_results
+
+
+def perform_prediction(model_class, default_values, features, output, test_function, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
+    """This method performs the task of regression for a single output.
+
+    :param model_class: prediction technique
+    :param default_values: default values for hyper parameters
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param test_function: function to perform validation tests and compute metrics
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
+    """
+
+    # =======================================================
+    #  Initialization
+    # =======================================================
+    X_train, X_test, Y_train, Y_test = initialize_data(features, output)
+    hyper_parameters = initialize_hyper_parameters(default_values, kwargs)
+
+    # =======================================================
+    #  Train: Create a the predictor
+    # =======================================================
+    model = model_class(**hyper_parameters)
+    model.fit(X_train, Y_train)
+
+    # =======================================================
+    #  Tests
+    # =======================================================
+    computed_prediction_metrics = test_function(model, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
+
+    return model, computed_prediction_metrics
 
 
 def process_graphics(Y_test, Y_pred, output):

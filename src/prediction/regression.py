@@ -20,7 +20,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 import consts
 from collect.collect_predicted_values import collect_predicted_values
-from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction
+from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction, \
+    perform_prediction
 
 
 def test_regression(reg, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=True):
@@ -48,33 +49,17 @@ def perform_svr_regression(features, output, print_results=True, export_predicte
 
     :param features: a list of features
     :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
     """
-
-    # =======================================================
-    #  Initialization
-    # =======================================================
-    X_train, X_test, Y_train, Y_test = initialize_data(features, output)
 
     # Set default values for hyper parameters:
     default_values = {
         "kernel": consts.PREDICTION_KERNEL_LINEAR,
     }
-    hyper_parameters = initialize_hyper_parameters(default_values, kwargs)
 
-    # =======================================================
-    #  Train: Create a svm Regressor
-    # =======================================================
-    # >> other params: gamma, max_iter, degree, shrinking
-    reg = svm.SVC(**hyper_parameters)
-    reg.fit(X_train, Y_train)
-
-    # =======================================================
-    #  Tests
-    # =======================================================
-    computed_regression_metrics = test_regression(reg, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
-
-    return reg, computed_regression_metrics
+    return perform_prediction(svm.SVC, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
 
 
 @deprecated("This function is deprecated, use 'perform_svr_regression()' instead")
@@ -100,12 +85,10 @@ def perform_linear_regression(features, output, print_results=True, export_predi
 
     :param features: a list of features
     :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
     """
-
-    # =======================================================
-    #  Initialization
-    # =======================================================
-    X_train, X_test, Y_train, Y_test = initialize_data(features, output)
 
     # Set default values for hyper parameters:
     default_values = {
@@ -115,19 +98,8 @@ def perform_linear_regression(features, output, print_results=True, export_predi
         "n_jobs": -1,
         "positive": False
     }
-    hyper_parameters = initialize_hyper_parameters(default_values, kwargs)
 
-    # =======================================================
-    #  Train: Create a Linear Regressor
-    # =======================================================
-    model = LinearRegression(**hyper_parameters).fit(X_train, Y_train)
-
-    # =======================================================
-    #  Tests
-    # =======================================================
-    computed_regression_metrics = test_regression(model, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
-
-    return model, computed_regression_metrics
+    return perform_prediction(LinearRegression, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
 
 
 def perform_mlp_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
@@ -136,12 +108,10 @@ def perform_mlp_regression(features, output, print_results=True, export_predicte
 
     :param features: a list of features
     :param output: a single output
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
     """
-
-    # =======================================================
-    #  Initialization
-    # =======================================================
-    X_train, X_test, Y_train, Y_test = initialize_data(features, output)
 
     # Set default values for hyper parameters:
     default_values = {
@@ -169,18 +139,6 @@ def perform_mlp_regression(features, output, print_results=True, export_predicte
         "n_iter_no_change": 10,
         "max_fun": 15_000
     }
-    hyper_parameters = initialize_hyper_parameters(default_values, kwargs)
 
-    # =======================================================
-    #  Train: Create a MLP Regressor
-    # =======================================================
-    print("Train...", file=stderr)
-    model = MLPRegressor(**hyper_parameters).fit(X_train, Y_train)
-    print("Training done.", file=stderr)
+    return perform_prediction(MLPRegressor, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
 
-    # =======================================================
-    #  Tests
-    # =======================================================
-    computed_regression_metrics = test_regression(model, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
-
-    return model, computed_regression_metrics
