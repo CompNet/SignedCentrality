@@ -20,40 +20,28 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 import consts
 from collect.collect_predicted_values import collect_predicted_values
-from prediction import initialize_hyper_parameters, initialize_data, process_graphics
+from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction
 
 
-def test_regression(reg, X_test, Y_test, output):
+def test_regression(reg, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=True):
     """
-    Perform validation tests
+    Perform validation tests for regression
 
     :param reg: trained regression model
     :param X_test: input test data
     :param Y_test: output test data
     """
 
-    # =======================================================
-    # Test: Predict the response for test dataset
-    # =======================================================
-    Y_pred = reg.predict(X_test)  # Returns a numpy.ndarray
+    prediction_metrics = [
+        metrics.r2_score,  # Best value: 1
+        metrics.mean_squared_error,  # Best value: 0
+        metrics.mean_absolute_error  # Best value: 0
+    ]
 
-    # =======================================================
-    # Metrics
-    # =======================================================
-    # print("Test dataset:", Y_test)
-    # print("Predicted dataset:", Y_pred)
-    print("R2 score:", metrics.r2_score(Y_test, Y_pred))  # Best value: 1
-    print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))  # Best value: 0
-    print("Mean absolute error:", metrics.mean_absolute_error(Y_test, Y_pred), "\n")  # Best value: 0
-
-    # Save predicted values into a file
-    collect_predicted_values(Y_pred, output)
-
-    # Save graphics into a file
-    process_graphics(Y_test, Y_pred, output)
+    return test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
 
-def perform_svr_regression(features, output, **kwargs):
+def perform_svr_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
     """This method performs the task of regression for a single output.
 
     The regression is computed using SVM.
@@ -84,7 +72,9 @@ def perform_svr_regression(features, output, **kwargs):
     # =======================================================
     #  Tests
     # =======================================================
-    test_regression(reg, X_test, Y_test, output)
+    computed_regression_metrics = test_regression(reg, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
+
+    return reg, computed_regression_metrics
 
 
 @deprecated("This function is deprecated, use 'perform_svr_regression()' instead")
@@ -104,7 +94,7 @@ def perform_regression(features, output, kernel):
     return perform_svr_regression(features, output, kernel=kernel)
 
 
-def perform_linear_regression(features, output, **kwargs):
+def perform_linear_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
     """
     Performs linear regression
 
@@ -135,10 +125,12 @@ def perform_linear_regression(features, output, **kwargs):
     # =======================================================
     #  Tests
     # =======================================================
-    test_regression(model, X_test, Y_test, output)
+    computed_regression_metrics = test_regression(model, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
+
+    return model, computed_regression_metrics
 
 
-def perform_mlp_regression(features, output, **kwargs):
+def perform_mlp_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
     """
     Performs regression using a multilayer perceptron
 
@@ -189,4 +181,6 @@ def perform_mlp_regression(features, output, **kwargs):
     # =======================================================
     #  Tests
     # =======================================================
-    test_regression(model, X_test, Y_test, output)
+    computed_regression_metrics = test_regression(model, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
+
+    return model, computed_regression_metrics

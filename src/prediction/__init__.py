@@ -6,6 +6,8 @@ import consts
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+
+from collect.collect_predicted_values import collect_predicted_values
 from path import get_csv_folder_path
 
 """
@@ -64,6 +66,42 @@ def initialize_hyper_parameters(default_values, user_defined_values):
         hyper_parameters = {**hyper_parameters, key: param_value}
 
     return hyper_parameters
+
+
+def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_results=True, export_predicted_values=True, export_graphical_results=True):
+    """
+    Perform validation tests
+
+    :param reg: trained prediction model
+    :param X_test: input test data
+    :param Y_test: output test data
+    """
+
+    # =======================================================
+    # Test: Predict the response for test dataset
+    # =======================================================
+    Y_pred = reg.predict(X_test)  # Returns a numpy.ndarray
+
+    # =======================================================
+    # Metrics
+    # =======================================================
+    prediction_metrics_results = {}
+    for metric in prediction_metrics:
+        prediction_metrics_results[metric.__name__] = metric(Y_test, Y_pred)
+
+    if print_results:
+        for metric in prediction_metrics:
+            print(metric.__name__ + ":", prediction_metrics_results[metric.__name__])
+
+    # Save predicted values into a file
+    if export_predicted_values:
+        collect_predicted_values(Y_pred, output)
+
+    # Save graphics into a file
+    if export_graphical_results:
+        process_graphics(Y_test, Y_pred, output)
+
+    return prediction_metrics_results
 
 
 def process_graphics(Y_test, Y_pred, output):
