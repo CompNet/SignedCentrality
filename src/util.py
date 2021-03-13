@@ -3,14 +3,12 @@ Created on Sep 23, 2020
 
 @author: nejat
 '''
-
+import csv
 import itertools as iter
 import numpy as np
 import math
-
 import consts
-
-from csv import reader, Sniffer
+from csv import reader, writer, Sniffer, Dialect
 from sys import float_info
 from igraph import Graph
 
@@ -314,5 +312,5 @@ def write_csv(path: str, matrix):
     """
 
     with open(path, 'w') as file:
-        file.writelines(matrix)
+        writer(file, Dialect.delimiter).writerows([[str(col) for col in row] for row in matrix])
 

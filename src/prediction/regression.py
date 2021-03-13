@@ -1,104 +1,144 @@
-'''
-Created on Sep 23, 2020
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+This module contains functions related regression computing.
+
+.. note: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+.. note: https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
+.. note: https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics
 
 @author: nejat
-'''
-import os
-import consts
-import path
+@author: Virgile Sucal
+"""
 
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-# Import train_test_split function
-from sklearn.model_selection import train_test_split
-#Import svm model
-from sklearn import svm
-#Import scikit-learn metrics module for accuracy calculation
+from sys import stderr
+from deprecated import deprecated
 from sklearn import metrics
+from sklearn import svm
+from sklearn.linear_model import LinearRegression
+from sklearn.neural_network import MLPRegressor
+import consts
+from collect.collect_predicted_values import collect_predicted_values
+from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction, \
+    perform_prediction
 
-import collect.collect_graphics
 
-# https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
-# https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
-# https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics
+def test_regression(reg, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=True):
+    """
+    Perform validation tests for regression
 
-def perform_regression(features, output, kernel):
-    """This method performs the task of regression for a single output.
-
-    :param features: a list of features
-    :type features: string list
-    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :type output: string
-    :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
-    :type kernel: string
+    :param reg: trained regression model
+    :param X_test: input test data
+    :param Y_test: output test data
     """
 
-    # =======================================================
-    # Read features and output from file (original code)
-    # =======================================================
-    df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=output)
-    Y = df.to_numpy()
+    prediction_metrics = [
+        metrics.r2_score,  # Best value: 1
+        metrics.mean_squared_error,  # Best value: 0
+        metrics.mean_absolute_error  # Best value: 0
+    ]
 
-    df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES + ".csv"), usecols=features)
-    X = df.to_numpy()
-
-    # =======================================================
-    # Read features and output from file (test code)
-    # =======================================================
-    # df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + "_full.csv"), usecols=output)
-    # Y = df.to_numpy()
-
-    # df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES + "_full.csv"), usecols=features)
-    # X = df.to_numpy()
-
-    scaler = StandardScaler()
-    # scaler.fit(X[:,0].reshape(-1,1))
-    # X[:,0] = scaler.transform(X[:,0].reshape(-1,1)).reshape(-1)
-    scaler.fit(X)
-    X = scaler.transform(X)
-
-    # =======================================================
-    # Split data intro train and test sets
-    # =======================================================
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3,
-                                                        random_state=109)  # 70% training and 30% test
-    Y_train = Y_train.ravel()  # convert into 1D array, due to the warning from 'train_test_split'
-
-    # =======================================================
-    #  Train: Create a svm Regressor
-    # =======================================================
-    # >> other params: gamma, max_iter, degree, shrinking
-    # reg = svm.SVC(kernel=kernel) # original code
-    reg = svm.SVR(kernel='linear')
-    reg.fit(X_train, Y_train)
-
-    # =======================================================
-    # Test: Predict the response for test dataset
-    # =======================================================
-    Y_pred = reg.predict(X_test) # Returns a numpy.ndarray
+    return test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
 
-    # print("Predicted dataset before rounding:", Y_pred) # I want to transform decimal values to integer values
-    # i = 0
-    # for val in Y_pred:
-    #     print("Value before rounding:", val)
-    #     Y_pred[i] = round(val)
-    #     print("Value after rounding:",Y_pred[i])
-    #     i += 1
-    # print("Predicted dataset after rounding:", Y_pred)
+def perform_svr_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
+    """This method performs the task of regression for a single output.
 
-    # =======================================================
-    # Metrics
-    # =======================================================
-    # print("Test dataset:", Y_test)
-    # print("Predicted dataset:", Y_pred)
-    print("R2 score:", metrics.r2_score(Y_test, Y_pred))
+    The regression is computed using SVM.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
+    """
+
+    # Set default values for hyper parameters:
+    default_values = {
+        "kernel": consts.PREDICTION_KERNEL_LINEAR,
+    }
+
+    return perform_prediction(svm.SVC, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
 
 
-    print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred),"\n")
+@deprecated("This function is deprecated, use 'perform_svr_regression()' instead")
+def perform_regression(features, output, kernel):
+    """
+    Alias for perform_svr_regression().
 
-    # Saving graphics to file
-    # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
-    # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
+    This function is deprecated, use 'perform_svr_regression()' instead
+    It hasn't been deleted for compatibility with previous versions.
+    It should not be used in new functions.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
+    """
+
+    return perform_svr_regression(features, output, kernel=kernel)
+
+
+def perform_linear_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
+    """
+    Performs linear regression
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
+    """
+
+    # Set default values for hyper parameters:
+    default_values = {
+        "fit_intercept": True,
+        "normalize": False,
+        "copy_X": True,
+        "n_jobs": -1,
+        "positive": False
+    }
+
+    return perform_prediction(LinearRegression, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
+
+
+def perform_mlp_regression(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
+    """
+    Performs regression using a multilayer perceptron
+
+    :param features: a list of features
+    :param output: a single output
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
+    """
+
+    # Set default values for hyper parameters:
+    default_values = {
+        "hidden_layer_sizes": 20000,
+        "activation": consts.MLP.TANH,
+        "solver": consts.MLP.SGD,
+        "alpha": 0.0001,
+        "batch_size": consts.MLP.AUTO,
+        "learning_rate": consts.MLP.CONSTANT,
+        "learning_rate_init": 0.001,
+        "power_t": 0.5,
+        "max_iter": 15_000,
+        "shuffle": False,
+        "random_state": None,
+        "tol": 0.0001,
+        "verbose": False,
+        "warm_start": False,
+        "momentum": 0.9,
+        "nesterovs_momentum": True,
+        "early_stopping": False,
+        "validation_fraction": 0.1,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-08,
+        "n_iter_no_change": 10,
+        "max_fun": 15_000
+    }
+
+    return perform_prediction(MLPRegressor, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
 
