@@ -112,8 +112,61 @@ SNE_BATCH_SIZE_NAME = "batch_size"
 SNE_IS_TRAIN_NAME = "is_train"
 
 
+# Linear regression hyper parameters
+class LinearRegression:
+    FIT_INTERCEPT = "fit_intercept"
+    NORMALIZE = "normalize"
+    COPY_X = "copy_X"
+    N_JOBS = "n_jobs"
+    POSITIVE = "positive"
+
+
+# SVM hyper parameters
+class SVM:
+    # Parameters Names
+    KERNEL = "kernel"
+    GAMMA = "gamma"
+    MAX_ITER = "max_iter"
+    TOL = "tol"
+    SHRINKING = "shrinking"
+    PROBABILITY = "probability"
+    DECISION_FUNCTION_SHAPE = "decision_function_shape"
+
+    # Parameters Values
+    GAMMA_SCALE = "gamma_scale"
+    GAMMA_AUTO = "gamma_auto"
+    DECISION_FUNCTION_SHAPE_OVO = "ovo"
+    DECISION_FUNCTION_SHAPE_OVR = "ovr"
+
+
 # MLP hyper parameters
 class MLP:
+    # Parameters Names
+    HIDDEN_LAYER_SIZES = "hidden_layer_sizes"
+    ACTIVATION = "activation"
+    SOLVER = "solver"
+    ALPHA = "alpha"
+    BATCH_SIZE = "batch_size"
+    LEARNING_RATE = "learning_rate"
+    LEARNING_RATE_INIT = "learning_rate_init"
+    POWER_T = "power_t"
+    MAX_ITER = "max_iter"
+    SHUFFLE = "shuffle"
+    RANDOM_STATE = "random_state"
+    TOL = "tol"
+    VERBOSE = "verbose"
+    WARM_START = "warm_start"
+    MOMENTUM = "momentum"
+    NESTEROVS_MOMENTUM = "nesterovs_momentum"
+    EARLY_STOPPING = "early_stopping"
+    VALIDATION_FRACTION = "validation_fraction"
+    BETA_1 = "beta_1"
+    BETA_2 = "beta_2"
+    EPSILON = "epsilon"
+    N_ITER_NO_CHANGE = "n_iter_no_change"
+    MAX_FUN = "max_fun"
+
+    # Parameters Values
     IDENTITY = 'identity'
     LOGISTIC = 'logistic'
     TANH = 'tanh'
