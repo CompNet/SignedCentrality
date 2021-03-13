@@ -78,42 +78,43 @@ if __name__ == '__main__':
         [consts.PREFIX_STD+consts.CENTR_EIGEN]
     ]
      
-     features = list(itertools.chain.from_iterable(features_list))
-     print(features)
-     output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-     print(output)
-     kernel = consts.PREDICTION_KERNEL_LINEAR
-     print(kernel)
+    features = list(itertools.chain.from_iterable(features_list))
+    print(features)
+    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
+    print(output)
+    kernel = consts.PREDICTION_KERNEL_LINEAR
+    print(kernel)
 
-     # random forest classification task
-     prediction.random_forest_classification.perform_random_forest_classification(features, output, 100)
+    # random forest classification task
+    
+    prediction.random_forest_classification.perform_random_forest_classification(features, output, 100)
      
-     # classification task : one or more solutions
-     prediction.classification.perform_classification(features, output, kernel)
+    # classification task : one or more solutions
+    prediction.classification.perform_classification(features, output, kernel)
 
-     # regression task : number of solutions
-     output1 = [consts.OUTPUT_NB_SOLUTIONS]
-     print(output1)
-     prediction.regression.perform_regression(features, output1, kernel)
+    # regression task : number of solutions
+    output1 = [consts.OUTPUT_NB_SOLUTIONS]
+    print(output1)
+    prediction.regression.perform_regression(features, output1, kernel)
 
-     # classification task : one or more classes of solution
-     output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
-     print(output2)
-     prediction.classification.perform_classification(features, output2, kernel)
+    # classification task : one or more classes of solution
+    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+    print(output2)
+    prediction.classification.perform_classification(features, output2, kernel)
 
-     # regression task : number of classes of solution
-     output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
-     print(output3)
-     prediction.regression.perform_regression(features, output3, kernel)
+    # regression task : number of classes of solution
+    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
+    print(output3)
+    prediction.regression.perform_regression(features, output3, kernel)
 
-     # regression task : graph imbalance
-     output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
-     print(output4)
-     prediction.regression.perform_regression(features, output4, kernel)
+    # regression task : graph imbalance
+    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
+    print(output4)
+    prediction.regression.perform_regression(features, output4, kernel)
 
-     output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
-     print(output5)
-     prediction.regression.perform_regression(features, output5, kernel)
+    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
+    print(output5)
+    prediction.regression.perform_regression(features, output5, kernel)
 
     print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
     print("Tests:", sep="", end="\n\n")

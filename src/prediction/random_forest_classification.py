@@ -20,6 +20,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
 
+from imblearn.under_sampling import RandomUnderSampler
+
 import collect.collect_graphics
 
 
@@ -42,12 +44,21 @@ def perform_random_forest_classification(features, output, n_estimators):
     df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES+".csv"), usecols=features)
     X = df.to_numpy()
 
+    
+
     scaler = StandardScaler()
 
     scaler.fit(X)
     X = scaler.transform(X)
 
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
+
+    #Rectify the imbalance in the data
+    undersample = RandomUnderSampler(sampling_strategy='majority')
+    # fit and apply the transform
+    X_over, Y_over = undersample.fit_resample(X, Y)
+    
+
+    X_train, X_test, Y_train, Y_test = train_test_split(X_over, Y_over, test_size=0.3)
     
     Y_train = Y_train.ravel()
 
@@ -55,7 +66,7 @@ def perform_random_forest_classification(features, output, n_estimators):
 
     Y_pred = model.predict(X_test)
     
-    rf_probs = model.predict_proba(X_test)[:, 1]
+##    rf_probs = model.predict_proba(X_test)[:, 1]
     
     print("F1 score:", metrics.f1_score(Y_test, Y_pred))
     
@@ -65,6 +76,6 @@ def perform_random_forest_classification(features, output, n_estimators):
 
     print("Recall:", metrics.recall_score(Y_test, Y_pred), "\n")
     
-    roc_value = roc_auc_score(Y_test, rf_probs)
-
-    print("roc value:", roc_value)
+##    roc_value = roc_auc_score(Y_test, rf_probs)
+##
+##    print("roc value:", roc_value)
