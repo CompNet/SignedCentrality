@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This module contains functions related to the SNE computing.
+This package contains functions related to the SNE computing.
 
 The embedding is computed by following the method of S.Yuan, X. Wu and Y. Xiang.
 
