@@ -63,6 +63,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * pandas 0.25.1
   * tensorflow 2.4.0
   * torch 1.7.1
+  * deprecated 1.2.11
 
 * Download this project from GitHub
 
@@ -81,6 +82,7 @@ All the modules listed below are the python modules
 * pandas 0.25.1
 * tensorflow 2.4.0
 * torch 1.7.1
+* deprecated 1.2.11
 
 
 
