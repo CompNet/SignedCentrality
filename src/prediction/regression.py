@@ -59,7 +59,7 @@ def perform_svr_regression(features, output, print_results=True, export_predicte
         "kernel": consts.PREDICTION_KERNEL_LINEAR,
     }
 
-    return perform_prediction(svm.SVC, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
+    return perform_prediction(svm.SVR, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
 
 
 @deprecated("This function is deprecated, use 'perform_svr_regression()' instead")
@@ -92,11 +92,11 @@ def perform_linear_regression(features, output, print_results=True, export_predi
 
     # Set default values for hyper parameters:
     default_values = {
-        "fit_intercept": True,
-        "normalize": False,
-        "copy_X": True,
-        "n_jobs": -1,
-        "positive": False
+        consts.LinearRegression.FIT_INTERCEPT: True,
+        consts.LinearRegression.NORMALIZE: False,
+        consts.LinearRegression.COPY_X: True,
+        consts.LinearRegression.N_JOBS: -1,
+        consts.LinearRegression.POSITIVE: False
     }
 
     return perform_prediction(LinearRegression, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
@@ -115,29 +115,29 @@ def perform_mlp_regression(features, output, print_results=True, export_predicte
 
     # Set default values for hyper parameters:
     default_values = {
-        "hidden_layer_sizes": 20000,
-        "activation": consts.MLP.TANH,
-        "solver": consts.MLP.SGD,
-        "alpha": 0.0001,
-        "batch_size": consts.MLP.AUTO,
-        "learning_rate": consts.MLP.CONSTANT,
-        "learning_rate_init": 0.001,
-        "power_t": 0.5,
-        "max_iter": 15_000,
-        "shuffle": False,
-        "random_state": None,
-        "tol": 0.0001,
-        "verbose": False,
-        "warm_start": False,
-        "momentum": 0.9,
-        "nesterovs_momentum": True,
-        "early_stopping": False,
-        "validation_fraction": 0.1,
-        "beta_1": 0.9,
-        "beta_2": 0.999,
-        "epsilon": 1e-08,
-        "n_iter_no_change": 10,
-        "max_fun": 15_000
+        consts.MLP.HIDDEN_LAYER_SIZES: (100, ),
+        consts.MLP.ACTIVATION: consts.MLP.TANH,
+        consts.MLP.SOLVER: consts.MLP.SGD,
+        consts.MLP.ALPHA: 0.0001,
+        consts.MLP.BATCH_SIZE: consts.MLP.AUTO,
+        consts.MLP.LEARNING_RATE: consts.MLP.CONSTANT,
+        consts.MLP.LEARNING_RATE_INIT: 0.001,
+        consts.MLP.POWER_T: 0.5,
+        consts.MLP.MAX_ITER: 15_000,
+        consts.MLP.SHUFFLE: True,
+        consts.MLP.RANDOM_STATE: None,
+        consts.MLP.TOL: 0.0001,
+        consts.MLP.VERBOSE: False,
+        consts.MLP.WARM_START: False,
+        consts.MLP.MOMENTUM: 0.9,
+        consts.MLP.NESTEROVS_MOMENTUM: True,
+        consts.MLP.EARLY_STOPPING: False,
+        consts.MLP.VALIDATION_FRACTION: 0.1,
+        consts.MLP.BETA_1: 0.9,
+        consts.MLP.BETA_2: 0.999,
+        consts.MLP.EPSILON: 1e-08,
+        consts.MLP.N_ITER_NO_CHANGE: 10,
+        consts.MLP.MAX_FUN: 15_000
     }
 
     return perform_prediction(MLPRegressor, default_values, features, output, test_regression, print_results, export_predicted_values, export_graphical_results, **kwargs)
