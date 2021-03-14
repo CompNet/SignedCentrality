@@ -137,7 +137,7 @@ def perform_prediction(model_class, default_values, features, output, test_funct
     # =======================================================
     #  Tests
     # =======================================================
-    computed_prediction_metrics = test_function(model, X_test, Y_test, output, print_results, export_predicted_values, export_graphical_results)
+    computed_prediction_metrics = test_function(model, X_test, Y_test, output[0], print_results, export_predicted_values, export_graphical_results)
 
     return model, computed_prediction_metrics
 
