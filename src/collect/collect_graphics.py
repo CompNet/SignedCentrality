@@ -198,7 +198,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
 
     # adding all index of outputs into a dictionary
     for i in range(1, int(max_output), interval_value):  # loop from 1 to the max value of the list, with a step of 10
-        tmp = i + 9
+        tmp = i + (interval_value - 1)
         tmp_string = str(i) + ":" + str(tmp)
         outputs_dictionary[tmp_string] = 0  # adding an element to the dict with the key and an initial value
         x_axis_names.append(tmp_string)
@@ -210,7 +210,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
 
     # collecting predicted values at the corresponding indexes
     for i in range(1, int(max_output), interval_value):  # loop from 1 to the max value of the list, with a step of 10
-        tmp = i + 9
+        tmp = i + (interval_value - 1)
         tmp_string = str(i) + ":" + str(tmp)
         tmp_index_list = outputs_dictionary[tmp_string]
         tmp_list = []
