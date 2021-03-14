@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 from collect.collect_predicted_values import collect_predicted_values
+import collect.collect_graphics
 from path import get_csv_folder_path
 
 """
@@ -150,4 +151,5 @@ def process_graphics(Y_test, Y_pred, output):
     # Saving graphics to file
     # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
     # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
+    # collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
 

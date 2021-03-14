@@ -7,6 +7,7 @@ import os
 import consts
 import path
 import util
+from deprecated import deprecated
 
 import numpy
 import matplotlib.pyplot as plt
@@ -36,6 +37,7 @@ def generate_plot(x_values, y_values, graphic_title):
     plt.close()
 
 
+@deprecated("This function is deprecated, use 'generate_boxplot_clean()' instead")
 def generate_boxplot(outputs_values, predicted_values, graphic_title):
     """ Deprecated method, use generate_boxplot_clean() instead
     This method generate a boxplot using matplotlib.pyplot
@@ -46,6 +48,7 @@ def generate_boxplot(outputs_values, predicted_values, graphic_title):
     :type predicted_values: integer list
     :param graphic_title: the title of the graphic
     :type graphic_title: string
+    """
     """
     # some tests (delete once the method is complete)
     print(outputs_values)
@@ -153,6 +156,9 @@ def generate_boxplot(outputs_values, predicted_values, graphic_title):
     axes.set_xticklabels(x_axis_names)
     plt.savefig(path_to_file)
     plt.close()
+    """
+
+    return generate_boxplot_clean(outputs_values, predicted_values, graphic_title)
 
 
 def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
@@ -172,6 +178,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
     data = []  # will contain multiples dataset, each one stands fora different boxplot
     outputs_dictionary = {}  # will contain position of elements from outputs_values_updated
     x_axis_names = []  # will contain labels for the x axis
+    interval_value = 10  # Value used to set the interval range (initial value : 10)
 
     # Initial setup for file saving
     graphic_title = str(graphic_title)
@@ -190,7 +197,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
     max_output = max(outputs_values_updated)
 
     # adding all index of outputs into a dictionary
-    for i in range(1, int(max_output), 10):  # loop from 1 to the max value of the list, with a step of 10
+    for i in range(1, int(max_output), interval_value):  # loop from 1 to the max value of the list, with a step of 10
         tmp = i + 9
         tmp_string = str(i) + ":" + str(tmp)
         outputs_dictionary[tmp_string] = 0  # adding an element to the dict with the key and an initial value
@@ -202,7 +209,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
         outputs_dictionary[tmp_string] = tmp_list
 
     # collecting predicted values at the corresponding indexes
-    for i in range(1, int(max_output), 10):  # loop from 1 to the max value of the list, with a step of 10
+    for i in range(1, int(max_output), interval_value):  # loop from 1 to the max value of the list, with a step of 10
         tmp = i + 9
         tmp_string = str(i) + ":" + str(tmp)
         tmp_index_list = outputs_dictionary[tmp_string]
