@@ -218,7 +218,8 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title):
             data.append([])
         else:
             for x in tmp_index_list:
-                tmp_list.append(float(predicted_values_updated[x]))
+                # tmp_list.append(float(predicted_values_updated[x]))
+                tmp_list.append(float(predicted_values_updated[x]) - float(outputs_values_updated[x]))
             data.append(tmp_list)
 
     # Generating boxplot

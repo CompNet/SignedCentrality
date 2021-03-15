@@ -117,13 +117,15 @@ if __name__ == '__main__':
     print("\nMLP Regression :")
     prediction.regression.perform_mlp_regression(features, output3)
 
-    # # regression task : graph imbalance
-    # output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
-    # print("Task:", *output4)
-    # # prediction.regression.perform_regression(features, output4, kernel)
-    #
-    # output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
-    # print(output5)
-    # # prediction.regression.perform_regression(features, output5, kernel)
+    # regression task : graph imbalance
+    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
+    print("Task:", *output4)
+    print("\nSVR :")
+    prediction.regression.perform_regression(features, output4, kernel)
+
+    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
+    print("Task:", *output4)
+    print("\nSVR :")
+    prediction.regression.perform_regression(features, output5, kernel)
 
 

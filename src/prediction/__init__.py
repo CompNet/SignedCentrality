@@ -151,5 +151,5 @@ def process_graphics(Y_test, Y_pred, output):
     # Saving graphics to file
     # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
     # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
-    # collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
+    collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
 
