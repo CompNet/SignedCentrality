@@ -83,12 +83,13 @@ if __name__ == '__main__':
     print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
     print("Tests:", sep="", end="\n\n")
 
-    # output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    # print("Task:", *output)
+    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
+    print("Task:", *output)
     kernel = consts.PREDICTION_KERNEL_LINEAR
     # print(kernel)
     # # classification task : one or more solutions
-    # prediction.classification.perform_classification(features, output, kernel)
+    print("\nSVC :")
+    prediction.classification.perform_classification(features, output, kernel)
 
     # regression task : number of solutions
     output1 = [consts.OUTPUT_NB_SOLUTIONS]
@@ -100,10 +101,11 @@ if __name__ == '__main__':
     print("\nMLP Regression :")
     prediction.regression.perform_mlp_regression(features, output1)
 
-    # # classification task : one or more classes of solution
-    # output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
-    # print("Task:", *output2)
-    # # prediction.classification.perform_classification(features, output2, kernel)
+    # classification task : one or more classes of solution
+    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+    print("Task:", *output2)
+    print("\nSVC :")
+    prediction.classification.perform_classification(features, output2, kernel)
 
     # regression task : number of classes of solution
     output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
