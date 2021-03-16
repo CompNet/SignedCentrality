@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 from collect.collect_predicted_values import collect_predicted_values
+import collect.collect_graphics
 from path import get_csv_folder_path
 
 """
@@ -110,7 +111,7 @@ def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_resul
 
 
 def perform_prediction(model_class, default_values, features, output, test_function, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
-    """This method performs the task of regression for a single output.
+    """This method performs the task of prediction for a single output.
 
     :param model_class: prediction technique
     :param default_values: default values for hyper parameters
@@ -150,4 +151,5 @@ def process_graphics(Y_test, Y_pred, output):
     # Saving graphics to file
     # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
     # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
+    collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
 
