@@ -86,82 +86,94 @@ if __name__ == '__main__':
     print(kernel)
 
     # random forest classification task
-    
+
+    print("RandomForest#################################\n")
     prediction.random_forest_classification.perform_random_forest_classification(features, output, 100)
-     
+    print("\n#################################\n")
+
+##    
     # classification task : one or more solutions
+    print("Classifier#################################\n")
     prediction.classification.perform_classification(features, output, kernel)
-
-    # regression task : number of solutions
-    output1 = [consts.OUTPUT_NB_SOLUTIONS]
-    print(output1)
-    prediction.regression.perform_regression(features, output1, kernel)
-
+    print("\n#################################\n")
+##
+##    # regression task : number of solutions
+##    output1 = [consts.OUTPUT_NB_SOLUTIONS]
+##    print(output1)
+##    prediction.regression.perform_regression(features, output1, kernel)
+##
     # classification task : one or more classes of solution
+    
     output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
     print(output2)
+    print("RandomForestBIS#################################\n")
+    prediction.random_forest_classification.perform_random_forest_classification(features, output2, 100)
+    print("\n#################################\n")
+    
+    print("ClassifierBIS#################################\n")
     prediction.classification.perform_classification(features, output2, kernel)
+    print("\n#################################\n")
 
-    # regression task : number of classes of solution
-    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
-    print(output3)
-    prediction.regression.perform_regression(features, output3, kernel)
-
-    # regression task : graph imbalance
-    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
-    print(output4)
-    prediction.regression.perform_regression(features, output4, kernel)
-
-    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
-    print(output5)
-    prediction.regression.perform_regression(features, output5, kernel)
-
-    print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
-    print("Tests:", sep="", end="\n\n")
-
-    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    print("Task:", *output)
-    kernel = consts.PREDICTION_KERNEL_LINEAR
-    # print(kernel)
-    # # classification task : one or more solutions
-    print("\nSVC :")
-    prediction.classification.perform_classification(features, output, kernel)
-
-    # regression task : number of solutions
-    output1 = [consts.OUTPUT_NB_SOLUTIONS]
-    print("Task:", *output1)
-    print("\nSVR :")
-    prediction.regression.perform_regression(features, output1, kernel)
-    print("\nLinear Regression :")
-    prediction.regression.perform_linear_regression(features, output1)
-    print("\nMLP Regression :")
-    prediction.regression.perform_mlp_regression(features, output1)
-
-    # classification task : one or more classes of solution
-    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
-    print("Task:", *output2)
-    print("\nSVC :")
-    prediction.classification.perform_classification(features, output2, kernel)
-
-    # regression task : number of classes of solution
-    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
-    print("Task:", *output3)
-    print("\nSVR :")
-    prediction.regression.perform_regression(features, output3, kernel)
-    print("\nLinear Regression :")
-    prediction.regression.perform_linear_regression(features, output3)
-    print("\nMLP Regression :")
-    prediction.regression.perform_mlp_regression(features, output3)
-
-    # regression task : graph imbalance
-    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
-    print("Task:", *output4)
-    print("\nSVR :")
-    prediction.regression.perform_regression(features, output4, kernel)
-
-    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
-    print("Task:", *output4)
-    print("\nSVR :")
-    prediction.regression.perform_regression(features, output5, kernel)
-
+##    # regression task : number of classes of solution
+##    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
+##    print(output3)
+##    prediction.regression.perform_regression(features, output3, kernel)
+##
+##    # regression task : graph imbalance
+##    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
+##    print(output4)
+##    prediction.regression.perform_regression(features, output4, kernel)
+##
+##    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
+##    print(output5)
+##    prediction.regression.perform_regression(features, output5, kernel)
+##
+##    print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
+##    print("Tests:", sep="", end="\n\n")
+##
+##    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
+##    print("Task:", *output)
+##    kernel = consts.PREDICTION_KERNEL_LINEAR
+##    # print(kernel)
+##    # # classification task : one or more solutions
+##    print("\nSVC :")
+##    prediction.classification.perform_classification(features, output, kernel)
+##
+##    # regression task : number of solutions
+##    output1 = [consts.OUTPUT_NB_SOLUTIONS]
+##    print("Task:", *output1)
+##    print("\nSVR :")
+##    prediction.regression.perform_regression(features, output1, kernel)
+##    print("\nLinear Regression :")
+##    prediction.regression.perform_linear_regression(features, output1)
+##    print("\nMLP Regression :")
+##    prediction.regression.perform_mlp_regression(features, output1)
+##
+##    # classification task : one or more classes of solution
+##    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+##    print("Task:", *output2)
+##    print("\nSVC :")
+##    prediction.classification.perform_classification(features, output2, kernel)
+##
+##    # regression task : number of classes of solution
+##    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
+##    print("Task:", *output3)
+##    print("\nSVR :")
+##    prediction.regression.perform_regression(features, output3, kernel)
+##    print("\nLinear Regression :")
+##    prediction.regression.perform_linear_regression(features, output3)
+##    print("\nMLP Regression :")
+##    prediction.regression.perform_mlp_regression(features, output3)
+##
+##    # regression task : graph imbalance
+##    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
+##    print("Task:", *output4)
+##    print("\nSVR :")
+##    prediction.regression.perform_regression(features, output4, kernel)
+##
+##    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
+##    print("Task:", *output4)
+##    print("\nSVR :")
+##    prediction.regression.perform_regression(features, output5, kernel)
+##
 

@@ -21,6 +21,11 @@ from sklearn.metrics import roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
 
 from imblearn.under_sampling import RandomUnderSampler
+from imblearn.under_sampling import NearMiss
+from imblearn.under_sampling import CondensedNearestNeighbour
+from imblearn.under_sampling import TomekLinks
+from imblearn.under_sampling import EditedNearestNeighbours
+from imblearn.under_sampling import OneSidedSelection
 
 import collect.collect_graphics
 
@@ -52,21 +57,41 @@ def perform_random_forest_classification(features, output, n_estimators):
     X = scaler.transform(X)
 
 
-    #Rectify the imbalance in the data
-    undersample = RandomUnderSampler(sampling_strategy='majority')
-    # fit and apply the transform
-    X_over, Y_over = undersample.fit_resample(X, Y)
-    
+##    #Rectify the imbalance in the data UNDERSAMPLING
+##    undersample = RandomUnderSampler(sampling_strategy='majority')
+##    undersample = NearMiss(version=1)
+##    undersample = NearMiss(version=2, n_neighbors=3)
+##    undersample = NearMiss(version=3, n_neighbors_ver3=3)
+##    undersample = CondensedNearestNeighbour(n_neighbors=1)
+##    undersample = TomekLinks()
+##    undersample = EditedNearestNeighbours(n_neighbors=3)
+##    undersample = OneSidedSelection(n_neighbors=1, n_seeds_S=200)
+##    undersample = NeighbourhoodCleaningRule(n_neighbors=3, threshold_cleaning=0.5)
 
-    X_train, X_test, Y_train, Y_test = train_test_split(X_over, Y_over, test_size=0.3)
-    
+##    # fit and apply the transform
+##    X, Y = undersample.fit_resample(X, Y)
+
+
+##    #Rectify the imbalance in the data OVERSAMPLING
+##    oversample = RandomOverSampler(sampling_strategy='majority')
+##    oversample = SMOTE()
+##    oversample = BorderlineSMOTE()
+##    oversample = SVMSMOTE()
+##    oversample = ADASYN()
+
+##    X, Y = oversample.fit_resample(X, Y)
+
+
+
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
+
     Y_train = Y_train.ravel()
 
     model.fit(X_train, Y_train)
 
     Y_pred = model.predict(X_test)
     
-##    rf_probs = model.predict_proba(X_test)[:, 1]
+    rf_probs = model.predict_proba(X_test)[:, 1]
     
     print("F1 score:", metrics.f1_score(Y_test, Y_pred))
     
@@ -76,6 +101,6 @@ def perform_random_forest_classification(features, output, n_estimators):
 
     print("Recall:", metrics.recall_score(Y_test, Y_pred), "\n")
     
-##    roc_value = roc_auc_score(Y_test, rf_probs)
-##
-##    print("roc value:", roc_value)
+    roc_value = roc_auc_score(Y_test, rf_probs)
+
+    print("roc value:", roc_value)

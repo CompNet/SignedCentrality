@@ -11,6 +11,20 @@ from collect.collect_predicted_values import collect_predicted_values
 import collect.collect_graphics
 from path import get_csv_folder_path
 
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.under_sampling import NearMiss
+from imblearn.under_sampling import CondensedNearestNeighbour
+from imblearn.under_sampling import TomekLinks
+from imblearn.under_sampling import EditedNearestNeighbours
+from imblearn.under_sampling import OneSidedSelection
+from imblearn.under_sampling import NeighbourhoodCleaningRule
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import BorderlineSMOTE
+from imblearn.over_sampling import SVMSMOTE
+from imblearn.over_sampling import ADASYN
+
+
 """
 This package contains functions related to the classification and regression.
 
@@ -34,10 +48,17 @@ def initialize_data(features, output):
     # =======================================================
     # Read features and output from file
     # =======================================================
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=output)
+
+##    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=output)
+##    Y = df.to_numpy()
+##
+##    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + ".csv"), usecols=features)
+##    X = df.to_numpy()
+    
+    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + "_full.csv"), usecols=output)
     Y = df.to_numpy()
 
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + ".csv"), usecols=features)
+    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + "_full.csv"), usecols=features)
     X = df.to_numpy()
 
     scaler = StandardScaler()
@@ -45,6 +66,31 @@ def initialize_data(features, output):
     # X[:,0] = scaler.transform(X[:,0].reshape(-1,1)).reshape(-1)
     scaler.fit(X)
     X = scaler.transform(X)
+
+    
+##    #Rectify the imbalance in the data UNDERSAMPLING
+##    undersample = RandomUnderSampler(sampling_strategy='majority')
+##    undersample = NearMiss(version=1)
+##    undersample = NearMiss(version=2, n_neighbors=3)
+##    undersample = NearMiss(version=3, n_neighbors_ver3=3)
+    undersample = CondensedNearestNeighbour(n_neighbors=1)
+##    undersample = TomekLinks()
+##    undersample = EditedNearestNeighbours(n_neighbors=3)
+##    undersample = OneSidedSelection(n_neighbors=1, n_seeds_S=200)
+##    undersample = NeighbourhoodCleaningRule(n_neighbors=3, threshold_cleaning=0.5)
+
+##    # fit and apply the transform
+    X, Y = undersample.fit_resample(X, Y)
+
+
+##    #Rectify the imbalance in the data OVERSAMPLING
+##    oversample = RandomOverSampler(sampling_strategy='minority')
+##    oversample = SMOTE()
+##    oversample = BorderlineSMOTE()
+##    oversample = SVMSMOTE()
+##    oversample = ADASYN()
+
+##    X, Y = oversample.fit_resample(X, Y)
 
     # =======================================================
     # Split data intro train and test sets
