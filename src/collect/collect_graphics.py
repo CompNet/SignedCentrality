@@ -26,13 +26,14 @@ def generate_plot(x_values, y_values, graphic_title):
     :type graphic_title: string
     """
     graphic_title = str(graphic_title)
-    graphic_title = util.prediction_name_refactor(graphic_title)
+    # graphic_title = util.prediction_name_refactor(graphic_title)
     filename = graphic_title+"_plot.png"
     path_to_file = os.path.join(path.get_graphics_folder_path(), filename)
 
     print("Generating plot for "+graphic_title, "\n")
     plt.plot(x_values, y_values, marker='o', c='blue', markersize=5)
     plt.title(graphic_title)
+    plt.xticks(rotation=45)
     plt.savefig(path_to_file)
     plt.close()
 

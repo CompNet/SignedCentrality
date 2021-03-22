@@ -25,7 +25,7 @@ from prediction import initialize_hyper_parameters, initialize_data, process_gra
     perform_prediction
 
 
-def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=True):
+def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=False):
     """
     Perform validation tests for classification
 
@@ -44,7 +44,7 @@ def test_classification(cla, X_test, Y_test, output, print_results=True, export_
     return test_prediction(cla, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
 
-def perform_svc_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
+def perform_svc_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=False, **kwargs):
     """This method performs the task of classification for a single output.
 
     The classification is computed using SVM.
@@ -79,5 +79,4 @@ def perform_classification(features, output, kernel):
     """
 
     return perform_svc_classification(features, output, kernel=kernel)
-
 

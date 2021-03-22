@@ -13,6 +13,7 @@ import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
 import prediction.regression
+import prediction.feature_ablation
 
 # =====================================
 GRAPH_SIZES = [20,24]
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     ]
 
     features = list(itertools.chain.from_iterable(features_list))
-    # print(features)
+    print(features)
 
     print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
     print("Tests:", sep="", end="\n\n")
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     print("Task:", *output)
     kernel = consts.PREDICTION_KERNEL_LINEAR
     # print(kernel)
-    # # classification task : one or more solutions
+    # classification task : one or more solutions
     print("\nSVC :")
     prediction.classification.perform_classification(features, output, kernel)
 
@@ -127,5 +128,10 @@ if __name__ == '__main__':
     print("Task:", *output4)
     print("\nSVR :")
     prediction.regression.perform_regression(features, output5, kernel)
+
+    # feature ablation test
+    print("Task: feature ablation")
+    # prediction.feature_ablation.feature_ablation(features, output2, kernel)
+    prediction.feature_ablation.feature_ablation_1(features, output2, kernel)
 
 
