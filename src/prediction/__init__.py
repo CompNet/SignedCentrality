@@ -33,10 +33,10 @@ def initialize_data(features, output):
     # =======================================================
     # Read features and output from file
     # =======================================================
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + ".csv"), usecols=output)
+    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + consts.CSV), usecols=output)
     Y = df.to_numpy()
 
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + ".csv"), usecols=features)
+    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + consts.CSV), usecols=features)
     X = df.to_numpy()
 
     scaler = StandardScaler()

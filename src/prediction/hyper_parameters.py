@@ -6,46 +6,93 @@ This module contains functions related to hyper parameters tes and comparison.
 
 @author: Virgile Sucal
 """
-
+from os.path import abspath, dirname, join
 from sys import stderr
 from deprecated import deprecated
 from sklearn import metrics
 import consts
+import sys
+from collect.collect_graphics import generate_plot
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
+from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
 from util import write_csv
+from path import get_csv_folder_path
 
 
 def pop(dictionary):
-    key = dictionary.keys()[0]
+    key = [key for key in dictionary.keys()][0]
     value = dictionary[key]
     del dictionary[key]
     return key, value
 
 
 def __define_output_file_name(hyper_parameters, prediction_function=None, ext=None):
-    return prediction_function + "_-_" if prediction_function is not None else "" + ";".join([str(key) + "=" + str(value) for key, value in hyper_parameters.items()]) + ext if ext is not None else ""
+    name = prediction_function
+    name += "_-_" if prediction_function is not None else ""
+    name += ";".join([str(key) + "=" + str(value) for key, value in hyper_parameters.items()])
+    name += ext if ext is not None else ""
+    return name
 
 
-def __initialize_all_models(results=None, param_pool=None, **kwargs):
-    if results is None:
-        results = []
+def __initialize_hyper_parameters_sets(param_pool=None, **parameters_range):
     if param_pool is None:
         param_pool = {}
 
-    if len(kwargs) == 0:
-        print(__define_output_file_name(param_pool))
-        return [*results, {**param_pool}]
+    if len(parameters_range) == 0:
+        # print(__define_output_file_name(param_pool))
+        return [{**param_pool}]
+    param, values = pop(parameters_range)
 
-    param, values = pop(kwargs)
-
+    results = []
     for value in values:
-        results = [*results, *__initialize_all_models(results, {**param_pool, param: value}, **kwargs)]
+        results = [*results,
+                   *__initialize_hyper_parameters_sets({**param_pool, param: value}, **parameters_range)]
 
     return results
 
 
-def test_hyper_parameters(prediction_function, features, export_path, **parameters_range):
+def __initialize_graphic_data(best_param_set, results):
+    data = {}
+
+    for (metric_name, param_set, metric_value) in best_param_set:
+        metric_data = {param_name: [(str(param_set[param_name]), metric_value)] for param_name in param_set.keys()}  # str() even is parameter is a number because numeric parameters are defined in a discrete set.
+
+        for result in results:
+            non_optimal_values = []
+            for param, value in param_set.items():  # Don't use result, because it contains more columns than best_param_set.
+                if value != result[param]:
+                    non_optimal_values.append(param)
+            if len(non_optimal_values) != 1:
+                continue
+
+            tested_param_name = non_optimal_values[0]
+            metric_data[tested_param_name].append((result[tested_param_name], result[metric_name]))
+
+        data[metric_name] = {param_name: tuple(data_list) for param_name, data_list in metric_data.items()}
+
+    return data
+
+
+def print_parameters_comparison(file_path, param_name, param_values, metric_name, metric_values, graphic_name):
+    generate_plot(param_values, metric_values, graphic_name)
+
+
+def print_parameters_comparisons(path, prediction_function_name, best_param_set, results, output):
+    export_path = dirname(path)  # Not used
+
+    data = __initialize_graphic_data(best_param_set, results)
+
+    for metric_name, metric_data in data.items():
+        for param_name, values in metric_data.items():
+            param_values = [value[0] for value in values]
+            metric_values = [value[1] for value in values]
+
+            graphic_name = output + "_-_" + prediction_function_name + "_-_" + param_name + "_-_" + metric_name + "_-"
+            print_parameters_comparison(export_path + graphic_name, param_name, param_values, metric_name, metric_values, graphic_name)
+
+
+def test_hyper_parameters(prediction_function, features, output, export_path, **parameters_range):
     """
     Test combinations for  all values given for each parameter
 
@@ -53,18 +100,72 @@ def test_hyper_parameters(prediction_function, features, export_path, **paramete
     """
 
     results = []
+    best_param_set = None
+    print("Initialization ...", file=stderr)
+    param_sets = __initialize_hyper_parameters_sets(**parameters_range)
+    print("Initialization done.", file=stderr)
+    print("There are", len(param_sets), "parameters sets.", file=stderr)
+    print("params sets", file=stderr)
 
-    for hyper_parameters in __initialize_all_models(**parameters_range):
-        model, prediction_metrics = prediction_function(features, __define_output_file_name(hyper_parameters, prediction_function), False, False, True, **hyper_parameters)
-        results.append({**parameters_range, **prediction_metrics})
+    # Initialize progress bar:
+    p_number = len(param_sets)
+    p_counter = 0
+    train_progress_percent = 0
+    bar_size = 48
+    print()
+    print(" 0 %\t|", "".join(["-" for _ in range(bar_size)]), "|\r", sep="", end="")
 
-    headers = [*parameters_range.keys(), *results[0][1].keys()]  # Ordered
+    # Run tests:
+    for hyper_parameters in param_sets:
+        model, prediction_metrics = prediction_function(
+            features,
+            output,
+            False, False, False,
+            **hyper_parameters
+        )
+        results = [*results, {**hyper_parameters, **prediction_metrics}]
+
+        if best_param_set is None:
+            best_param_set = [(metric_name, hyper_parameters, metric_value) for metric_name, metric_value in prediction_metrics.items()]
+        else:
+            for i in range(len(best_param_set)):
+                metric_name, best_hyper_parameters, metric_value = best_param_set[i]
+                if abs(abs(consts.PREDICTION_METRICS_OPTIMAL_VALUES[metric_name]) - abs(prediction_metrics[metric_name])) < abs(abs(consts.PREDICTION_METRICS_OPTIMAL_VALUES[metric_name]) - abs(metric_value)):
+                    best_param_set[i] = (metric_name, hyper_parameters, prediction_metrics[metric_name])
+
+        # Update progress bar:
+        new_train_progress_percent = (p_counter * 100) // p_number
+        if new_train_progress_percent > train_progress_percent:
+            train_progress_percent = new_train_progress_percent
+            progress_bar = (train_progress_percent * bar_size) // 100
+            print(
+                " {} %\t|{}{}|\r".format(
+                    str(train_progress_percent),
+                    "".join(["#" for _ in range(progress_bar)]),
+                    "".join(["-" for _ in range(bar_size - progress_bar)])
+                ), sep="", end=""
+            )
+
+    # End progress bar:
+    print(" 100 %\t|", "".join(["#" for _ in range(bar_size)]), "|", sep="")
+    print("\nExport results ...", file=stderr)
+
+    headers = [*parameters_range.keys(), *[bps[0] for bps in best_param_set]]  # Ordered
     ordered_results = [[result[key] for key in headers] for result in results]
 
-    write_csv(export_path, [headers, *ordered_results])
+    write_csv(join(get_csv_folder_path(), output[0] + "_-_" + prediction_function.__name__ + consts.CSV), [headers, *ordered_results])
+    print_parameters_comparisons(export_path, prediction_function.__name__, best_param_set, results, *output)
+    print("Export done.", file=stderr)
 
 
 def compare_hyper_parameters(features, export_path):
+    max_iter = {  # Max number of iterations for all predictors
+        # 10_000,
+        # 100_000,
+        # 1_000_000,
+        10_000_000,
+        # -1,  # Warning: Without limitation, some kernel don't converge.
+    }
 
     linear_params_ranges = {
         consts.LinearRegression.FIT_INTERCEPT: [True, False],
@@ -100,9 +201,7 @@ def compare_hyper_parameters(features, export_path):
         ],
         consts.MLP.LEARNING_RATE_INIT: [0.001],
         consts.MLP.POWER_T: [0.5],
-        consts.MLP.MAX_ITER: [
-            n for n in range(200, 1_001, 100)
-        ],
+        consts.MLP.MAX_ITER: max_iter,
         consts.MLP.SHUFFLE: [True],
         consts.MLP.RANDOM_STATE: [None],
         consts.MLP.TOL: [0.0001],
@@ -133,13 +232,7 @@ def compare_hyper_parameters(features, export_path):
             consts.SVM.GAMMA_SCALE,  # Default value
             consts.SVM.GAMMA_AUTO,
         ],
-        consts.SVM.MAX_ITER: {
-            10_000,
-            100_000,
-            1_000_000,
-            10_000_000,
-            # -1,  # Warning: Without limitation, some kernel don't converge.
-        },
+        consts.SVM.MAX_ITER: max_iter,
         consts.SVM.TOL: [
             1,
             1e-1,
@@ -168,3 +261,25 @@ def compare_hyper_parameters(features, export_path):
     svr_params_ranges = {
         **svm_main_params_ranges,
     }
+
+    regression_functions = {
+        perform_linear_regression: linear_params_ranges,
+        perform_mlp_regression: mlp_params_ranges,
+        perform_svr_regression: svr_params_ranges,
+    }
+
+    classification_functions = {
+        # perform_svc_classification: svc_params_ranges,
+    }
+
+    outputs = {
+        # consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
+        consts.OUTPUT_NB_SOLUTIONS: regression_functions,
+        # consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES: classification_functions,
+        consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
+    }
+
+    for output, prediction_functions in outputs.items():
+        for prediction_function, params_ranges in prediction_functions.items():
+            print("####", output, ":", prediction_function.__name__, "####")
+            test_hyper_parameters(prediction_function, features, [output], export_path, **params_ranges)
