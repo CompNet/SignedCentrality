@@ -126,6 +126,6 @@ if __name__ == '__main__':
     # # print(output5)
     # # # prediction.regression.perform_regression(features, output5, kernel)
 
-    compare_hyper_parameters(features, "stub")
+    compare_hyper_parameters(features)
 
 
