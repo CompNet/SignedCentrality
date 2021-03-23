@@ -9,7 +9,7 @@ import numpy as np
 import math
 import consts
 from csv import reader, writer, Sniffer, Dialect
-from sys import float_info
+from sys import float_info, stdout
 from igraph import Graph
 
 
@@ -30,12 +30,12 @@ def which(values):
     values: boolean values
     """
     for value in values:
-        if not isinstance(value,(bool,np.bool_)):
+        if not isinstance(value, (bool, np.bool_)):
             raise Exception('which() function expects only boolean values')
     indxs = [indx for indx, bool_elt in enumerate(values) if bool_elt]
     return indxs
-           
-           
+
+
 def generate_uniform_membership(n, l0):
     """This method creates a membership data, where the size of the modules
     as equal as possible, i.e. uniform distribution.
@@ -50,13 +50,13 @@ def generate_uniform_membership(n, l0):
     :type prop_mispl: float
     """
     membership = []
-    nk = math.floor(n/l0)
+    nk = math.floor(n / l0)
     module_sizes = [nk] * l0
     nb_remaining = n - (nk * l0)
     for i in range(nb_remaining):
         module_sizes[i] += 1
     for i in range(l0):
-        membership.extend([i+1] * module_sizes[i])
+        membership.extend([i + 1] * module_sizes[i])
     return membership
 
 
@@ -72,12 +72,12 @@ def compute_prop_neg(n, l0):
     prop_neg = 0
 
     membership = generate_uniform_membership(n, l0)
-    module_sizes = [membership.count(indx) for indx in range(1,l0+1)]
-    for m1, m2 in iter.combinations(range(1,l0+1), 2):
-        n1 = module_sizes[m1-1]
-        n2 = module_sizes[m2-1]
-        prop_neg += (n1*n2)/((n*(n-1)/2))
-    
+    module_sizes = [membership.count(indx) for indx in range(1, l0 + 1)]
+    for m1, m2 in iter.combinations(range(1, l0 + 1), 2):
+        n1 = module_sizes[m1 - 1]
+        n2 = module_sizes[m2 - 1]
+        prop_neg += (n1 * n2) / ((n * (n - 1) / 2))
+
     return prop_neg
 
 
@@ -147,10 +147,10 @@ def read_graph(path_name, format=None):
 
     if format is not None and format.lower() == consts.FILE_FORMAT_CSV:
         # The separator in CSV files is the comma.
-        graph = Graph.Read_Adjacency(path_name, sep=",", comment_char="#", attribute=consts.EDGE_WEIGHT_ATTR) 
+        graph = Graph.Read_Adjacency(path_name, sep=",", comment_char="#", attribute=consts.EDGE_WEIGHT_ATTR)
     else:
         graph = Graph.Read(path_name, format)
-        
+
     return graph
 
 
@@ -284,7 +284,6 @@ def read_csv(path: str, remove_headers=True):
     csv = []
 
     with open(path, 'r') as file:
-
         dialect = Sniffer().sniff(file.read(1024))
         file.seek(0)
 
@@ -314,3 +313,61 @@ def write_csv(path: str, matrix):
     with open(path, 'w') as file:
         writer(file, Dialect.delimiter).writerows([[str(col) for col in row] for row in matrix])
 
+
+class ProgressBar:
+    """
+    This class displays and handles a CLI progress bar
+    """
+
+    def __init__(self, full_progress_number, bar_size=48, file=stdout):
+        """
+        Constructs a newly allocated ProgressBar instance
+
+        :param full_progress_number: Value the counter has to reach to complete progress
+        :param bar_size: Size of the progress bar
+        :param file: Output file
+        """
+
+        self.full_progress_number = full_progress_number
+        self.progress_counter = 0
+        self.progress_percent = 0
+        self.bar_size = bar_size
+        self.file = file
+
+    def initialize(self):
+        """
+        Display a 0% progress bar
+        """
+
+        self.progress_counter = 0
+        self.progress_percent = 0
+        print(" 0 %\t|", "".join(["-" for _ in range(self.bar_size)]), "|\r", sep="", end="", file=self.file)
+
+    def update(self, counter_increment=1):
+        """
+        Update value of the progress bar
+
+        Update value and print it if the bar or the printed percentage has grown
+
+        :param counter_increment: value to add to the counter
+        """
+        self.progress_counter += counter_increment
+        new_progress_percent = (self.progress_counter * 100) // self.full_progress_number
+        if new_progress_percent > self.progress_percent:
+            self.progress_percent = new_progress_percent
+            progress_bar = (self.progress_percent * self.bar_size) // 100
+            print(
+                " {} %\t|{}{}|\r".format(
+                    str(self.progress_percent),
+                    "".join(["#" for _ in range(progress_bar)]),
+                    "".join(["-" for _ in range(self.bar_size - progress_bar)])
+                ), sep="", end="", file=self.file
+            )
+
+    def finalize(self):
+        """
+        Display a 100% progress bar
+        """
+        self.progress_counter = self.full_progress_number
+        self.progress_percent = 100
+        print(" 100 %\t|", "".join(["#" for _ in range(self.bar_size)]), "|", sep="", file=self.file)

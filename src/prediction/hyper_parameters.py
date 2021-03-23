@@ -16,7 +16,7 @@ from collect.collect_graphics import generate_plot
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
-from util import write_csv
+from util import write_csv, ProgressBar
 from path import get_csv_folder_path
 
 
@@ -144,15 +144,10 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
     param_sets = __initialize_hyper_parameters_sets(**parameters_range)
     print("Initialization done.", file=stderr)
     print("There are", len(param_sets), "parameters sets.", file=stderr)
-    print("params sets", file=stderr)
 
     # Initialize progress bar:
-    param_set_number = len(param_sets)
-    param_set_counter = 0
-    train_progress_percent = 0
-    bar_size = 48
-    print()
-    print(" 0 %\t|", "".join(["-" for _ in range(bar_size)]), "|\r", sep="", end="")
+    progress_bar = ProgressBar(len(param_sets))
+    progress_bar.initialize()
 
     # Run tests:
     for hyper_parameters in param_sets:
@@ -173,20 +168,10 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
                     best_param_set[i] = (metric_name, hyper_parameters, prediction_metrics[metric_name])
 
         # Update progress bar:
-        new_train_progress_percent = (param_set_counter * 100) // param_set_number
-        if new_train_progress_percent > train_progress_percent:
-            train_progress_percent = new_train_progress_percent
-            progress_bar = (train_progress_percent * bar_size) // 100
-            print(
-                " {} %\t|{}{}|\r".format(
-                    str(train_progress_percent),
-                    "".join(["#" for _ in range(progress_bar)]),
-                    "".join(["-" for _ in range(bar_size - progress_bar)])
-                ), sep="", end=""
-            )
+        progress_bar.update()
 
     # End progress bar:
-    print(" 100 %\t|", "".join(["#" for _ in range(bar_size)]), "|", sep="")
+    progress_bar.finalize()
     print("\nExport results ...", file=stderr)
 
     headers = [*parameters_range.keys(), *[bps[0] for bps in best_param_set]]  # Ordered
