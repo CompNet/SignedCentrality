@@ -136,6 +136,7 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
     :param features: features to train predictors
     :param output: prediction task
     :param parameters_range: range of values for each parameter
+    :return: the best parameters set
     """
 
     results = []
@@ -180,6 +181,8 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
     write_csv(join(get_csv_folder_path(), output[0] + "_-_" + prediction_function.__name__ + consts.CSV), [headers, *ordered_results])
     print_parameters_comparisons(prediction_function.__name__, best_param_set, results, *output)
     print("Export done.", file=stderr)
+
+    return best_param_set
 
 
 def compare_hyper_parameters(features):
@@ -312,4 +315,10 @@ def compare_hyper_parameters(features):
     for output, prediction_functions in outputs.items():
         for prediction_function, params_ranges in prediction_functions.items():
             print("####", output, ":", prediction_function.__name__, "####")
-            test_hyper_parameters(prediction_function, features, [output], **params_ranges)
+            best_param_set = test_hyper_parameters(prediction_function, features, [output], **params_ranges)
+            print(best_param_set)
+            print("Best parameters sets:")
+            for (metric_name, metric_best_param_set, metric_value) in best_param_set:
+                print("\tMetric:", metric_name, "=", metric_value)
+                for param, value in metric_best_param_set.items():
+                    print("\t\t", param, ": ", value, sep="")
