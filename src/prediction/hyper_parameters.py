@@ -12,7 +12,7 @@ from deprecated import deprecated
 from sklearn import metrics
 import consts
 import sys
-from collect.collect_graphics import generate_plot
+from collect.collect_graphics import generate_plot, generate_errorbar_plot
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
@@ -84,7 +84,7 @@ def __initialize_graphic_data(best_param_set, results):
                 continue
 
             tested_param_name = non_optimal_values[0]
-            metric_data[tested_param_name].append((result[tested_param_name], result[metric_name]))
+            metric_data[tested_param_name].append((str(result[tested_param_name]), result[metric_name]))
 
         data[metric_name] = {param_name: tuple(data_list) for param_name, data_list in metric_data.items()}
 
@@ -102,7 +102,9 @@ def print_parameters_comparison(param_name, param_values, metric_name, metric_va
     :param graphic_name: name of the graphic
     """
 
-    generate_plot(param_values, metric_values, graphic_name)
+    param_name = str(param_name)
+    metric_name = str(metric_name)
+    generate_errorbar_plot(param_values, metric_values, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
 
 
 def print_parameters_comparisons(prediction_function_name, best_param_set, results, output):
@@ -204,7 +206,7 @@ def compare_hyper_parameters(features):
         consts.LinearRegression.FIT_INTERCEPT: [True, False],
         consts.LinearRegression.NORMALIZE: [True, False],
         consts.LinearRegression.COPY_X: [True, False],
-        consts.LinearRegression.N_JOBS: [-1],
+        # consts.LinearRegression.N_JOBS: [-1],
         consts.LinearRegression.POSITIVE: [True, False],
     }
 
