@@ -6,6 +6,7 @@ import traceback
 from math import nan, isnan
 from sys import stderr
 from warnings import catch_warnings, filterwarnings
+from sklearn.exceptions import ConvergenceWarning
 import consts
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -164,6 +165,7 @@ def perform_prediction(model_class, default_values, features, output, test_funct
     # =======================================================
     model = model_class(**hyper_parameters)
     filterwarnings("error", category=RuntimeWarning)  # To catch runtime warnings as errors.
+    filterwarnings("ignore", category=ConvergenceWarning)
     try:
         model.fit(X_train, Y_train)  # There is an overflow in matmul if there are 300 layers, activation function is "identity" and solver is 'sgd'.
     except RuntimeWarning:  # If there is an overflow in matmul.

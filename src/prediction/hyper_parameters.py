@@ -134,7 +134,7 @@ def print_parameters_comparisons(prediction_function_name, best_param_set, resul
             print_parameters_comparison(param_name, param_values, metric_name, metric_values, graphic_name)
 
 
-def test_hyper_parameters(prediction_function, features, output, **parameters_range):
+def test_hyper_parameters(prediction_function, features, output, train_iterations_number=10, **parameters_range):
     """
     Test combinations for  all values given for each parameter
 
@@ -143,16 +143,15 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
     :param prediction_function: function that makes the predictions
     :param features: features to train predictors
     :param output: prediction task
+    :param train_iterations_number: number of iterations to train model, the final result is the mean of all iterations results
     :param parameters_range: range of values for each parameter
     :return: the best parameters set
     """
 
     results = []
     best_param_set = None
-    print("Initialization ...", file=stderr)
     param_sets = __initialize_hyper_parameters_sets(**parameters_range)
-    print("Initialization done.", file=stderr)
-    print("There are", len(param_sets), "parameters sets.", file=stderr)
+    print("There are", len(param_sets), "parameters sets and", train_iterations_number, "train iterations.", file=stderr)
 
     # Initialize progress bar:
     progress_bar = ProgressBar(len(param_sets))
@@ -160,13 +159,25 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
 
     # Run tests:
     for hyper_parameters in param_sets:
-        model, prediction_metrics = prediction_function(
-            features,
-            output,
-            False, False, False,
-            **hyper_parameters
-        )
+        prediction_metrics = None
 
+        # Compute a mean value to make results more accurate:
+        for it in range(train_iterations_number):
+            # print("Iteration ", it, " of ", train_iterations_number, ":", sep="")
+            model, it_prediction_metrics = prediction_function(
+                features,
+                output,
+                False, False, False,
+                **hyper_parameters
+            )
+            if prediction_metrics is None:
+                prediction_metrics = {**it_prediction_metrics}
+            else:
+                for metric_name, it_metric_value in it_prediction_metrics.items():
+                    prediction_metrics[metric_name] += it_metric_value
+
+        for metric_name, metric_value in prediction_metrics.items():
+            prediction_metrics[metric_name] = metric_value / train_iterations_number
         results = [*results, {**hyper_parameters, **prediction_metrics}]  # If there have been an error in model training, it will be shown in CSV file by a NAN value for the metric.
 
         if best_param_set is None:
@@ -186,7 +197,6 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
 
     # End progress bar:
     progress_bar.finalize()
-    print("\nExport results ...", file=stderr)
 
     headers = [*parameters_range.keys(), *[bps[0] for bps in best_param_set]]  # Ordered
     ordered_results = [[result[key] for key in headers] for result in results]
@@ -195,12 +205,10 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
     graphic_results = []
     for r in results:
         if sum([int(True if isnan(r[key]) else False) for key in [bps[0] for bps in best_param_set]]) > 0:
-            print("Excluded parameters set:", r, file=stderr)
+            # print("Excluded parameters set:", r, file=stderr)
             continue  # NAN values aren't taken into account in the graphic to keep accuracy of right values.
         graphic_results.append(r)
     print_parameters_comparisons(prediction_function.__name__, best_param_set, graphic_results, *output)
-
-    print("Export done.", file=stderr)
 
     return best_param_set
 
@@ -344,3 +352,4 @@ def compare_hyper_parameters(features):
                 print("\tMetric:", metric_name, "=", metric_value)
                 for param, value in metric_best_param_set.items():
                     print("\t\t", param, ": ", value, sep="")
+            print()
