@@ -21,9 +21,19 @@ def __make_file_path(graphic_title, plot_type: str = None, add_plot_to_name=True
     :return: the computed path
     """
 
-    return os.path.join(path.get_graphics_folder_path(), str(graphic_title + str(str(
-        str("_-" if dash_between_name_and_plot else "") + "_" + str(
-            plot_type)) if plot_type is not None and add_plot_to_name else "") + consts.PNG))
+    return os.path.join(
+        path.get_graphics_folder_path(),
+        str(
+            graphic_title +
+            str(
+                str(
+                    str("_-" if dash_between_name_and_plot else "") + "_" + str(plot_type)
+                ) if plot_type is not None and add_plot_to_name else ""
+            ) +
+            # consts.PNG
+            consts.PDF
+        )
+    )
 
 
 def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False, *args, **kwargs):
@@ -54,7 +64,7 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     plt.close()
 
 
-def generate_plot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True,dash_between_name_and_plot=False, verbose=False):
+def generate_plot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
     """
     This method generate a plot using matplotlib.pyplot
 
@@ -66,6 +76,7 @@ def generate_plot(x_values, y_values, graphic_title, x_label=None, y_label=None,
     :type graphic_title: string
     :param x_label: label for x axis
     :param y_label: label for y axis
+    :param print_title: True if the graphic must have a title
     :param add_plot_to_name: True if plot type must be added
     :param dash_between_name_and_plot: True if plot type must be preceded by a dash
     :param verbose: True if information must be printed

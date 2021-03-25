@@ -6,6 +6,7 @@ This module contains functions related to hyper parameters tes and comparison.
 
 @author: Virgile Sucal
 """
+from math import isnan
 from os.path import abspath, dirname, join
 from sys import stderr
 from deprecated import deprecated
@@ -73,7 +74,7 @@ def __initialize_graphic_data(best_param_set, results):
     data = {}
 
     for (metric_name, param_set, metric_value) in best_param_set:
-        metric_data = {param_name: [(str(param_set[param_name]), metric_value)] for param_name in param_set.keys()}  # str() even is parameter is a number because numeric parameters are defined in a discrete set.
+        metric_data = {param_name: [(param_set[param_name], metric_value)] for param_name in param_set.keys()}
 
         for result in results:
             non_optimal_values = []
@@ -84,7 +85,7 @@ def __initialize_graphic_data(best_param_set, results):
                 continue
 
             tested_param_name = non_optimal_values[0]
-            metric_data[tested_param_name].append((str(result[tested_param_name]), result[metric_name]))
+            metric_data[tested_param_name].append((result[tested_param_name], result[metric_name]))
 
         data[metric_name] = {param_name: tuple(data_list) for param_name, data_list in metric_data.items()}
 
@@ -124,6 +125,11 @@ def print_parameters_comparisons(prediction_function_name, best_param_set, resul
             param_values = [value[0] for value in values]
             metric_values = [value[1] for value in values]
 
+            if param_name == consts.MLP.HIDDEN_LAYER_SIZES:
+                param_values = [str(len(param_value)) + '*' + str(param_value[0]) for param_value in param_values]
+            else:
+                param_values = [str(param_value) for param_value in param_values]  # str() even is parameter is a number because numeric parameters are defined in a discrete set.
+
             graphic_name = output + "_-_" + prediction_function_name + "_-_" + param_name + "_-_" + metric_name
             print_parameters_comparison(param_name, param_values, metric_name, metric_values, graphic_name)
 
@@ -160,13 +166,18 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
             False, False, False,
             **hyper_parameters
         )
-        results = [*results, {**hyper_parameters, **prediction_metrics}]
+
+        results = [*results, {**hyper_parameters, **prediction_metrics}]  # If there have been an error in model training, it will be shown in CSV file by a NAN value for the metric.
 
         if best_param_set is None:
-            best_param_set = [(metric_name, hyper_parameters, metric_value) for metric_name, metric_value in prediction_metrics.items()]
+            best_param_set = [(metric_name, hyper_parameters, metric_value) if metric_value is not None else (metric_name, None, None) for metric_name, metric_value in prediction_metrics.items()]
         else:
             for i in range(len(best_param_set)):
                 metric_name, best_hyper_parameters, metric_value = best_param_set[i]
+                if isnan(prediction_metrics[metric_name]):  # If True, the parameters caused an error ...
+                    continue  # ... so they can't be the best parameter set.
+                if None in [best_hyper_parameters, metric_value] or isnan(metric_value):  # If True, the best parameters haven't been set for this metric ...
+                    continue  # ... so they have to be now.
                 if abs(abs(consts.PREDICTION_METRICS_OPTIMAL_VALUES[metric_name]) - abs(prediction_metrics[metric_name])) < abs(abs(consts.PREDICTION_METRICS_OPTIMAL_VALUES[metric_name]) - abs(metric_value)):
                     best_param_set[i] = (metric_name, hyper_parameters, prediction_metrics[metric_name])
 
@@ -181,7 +192,14 @@ def test_hyper_parameters(prediction_function, features, output, **parameters_ra
     ordered_results = [[result[key] for key in headers] for result in results]
 
     write_csv(join(get_csv_folder_path(), output[0] + "_-_" + prediction_function.__name__ + consts.CSV), [headers, *ordered_results])
-    print_parameters_comparisons(prediction_function.__name__, best_param_set, results, *output)
+    graphic_results = []
+    for r in results:
+        if sum([int(True if isnan(r[key]) else False) for key in [bps[0] for bps in best_param_set]]) > 0:
+            print("Excluded parameters set:", r, file=stderr)
+            continue  # NAN values aren't taken into account in the graphic to keep accuracy of right values.
+        graphic_results.append(r)
+    print_parameters_comparisons(prediction_function.__name__, best_param_set, graphic_results, *output)
+
     print("Export done.", file=stderr)
 
     return best_param_set
@@ -210,12 +228,15 @@ def compare_hyper_parameters(features):
         consts.LinearRegression.POSITIVE: [True, False],
     }
 
+    layer_sizes = [n for n in range(10, 301, 50)]
+    layers_numbers = [n for n in range(10, 101, 50)]
+    layers = []
+    for layer_size in layer_sizes:
+        layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
+    print(len(layers))
+
     mlp_params_ranges = {
-        # consts.MLP.HIDDEN_LAYER_SIZES: [
-        #     (
-        #         layer_size for layer_size in range(10, 301, 10)
-        #     ) for layer_number in range(10, 101, 10)
-        # ],
+        consts.MLP.HIDDEN_LAYER_SIZES: layers,
         consts.MLP.ACTIVATION: [
             consts.MLP.IDENTITY,
             consts.MLP.LOGISTIC,
@@ -318,7 +339,6 @@ def compare_hyper_parameters(features):
         for prediction_function, params_ranges in prediction_functions.items():
             print("####", output, ":", prediction_function.__name__, "####")
             best_param_set = test_hyper_parameters(prediction_function, features, [output], **params_ranges)
-            print(best_param_set)
             print("Best parameters sets:")
             for (metric_name, metric_best_param_set, metric_value) in best_param_set:
                 print("\tMetric:", metric_name, "=", metric_value)

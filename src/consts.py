@@ -13,6 +13,7 @@ from sklearn import metrics
 CSV = ".csv"
 TXT = ".txt"
 PNG = ".png"
+PDF = ".pdf"
 MAIN_FOLDER = os.path.abspath("..") # the absolute path of the previous level
 IN_FOLDER = os.path.join(MAIN_FOLDER, "in")
 OUT_FOLDER = os.path.join(MAIN_FOLDER, "out")
