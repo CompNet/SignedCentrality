@@ -236,12 +236,15 @@ def compare_hyper_parameters(features):
         consts.LinearRegression.POSITIVE: [True, False],
     }
 
-    layer_sizes = [n for n in range(10, 301, 50)]
-    layers_numbers = [n for n in range(10, 101, 50)]
+    # layer_sizes = [n for n in range(10, 301, 50)]
+    layer_sizes = [n for n in range(1, 20, 4)]
+    # layers_numbers = [n for n in range(10, 101, 50)]
+    layers_numbers = [n for n in range(1, 10, 2)]
     layers = []
     for layer_size in layer_sizes:
         layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
-    print(len(layers))
+    # print(len(layers))
+    # layers = [(n, ) for n in range(10, 101, 20)]  # TODO: Only for tests ...
 
     mlp_params_ranges = {
         consts.MLP.HIDDEN_LAYER_SIZES: layers,

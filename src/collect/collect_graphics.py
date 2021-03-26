@@ -60,6 +60,12 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
         plt.xlabel(x_label)
     if y_label is not None:
         plt.ylabel(y_label)
+
+    max_char_number_per_line = 48
+    char_number = max(*[len(arg) for arg in args[0]])
+    if len(args[0]) * char_number > max_char_number_per_line:
+        plt.xticks(rotation=-45)
+
     plt.savefig(path_to_file)
     plt.close()
 
