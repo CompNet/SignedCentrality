@@ -315,7 +315,7 @@ def write_csv(path: str, matrix):
 
 
 def prediction_name_refactor(prediction_name):
-    refactored_name = None
+    refactored_name = prediction_name
     if prediction_name == "['nb_solutions']":
         refactored_name = consts.OUTPUT_NB_SOLUTIONS
     elif prediction_name == "['single_solution']":
