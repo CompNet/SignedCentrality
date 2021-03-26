@@ -5,12 +5,15 @@ Created on Sep 23, 2020
 '''
 
 import os
+from sklearn import metrics
 
 # ===========================
 # Path variables
 # ===========================
 CSV = ".csv"
 TXT = ".txt"
+PNG = ".png"
+PDF = ".pdf"
 MAIN_FOLDER = os.path.abspath("..") # the absolute path of the previous level
 IN_FOLDER = os.path.join(MAIN_FOLDER, "in")
 OUT_FOLDER = os.path.join(MAIN_FOLDER, "out")
@@ -178,4 +181,12 @@ class MLP:
     INVSCALING = 'invscaling'
     ADAPTIVE = 'adaptive'
     AUTO = 'auto'
+
+
+# Optimal values for prediction metrics
+PREDICTION_METRICS_OPTIMAL_VALUES = {
+    metrics.r2_score.__name__: 1,
+    metrics.mean_squared_error.__name__: 0,
+    metrics.mean_absolute_error.__name__: 0,
+}
 
