@@ -58,6 +58,7 @@ def initialize_data(features, output):
     Y = df.to_numpy()
 
     df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + "_full.csv"), usecols=features)
+    X = df.to_numpy()
 
 ##    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + consts.CSV), usecols=output)
 ##    Y = df.to_numpy()
@@ -71,30 +72,12 @@ def initialize_data(features, output):
     scaler.fit(X)
     X = scaler.transform(X)
 
-    
-##    #Rectify the imbalance in the data UNDERSAMPLING
-##    undersample = RandomUnderSampler(sampling_strategy='majority')
-##    undersample = NearMiss(version=1)
-##    undersample = NearMiss(version=2, n_neighbors=3)
-##    undersample = NearMiss(version=3, n_neighbors_ver3=3)
-##    undersample = CondensedNearestNeighbour(n_neighbors=1)
-##    undersample = TomekLinks()
-##    undersample = EditedNearestNeighbours(n_neighbors=3)
-##    undersample = OneSidedSelection(n_neighbors=1, n_seeds_S=200)
-##    undersample = NeighbourhoodCleaningRule(n_neighbors=3, threshold_cleaning=0.5)
+    undersample = EditedNearestNeighbours(n_neighbors=3)
 
-##    # fit and apply the transform
-##    X, Y = undersample.fit_resample(X, Y)
+    # fit and apply the transform
+    X, Y = undersample.fit_resample(X, Y)
 
 
-##    #Rectify the imbalance in the data OVERSAMPLING
-##    oversample = RandomOverSampler(sampling_strategy='minority')
-##    oversample = SMOTE()
-##    oversample = BorderlineSMOTE()
-##    oversample = SVMSMOTE()
-    oversample = ADASYN()
-
-    X, Y = oversample.fit_resample(X, Y)
 
     # =======================================================
     # Split data intro train and test sets

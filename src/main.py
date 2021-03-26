@@ -87,16 +87,13 @@ if __name__ == '__main__':
     print(output)
     kernel = consts.PREDICTION_KERNEL_LINEAR
 
-    # random forest classification task
-
-    print("RandomForest#################################\n")
-    prediction.random_forest_classification.perform_random_forest_classification(features, output, 10)
-    print("\n#################################\n")
 
     # print(kernel)
     # classification task : one or more solutions
     print("\nSVC :")
     prediction.classification.perform_classification(features, output, kernel)
+    print("\nRandom Forest :")
+    prediction.random_forest_classification.perform_classification(features, output, 1000)
 
     # regression task : number of solutions
     output1 = [consts.OUTPUT_NB_SOLUTIONS]
@@ -113,6 +110,9 @@ if __name__ == '__main__':
     print("Task:", *output2)
     print("\nSVC :")
     prediction.classification.perform_classification(features, output2, kernel)
+    print("\nRandom Forest :")
+    prediction.random_forest_classification.perform_classification(features, output2, 1000)
+
 
     # regression task : number of classes of solution
     output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]

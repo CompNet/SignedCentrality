@@ -23,6 +23,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
 
+from sys import stderr
+from deprecated import deprecated
+from sklearn import metrics
+from sklearn import svm
+import consts
+from collect.collect_predicted_values import collect_predicted_values
+from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction, \
+    perform_prediction
+
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss
 from imblearn.under_sampling import CondensedNearestNeighbour
@@ -33,31 +42,62 @@ from imblearn.under_sampling import OneSidedSelection
 import collect.collect_graphics
 
 
-def perform_random_forest_classification(features, output, n_estimators):
-    """This method performs the task of random forest classification.
+def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=False):
+    """
+    Perform validation tests for classification
 
-    :param features: a list of features
-    :type features: string list
-    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :type output: string
-    :param n_estimators: indicates the number of trees wanted in the classification
-    :type n_estimators: int
+    :param cla: trained classification model
+    :param X_test: input test data
+    :param Y_test: output test data
     """
 
-    model = RandomForestClassifier(n_estimators=n_estimators)
+    prediction_metrics = [
+        metrics.f1_score,  # Best value: 1
+        metrics.accuracy_score,  # Best value: 1 if normalize == True, else the number of correctly classified samples
+        metrics.precision_score,  # Best value: 1
+        metrics.recall_score  # Best value: 1
+    ]
 
-    df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS+".csv"), usecols=output)
-    Y = df.to_numpy()
-        
-    df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES+".csv"), usecols=features)
-    X = df.to_numpy()
+    return test_prediction(cla, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
-    
 
-    scaler = StandardScaler()
+def perform_random_forest_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=False, **kwargs):
+    """This method performs the task of classification for a single output.
 
-    scaler.fit(X)
-    X = scaler.transform(X)
+    The classification is computed using SVM.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
+    """
+
+    # Set default values for hyper parameters:
+    default_values = {
+        "n_estimators": 10000,
+    }
+
+    return perform_prediction(RandomForestClassifier, default_values, features, output, test_classification, print_results, export_predicted_values, export_graphical_results, **kwargs)
+
+
+@deprecated("This function is deprecated, use 'perform_svc_classification()' instead")
+def perform_classification(features, output, n_estimators):
+    """
+    Alias for perform_svc_classification().
+
+    This function is deprecated, use 'perform_svc_classification()' instead
+    It hasn't been deleted for compatibility with previous versions.
+    It should not be used in new functions.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
+    """
+
+    return perform_random_forest_classification(features, output, n_estimators=n_estimators)
+
+
 
 
 ##    #Rectify the imbalance in the data UNDERSAMPLING
@@ -83,27 +123,3 @@ def perform_random_forest_classification(features, output, n_estimators):
 ##    oversample = ADASYN()
 
 ##    X, Y = oversample.fit_resample(X, Y)
-
-
-
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
-
-    Y_train = Y_train.ravel()
-
-    model.fit(X_train, Y_train)
-
-    Y_pred = model.predict(X_test)
-    
-    rf_probs = model.predict_proba(X_test)[:, 1]
-    
-    print("F1 score:", metrics.f1_score(Y_test, Y_pred))
-    
-    print("Accuracy:", metrics.accuracy_score(Y_test, Y_pred))
-
-    print("Precision:", metrics.precision_score(Y_test, Y_pred))
-
-    print("Recall:", metrics.recall_score(Y_test, Y_pred), "\n")
-    
-    roc_value = roc_auc_score(Y_test, rf_probs)
-
-    print("roc value:", roc_value)
