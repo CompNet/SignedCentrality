@@ -88,31 +88,31 @@ if __name__ == '__main__':
     # random forest classification task
 
     print("RandomForest#################################\n")
-    prediction.random_forest_classification.perform_random_forest_classification(features, output, 100)
+    prediction.random_forest_classification.perform_random_forest_classification(features, output, 10)
     print("\n#################################\n")
 
-##    
+    
     # classification task : one or more solutions
-    print("Classifier#################################\n")
-    prediction.classification.perform_classification(features, output, kernel)
-    print("\n#################################\n")
+##    print("Classifier#################################\n")
+##    prediction.classification.perform_classification(features, output, kernel)
+##    print("\n#################################\n")
 ##
 ##    # regression task : number of solutions
 ##    output1 = [consts.OUTPUT_NB_SOLUTIONS]
 ##    print(output1)
 ##    prediction.regression.perform_regression(features, output1, kernel)
 ##
-    # classification task : one or more classes of solution
+##    # classification task : one or more classes of solution
     
-    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
-    print(output2)
-    print("RandomForestBIS#################################\n")
-    prediction.random_forest_classification.perform_random_forest_classification(features, output2, 100)
-    print("\n#################################\n")
-    
-    print("ClassifierBIS#################################\n")
-    prediction.classification.perform_classification(features, output2, kernel)
-    print("\n#################################\n")
+##    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+##    print(output2)
+####    print("RandomForestBIS#################################\n")
+####    prediction.random_forest_classification.perform_random_forest_classification(features, output2, 100)
+####    print("\n#################################\n")
+##    
+##    print("ClassifierBIS#################################\n")
+##    prediction.classification.perform_classification(features, output2, kernel)
+##    print("\n#################################\n")
 
 ##    # regression task : number of classes of solution
 ##    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]

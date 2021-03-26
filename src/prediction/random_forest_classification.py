@@ -1,7 +1,10 @@
 '''
 Created on Mar 04, 2021
 
-@author: alexandre
+@author: nejat
+@author: Virgile Sucal
+@author: Laurent Pereira
+@author: Alexandre
 '''
 
 import os

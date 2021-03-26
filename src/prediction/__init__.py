@@ -73,14 +73,14 @@ def initialize_data(features, output):
 ##    undersample = NearMiss(version=1)
 ##    undersample = NearMiss(version=2, n_neighbors=3)
 ##    undersample = NearMiss(version=3, n_neighbors_ver3=3)
-    undersample = CondensedNearestNeighbour(n_neighbors=1)
+##    undersample = CondensedNearestNeighbour(n_neighbors=1)
 ##    undersample = TomekLinks()
 ##    undersample = EditedNearestNeighbours(n_neighbors=3)
 ##    undersample = OneSidedSelection(n_neighbors=1, n_seeds_S=200)
 ##    undersample = NeighbourhoodCleaningRule(n_neighbors=3, threshold_cleaning=0.5)
 
 ##    # fit and apply the transform
-    X, Y = undersample.fit_resample(X, Y)
+##    X, Y = undersample.fit_resample(X, Y)
 
 
 ##    #Rectify the imbalance in the data OVERSAMPLING
@@ -88,9 +88,9 @@ def initialize_data(features, output):
 ##    oversample = SMOTE()
 ##    oversample = BorderlineSMOTE()
 ##    oversample = SVMSMOTE()
-##    oversample = ADASYN()
+    oversample = ADASYN()
 
-##    X, Y = oversample.fit_resample(X, Y)
+    X, Y = oversample.fit_resample(X, Y)
 
     # =======================================================
     # Split data intro train and test sets
@@ -146,8 +146,8 @@ def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_resul
             print(metric.__name__ + ":", prediction_metrics_results[metric.__name__])
 
     # Save predicted values into a file
-    if export_predicted_values:
-        collect_predicted_values(Y_pred, output)
+##    if export_predicted_values:
+##        collect_predicted_values(Y_pred, output)
 
     # Save graphics into a file
     if export_graphical_results:
