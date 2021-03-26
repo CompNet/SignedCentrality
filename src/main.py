@@ -14,6 +14,7 @@ import collect.collect_outputs
 import prediction.classification
 import prediction.regression
 import prediction.feature_ablation
+from prediction.hyper_parameters import compare_hyper_parameters
 
 # =====================================
 GRAPH_SIZES = [20,24]
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     ]
 
     features = list(itertools.chain.from_iterable(features_list))
-    print(features)
+    # print(features)
 
     print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
     print("Tests:", sep="", end="\n\n")
@@ -133,5 +134,7 @@ if __name__ == '__main__':
     print("Task: feature ablation")
     # prediction.feature_ablation.feature_ablation(features, output2, kernel)
     prediction.feature_ablation.feature_ablation_1(features, output2, kernel)
+
+    compare_hyper_parameters(features)
 
 
