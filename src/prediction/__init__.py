@@ -15,7 +15,6 @@ import prediction
 from collect.collect_predicted_values import collect_predicted_values
 import collect.collect_graphics
 from path import get_csv_folder_path
-
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss
 from imblearn.under_sampling import CondensedNearestNeighbour
@@ -40,20 +39,13 @@ This package contains functions related to the classification and regression.
 """
 
 
-def initialize_data(features, output):
+def import_data(features, output):
     """
-    Initialize input and output sets for training and tests
+    Import data
 
     :param features: a list of features
-    :type features: string list
     :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :type output: string
     """
-
-    # =======================================================
-    # Read features and output from file
-    # =======================================================
-
 
     df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + consts.CSV), usecols=output)
     Y = df.to_numpy()
@@ -67,20 +59,64 @@ def initialize_data(features, output):
     scaler.fit(X)
     X = scaler.transform(X)
 
-    undersample = EditedNearestNeighbours(n_neighbors=3)
-
-    # fit and apply the transform
-    X, Y = undersample.fit_resample(X, Y)
+    return X, Y
 
 
+def split_data(X, Y):
+    """
+    Split data
 
-    # =======================================================
-    # Split data intro train and test sets
-    # =======================================================
+    :param X: Input data
+    :param Y: Output data
+    """
+
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=109)  # 70% training and 30% test
     Y_train = Y_train.ravel()  # convert into 1D array, due to the warning from 'train_test_split'
 
     return X_train, X_test, Y_train, Y_test
+
+
+def perform_imbalance_correction(X, Y):
+    """
+    Perform imbalance correction
+
+    :param X: Input data
+    :param Y: Output data
+    :return: Corrected X and Y
+    """
+
+    undersample = EditedNearestNeighbours(n_neighbors=3)
+
+    # fit and apply the transform
+    return undersample.fit_resample(X, Y)
+
+
+def initialize_data(features, output, imbalance_correction=False):
+    """
+    Initialize input and output sets for training and tests
+
+    :param features: a list of features
+    :type features: string list
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :type output: string
+    :param imbalance_correction: True if imbalance correction must be performed
+    """
+
+    # =======================================================
+    # Read features and output from file
+    # =======================================================
+    X, Y = import_data(features, output)
+
+    # =======================================================
+    # Imbalance correction
+    # =======================================================
+    if imbalance_correction:
+        X, Y = perform_imbalance_correction(X, Y)
+
+    # =======================================================
+    # Split data intro train and test sets
+    # =======================================================
+    return split_data(X, Y)
 
 
 def initialize_hyper_parameters(default_values, user_defined_values):
@@ -154,8 +190,8 @@ def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_resul
             print(metric.__name__ + ":", prediction_metrics_results[metric.__name__])
 
     # Save predicted values into a file
-##    if export_predicted_values:
-##        collect_predicted_values(Y_pred, output)
+    if export_predicted_values:
+        collect_predicted_values(Y_pred, output)
 
     # Save graphics into a file
     if export_graphical_results:
