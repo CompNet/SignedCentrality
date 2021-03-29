@@ -133,7 +133,8 @@ if __name__ == '__main__':
     # feature ablation test
     print("Task: feature ablation")
     # prediction.feature_ablation.feature_ablation(features, output2, kernel)
-    prediction.feature_ablation.feature_ablation_1(features, output2, kernel)
+    # prediction.feature_ablation.feature_ablation_1(features, output2, kernel)
+    prediction.feature_ablation.feature_ablation_1(features, output1, kernel)
 
     compare_hyper_parameters(features)
 

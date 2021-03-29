@@ -70,12 +70,15 @@ def feature_ablation(features, output, kernel):
     # collect.collect_graphics.generate_plot(features, scores, "feature_ablation_test")
 
 
-def score_model(X_train, X_test, y_train, y_test, kernel):
-    clf = svm.SVC(kernel=kernel)
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
+def score_model(X_train, X_test, y_train, y_test, kernel):  # the "identical score everytime" issue is probably here
+    # predictor = svm.SVC(kernel=kernel)
+    predictor = svm.SVR(kernel=kernel)
+    predictor.fit(X_train, y_train)
+    y_pred = predictor.predict(X_test)
     # print(metrics.f1_score(y_test, y_pred))
-    return metrics.f1_score(y_test, y_pred)
+    # return metrics.f1_score(y_test, y_pred)
+    print(metrics.mean_squared_error(y_test, y_pred))
+    return metrics.mean_squared_error(y_test, y_pred)
 
 
 def feature_ablation_1(features, output, kernel): # https://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_digits.html#sphx-glr-auto-examples-feature-selection-plot-rfe-digits-py
@@ -101,14 +104,16 @@ def feature_ablation_1(features, output, kernel): # https://scikit-learn.org/sta
     # =======================================================
     # Processing features ranking (SVC only)
     # =======================================================
-    clf = svm.SVC(kernel=kernel)
-    rfe = RFE(estimator=clf)
+    # predictor = svm.SVC(kernel=kernel)
+    predictor = svm.SVR(kernel=kernel)
+    rfe = RFE(estimator=predictor)
     rfe.fit(X_train, Y_train)
     ranking = rfe.ranking_
     # print(ranking) # Contains the rankings for each feature
     # print(features)
 
-    base_score = score_model(X_train, X_test, Y_train, Y_test, kernel)
+    # base_score = score_model(X_train, X_test, Y_train, Y_test, kernel)
+    base_score = score_model1(predictor, X_train, X_test, Y_train, Y_test, kernel)
 
     # =======================================================
     # Initializing variables
@@ -133,7 +138,7 @@ def feature_ablation_1(features, output, kernel): # https://scikit-learn.org/sta
     scores.append(base_score)
     feature_list.append("Base score")
 
-    # print(scores)
+    print(scores)
     # print(feature_list)
     # print(X_train)
     # print(len(ranking_updated))
@@ -147,37 +152,58 @@ def feature_ablation_1(features, output, kernel): # https://scikit-learn.org/sta
         # print(feature_name_worst_ranking)
 
         feature_list.append("Without "+feature_name_worst_ranking)
-        # print(feature_list)
+        print(feature_list)
 
         use_column[features.index(feature_name_worst_ranking)] = False  # the index where the feature is found is set to False : this feature will not be used anymore
         # print(features)
         # print(use_column)
 
+        X_train_reduced = X_train[:, use_column]
+        print(X_train_reduced)
         # print(X_train[:, use_column])
+        print(...)
+        X_test_reduced = X_test[:, use_column]
+        print(X_test_reduced)
+        # print(X_test[:, use_column])
+
         scores.append(score_model(X_train[:, use_column],
                                   X_test[:, use_column],
                                   Y_train,
                                   Y_test,
                                   kernel))  # Calculating score with only the features not deleted yet
-        # print(scores)
+
+        """scores.append(score_model1(predictor,
+                                  X_train_reduced,
+                                  X_test_reduced,
+                                  Y_train,
+                                  Y_test,
+                                  kernel))  # Calculating score with only the features not deleted yet"""
+
+        print(scores)
 
         ranking_updated.pop(index_worst_ranking)  # Deleting ranking associated to the worst feature
         features_updated.pop(index_worst_ranking)  # Deleting worst feature from feature list
         # print(ranking_updated)
         # print(features_updated)
 
-    if len(ranking_updated) == 1:
+    """if len(ranking_updated) == 1:
         use_column[features.index(features_updated[0])] = False
-        # print(use_column)
+        print(use_column)
         feature_list.append("Without " + features_updated[0])
-        # print(feature_list)
+        print(feature_list)
         scores.append(0)
-        # print(scores)
+        print(scores)"""
 
     collect.collect_graphics.generate_plot(feature_list, scores, "feature_ablation_test")
 
 
-
+def score_model1(predictor, X_train, X_test, y_train, y_test, kernel):  # the "identical score everytime" issue is probably here
+    predictor.fit(X_train, y_train)
+    y_pred = predictor.predict(X_test)
+    # print(metrics.f1_score(y_test, y_pred))
+    # return metrics.f1_score(y_test, y_pred)
+    print(metrics.mean_squared_error(y_test, y_pred))
+    return metrics.mean_squared_error(y_test, y_pred)
 
 
 
