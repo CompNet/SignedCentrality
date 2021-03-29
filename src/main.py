@@ -18,6 +18,9 @@ import prediction.random_forest_classification
 
 import prediction.feature_ablation
 from prediction.hyper_parameters import compare_hyper_parameters
+
+from imblearn.under_sampling import EditedNearestNeighbours
+
 # =====================================
 GRAPH_SIZES = [20,24]
 L0_VALS = [3]
@@ -91,7 +94,7 @@ if __name__ == '__main__':
     # print(kernel)
     # classification task : one or more solutions
     print("\nSVC :")
-    prediction.classification.perform_classification(features, output, kernel)
+    prediction.classification.perform_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3))
     print("\nRandom Forest :")
     prediction.random_forest_classification.perform_classification(features, output, 1000)
 
