@@ -23,11 +23,9 @@ import collect.collect_predicted_values
 
 """
 Local test for feature ablation for SVC classification only, will use new prediction structure once it works
-
 https://www.samueltaylor.org/articles/feature-importance-for-any-model.html
 https://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_digits.html#sphx-glr-auto-examples-feature-selection-plot-rfe-digits-py
 https://scikit-learn.org/stable/modules/feature_selection.html#recursive-feature-elimination
-
 @author: Laurent Pereira
 """
 
@@ -204,7 +202,6 @@ def score_model1(predictor, X_train, X_test, y_train, y_test, kernel):  # the "i
     # return metrics.f1_score(y_test, y_pred)
     print(metrics.mean_squared_error(y_test, y_pred))
     return metrics.mean_squared_error(y_test, y_pred)
-
 
 
 

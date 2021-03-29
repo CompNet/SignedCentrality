@@ -115,7 +115,7 @@ if __name__ == '__main__':
     print("\nSVR :")
     prediction.regression.perform_regression(features, output3, kernel)
     print("\nLinear Regression :")
-    prediction.regression.perform_linear_regression(features, output3)
+    # prediction.regression.perform_linear_regression(features, output3)
     print("\nMLP Regression :")
     prediction.regression.perform_mlp_regression(features, output3)
 
@@ -130,11 +130,16 @@ if __name__ == '__main__':
     print("\nSVR :")
     prediction.regression.perform_regression(features, output5, kernel)
 
-    # feature ablation test
-    print("Task: feature ablation")
-    # prediction.feature_ablation.feature_ablation(features, output2, kernel)
-    # prediction.feature_ablation.feature_ablation_1(features, output2, kernel)
-    prediction.feature_ablation.feature_ablation_1(features, output1, kernel)
+    # feature ablation task
+    print("\nTask: feature ablation")
+    print("\nSVC :")
+    prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
+    print("\nSVR :")
+    prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
+    print("\nLinear Regression :")
+    prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
+    print("\nMLP Regression :")
+    # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
 
     compare_hyper_parameters(features)
 
