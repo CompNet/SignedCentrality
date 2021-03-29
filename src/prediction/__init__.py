@@ -47,10 +47,10 @@ def import_data(features, output):
     :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
     """
 
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + "_full.csv"), usecols=output)
+    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + consts.CSV), usecols=output)
     Y = df.to_numpy()
 
-    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + "_full.csv"), usecols=features)
+    df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_FEATURES + consts.CSV), usecols=features)
     X = df.to_numpy()
 
     scaler = StandardScaler()
