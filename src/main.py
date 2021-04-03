@@ -112,7 +112,7 @@ if __name__ == '__main__':
     output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
     print("Task:", *output2)
     print("\nSVC :")
-    prediction.classification.perform_classification(features, output2, kernel)
+    prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
     print("\nRandom Forest :")
     prediction.random_forest_classification.perform_classification(features, output2, 1000)
 
