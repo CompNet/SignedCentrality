@@ -281,11 +281,11 @@ def compare_hyper_parameters(features, *tasks):
         ],
         # consts.MLP.ALPHA: [0.0001],
         # consts.MLP.BATCH_SIZE: [consts.MLP.AUTO],
-        # consts.MLP.LEARNING_RATE: [
-        #     consts.MLP.CONSTANT,
-        #     consts.MLP.INVSCALING,
-        #     consts.MLP.ADAPTIVE,
-        # ],
+        consts.MLP.LEARNING_RATE: [
+            consts.MLP.CONSTANT,
+            consts.MLP.INVSCALING,
+            consts.MLP.ADAPTIVE,
+        ],
         # consts.MLP.LEARNING_RATE_INIT: [0.001],
         # consts.MLP.POWER_T: [0.5],
         # consts.MLP.MAX_ITER: max_iter,
@@ -296,10 +296,10 @@ def compare_hyper_parameters(features, *tasks):
         # consts.MLP.WARM_START: [False],
         # consts.MLP.MOMENTUM: [0.9],
         # consts.MLP.NESTEROVS_MOMENTUM: [True],
-        # consts.MLP.EARLY_STOPPING: [
-        #     True,
-        #     False
-        # ],
+        consts.MLP.EARLY_STOPPING: [
+            True,
+            # False
+        ],
         # consts.MLP.VALIDATION_FRACTION: [0.1],
         # consts.MLP.BETA_1: [0.9],
         # consts.MLP.BETA_2: [0.999],
