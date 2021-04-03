@@ -25,8 +25,12 @@ def __make_file_path(graphic_title, plot_type: str = None, add_plot_to_name=True
     :return: the computed path
     """
 
+    file_path = path.get_graphics_folder_path()
+    if not os.path.isdir(file_path):
+        os.makedirs(file_path)
+
     return os.path.join(
-        path.get_graphics_folder_path(),
+        file_path,
         str(
             graphic_title +
             str(
