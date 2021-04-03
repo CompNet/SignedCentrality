@@ -13,8 +13,13 @@ import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
 import prediction.regression
+
+import prediction.random_forest_classification
+
 import prediction.feature_ablation
 from prediction.hyper_parameters import compare_hyper_parameters
+
+from imblearn.under_sampling import EditedNearestNeighbours
 
 # =====================================
 GRAPH_SIZES = [20,24]
@@ -78,20 +83,20 @@ if __name__ == '__main__':
         [consts.PREFIX_MEAN+consts.CENTR_EIGEN],
         [consts.PREFIX_STD+consts.CENTR_EIGEN]
     ]
-
+     
     features = list(itertools.chain.from_iterable(features_list))
-    # print(features)
-
-    print("\n", "".join(["#" for _ in range(1, 80)]), sep="", end="\n\n")
-    print("Tests:", sep="", end="\n\n")
-
+    print(features)
     output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    print("Task:", *output)
+    print(output)
     kernel = consts.PREDICTION_KERNEL_LINEAR
+
+
     # print(kernel)
     # classification task : one or more solutions
     print("\nSVC :")
-    prediction.classification.perform_classification(features, output, kernel)
+    prediction.classification.perform_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3))
+    print("\nRandom Forest :")
+    prediction.random_forest_classification.perform_classification(features, output, 1000)
 
     # regression task : number of solutions
     output1 = [consts.OUTPUT_NB_SOLUTIONS]
@@ -107,7 +112,10 @@ if __name__ == '__main__':
     output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
     print("Task:", *output2)
     print("\nSVC :")
-    prediction.classification.perform_classification(features, output2, kernel)
+    prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
+    print("\nRandom Forest :")
+    prediction.random_forest_classification.perform_classification(features, output2, 1000)
+
 
     # regression task : number of classes of solution
     output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
