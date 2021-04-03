@@ -71,8 +71,11 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
         plt.ylabel(y_label)
 
     max_char_number_per_line = 48
-    char_number = max(*[len(arg) for arg in args[0]])
-    if len(args[0]) * char_number > max_char_number_per_line:
+    try:
+        char_number = max(*[len(arg) for arg in args[0]], -1)  # -1 because if there is only one value, it is the second one.
+        if len(args[0]) * char_number > max_char_number_per_line:
+            plt.xticks(rotation=-45)
+    except:
         plt.xticks(rotation=-45)
 
     plt.savefig(path_to_file)

@@ -298,7 +298,7 @@ def read_csv(path: str, remove_headers=True):
     return matrix
 
 
-def write_csv(path: str, matrix):
+def write_csv(path: str, matrix, append=False):
     """
     Create a CSV file from a matrix
 
@@ -307,10 +307,12 @@ def write_csv(path: str, matrix):
     :param matrix: matrix to write
     :type matrix: list of lists
     :return: the matrix containing data
+    :param append: True if file must not be overwritten
+    :type append: bool
     :rtype: None
     """
 
-    with open(path, 'w') as file:
+    with open(path, 'w' if not append else 'a') as file:
         writer(file, Dialect.delimiter).writerows([[str(col) for col in row] for row in matrix])
 
 
