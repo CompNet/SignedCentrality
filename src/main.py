@@ -142,6 +142,7 @@ if __name__ == '__main__':
     # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
 
     # Hyper-parameters comparison
-    compare_hyper_parameters(features)
+    print("\nCompare Hyper-Parameters")
+    compare_hyper_parameters(features)  # Add outputs here to select comparisons to perform.
 
 
