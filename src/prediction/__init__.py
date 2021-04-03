@@ -15,6 +15,19 @@ import prediction
 from collect.collect_predicted_values import collect_predicted_values
 import collect.collect_graphics
 from path import get_csv_folder_path
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.under_sampling import NearMiss
+from imblearn.under_sampling import CondensedNearestNeighbour
+from imblearn.under_sampling import TomekLinks
+from imblearn.under_sampling import EditedNearestNeighbours
+from imblearn.under_sampling import OneSidedSelection
+from imblearn.under_sampling import NeighbourhoodCleaningRule
+from imblearn.over_sampling import RandomOverSampler
+from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import BorderlineSMOTE
+from imblearn.over_sampling import SVMSMOTE
+from imblearn.over_sampling import ADASYN
+
 
 """
 This package contains functions related to the classification and regression.
@@ -42,7 +55,7 @@ def import_data(features, output):
 
     scaler = StandardScaler()
     # scaler.fit(X[:,0].reshape(-1,1))
-    # X[:,0] = scaler.transform(X[:,0].reshape(-1,1)).reshape(-1)
+    # X[:,0] = scaler.transform(X[:,0].reshape(-1,1)).reshape(-1) consts.CSV
     scaler.fit(X)
     X = scaler.transform(X)
 
@@ -63,7 +76,7 @@ def split_data(X, Y):
     return X_train, X_test, Y_train, Y_test
 
 
-def perform_imbalance_correction(X, Y):
+def perform_imbalance_correction(X, Y, imbalance_correction_method):
     """
     Perform imbalance correction
 
@@ -72,10 +85,11 @@ def perform_imbalance_correction(X, Y):
     :return: Corrected X and Y
     """
 
-    return X, Y
+    # fit and apply the transform
+    return imbalance_correction_method.fit_resample(X, Y)
 
 
-def initialize_data(features, output, imbalance_correction=False):
+def initialize_data(features, output, imbalance_correction_method=False):
     """
     Initialize input and output sets for training and tests
 
@@ -94,8 +108,8 @@ def initialize_data(features, output, imbalance_correction=False):
     # =======================================================
     # Imbalance correction
     # =======================================================
-    if imbalance_correction:
-        X, Y = perform_imbalance_correction(X, Y)
+    if imbalance_correction_method:
+        X, Y = perform_imbalance_correction(X, Y, imbalance_correction_method=imbalance_correction_method)
 
     # =======================================================
     # Split data intro train and test sets
@@ -184,7 +198,7 @@ def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_resul
     return prediction_metrics_results
 
 
-def perform_prediction(model_class, default_values, features, output, test_function, print_results=True, export_predicted_values=True, export_graphical_results=True, print_stack_trace=False, **kwargs):
+def perform_prediction(model_class, default_values, features, output, test_function, print_results=True, export_predicted_values=True, export_graphical_results=True, print_stack_trace=False, imbalance_correction_method=False, **kwargs):
     """This method performs the task of prediction for a single output.
 
     :param model_class: prediction technique
@@ -201,7 +215,7 @@ def perform_prediction(model_class, default_values, features, output, test_funct
     # =======================================================
     #  Initialization
     # =======================================================
-    X_train, X_test, Y_train, Y_test = initialize_data(features, output)
+    X_train, X_test, Y_train, Y_test = initialize_data(features, output, imbalance_correction_method=imbalance_correction_method)
     hyper_parameters = initialize_hyper_parameters(default_values, kwargs)
 
     # =======================================================
