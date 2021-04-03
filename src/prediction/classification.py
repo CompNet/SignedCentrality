@@ -25,6 +25,7 @@ from prediction import initialize_hyper_parameters, initialize_data, process_gra
     perform_prediction
 
 
+
 def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=False):
     """
     Perform validation tests for classification
@@ -44,7 +45,7 @@ def test_classification(cla, X_test, Y_test, output, print_results=True, export_
     return test_prediction(cla, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
 
-def perform_svc_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=False, **kwargs):
+def perform_svc_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=False, imbalance_correction_method=False, **kwargs):
     """This method performs the task of classification for a single output.
 
     The classification is computed using SVM.
@@ -61,11 +62,11 @@ def perform_svc_classification(features, output, print_results=True, export_pred
         "kernel": consts.PREDICTION_KERNEL_LINEAR,
     }
 
-    return perform_prediction(svm.SVC, default_values, features, output, test_classification, print_results, export_predicted_values, export_graphical_results, **kwargs)
+    return perform_prediction(svm.SVC, default_values, features, output, test_classification, print_results, export_predicted_values, export_graphical_results, imbalance_correction_method=imbalance_correction_method, **kwargs)
 
 
 @deprecated("This function is deprecated, use 'perform_svc_classification()' instead")
-def perform_classification(features, output, kernel):
+def perform_classification(features, output, kernel, imbalance_correction_method=False):
     """
     Alias for perform_svc_classification().
 
@@ -78,5 +79,5 @@ def perform_classification(features, output, kernel):
     :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
     """
 
-    return perform_svc_classification(features, output, kernel=kernel)
+    return perform_svc_classification(features, output, kernel=kernel, imbalance_correction_method=imbalance_correction_method)
 
