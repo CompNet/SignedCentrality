@@ -1,87 +1,82 @@
-'''
-Created on Sep 23, 2020
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+This module contains functions related classification computing.
+
+.. note: https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
+.. note: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
+.. note: https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
+.. note: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+.. note: https://scikit-learn.org/stable/modules/model_evaluation.html#clustering-metrics
 
 @author: nejat
-'''
+@author: Virgile Sucal
+@author: Laurent Pereira
+"""
 
-import os
-import consts
-import path
-
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-# Import train_test_split function
-from sklearn.model_selection import train_test_split
-#Import svm model
-from sklearn import svm
-#Import scikit-learn metrics module for accuracy calculation
+from sys import stderr
+from deprecated import deprecated
 from sklearn import metrics
+from sklearn import svm
+import consts
+from collect.collect_predicted_values import collect_predicted_values
+from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction, \
+    perform_prediction
 
 
-# https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
-# https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
-# https://scikit-learn.org/stable/modules/metrics.html#linear-kernel
-# https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
-
-# TODO: 
-# - k fold test
-def perform_classification(features, output, kernel):
-    """This method performs the task of classification for a single output.
-       
-    :param features: a list of features
-    :type features: string list
-    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :type output: string
-    :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
-    :type kernel: string
+def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=False):
     """
-    # =======================================================
-    # Read features and output from file
-    # =======================================================
-    df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS+".csv"), usecols=output)
-    Y = df.to_numpy()
-    
-    df = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_FEATURES+".csv"), usecols=features)
-    X = df.to_numpy()
-    
-    scaler = StandardScaler()
-    #scaler.fit(X[:,0].reshape(-1,1))
-    #X[:,0] = scaler.transform(X[:,0].reshape(-1,1)).reshape(-1)
-    scaler.fit(X)
-    X = scaler.transform(X)
-    
-    # =======================================================
-    # Split data intro train and test sets
-    # =======================================================
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=109) # 70% training and 30% test
-    Y_train =  Y_train.ravel() # convert into 1D array, due to the warning from 'train_test_split'
-    
-    # =======================================================
-    #  Train: Create a svm Classifier
-    # =======================================================
-    # >> other params: gamma, max_iter, degree, decision_function_shape, shrinking
-    clf = svm.SVC(kernel=kernel) 
-    clf.fit(X_train, Y_train)
-    
-    # =======================================================
-    # Test: Predict the response for test dataset
-    # =======================================================
-    Y_pred = clf.predict(X_test)
-    
-    # =======================================================
-    # Metrics
-    # =======================================================
-    print("F1 score:", metrics.f1_score(Y_test, Y_pred))
-    
-    # Model Accuracy: how often is the classifier correct?
-    #print("Accuracy:", metrics.accuracy_score(Y_test, Y_pred))
-    # Model Precision: what percentage of positive tuples are labeled as such?
-    #print("Precision:", metrics.precision_score(Y_test, Y_pred))
-    # Model Recall: what percentage of positive tuples are labelled as such?
-    #print("Recall:", metrics.recall_score(Y_test, Y_pred))
-    
-    # Regression metrics for training : mean_squared_error
-    #print("mean squared error:", metrics.mean_squared_error(Y_test, Y_pred))
-    
-    
+    Perform validation tests for classification
+
+    :param cla: trained classification model
+    :param X_test: input test data
+    :param Y_test: output test data
+    """
+
+    prediction_metrics = [
+        metrics.f1_score,  # Best value: 1
+        metrics.accuracy_score,  # Best value: 1 if normalize == True, else the number of correctly classified samples
+        metrics.precision_score,  # Best value: 1
+        metrics.recall_score  # Best value: 1
+    ]
+
+    return test_prediction(cla, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
+
+
+def perform_svc_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=False, **kwargs):
+    """This method performs the task of classification for a single output.
+
+    The classification is computed using SVM.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param print_results: True if metrics results must be printed
+    :param export_predicted_values: True if predicted values must be exported
+    :param export_graphical_results: True if graphical results must be exported
+    """
+
+    # Set default values for hyper parameters:
+    default_values = {
+        "kernel": consts.PREDICTION_KERNEL_LINEAR,
+    }
+
+    return perform_prediction(svm.SVC, default_values, features, output, test_classification, print_results, export_predicted_values, export_graphical_results, **kwargs)
+
+
+@deprecated("This function is deprecated, use 'perform_svc_classification()' instead")
+def perform_classification(features, output, kernel):
+    """
+    Alias for perform_svc_classification().
+
+    This function is deprecated, use 'perform_svc_classification()' instead
+    It hasn't been deleted for compatibility with previous versions.
+    It should not be used in new functions.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
+    """
+
+    return perform_svc_classification(features, output, kernel=kernel)
+

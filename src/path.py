@@ -147,3 +147,10 @@ def get_plot_folder_path(n, l0, d, prop_mispl, prop_neg, network_no, network_des
                         "propNeg="+util.format_4digits(prop_neg), "network="+str(network_no),
                         network_desc)
     return path
+
+
+def get_graphics_folder_path():
+    """This method returns the path of the csv folder
+
+    """
+    return consts.GRAPHICS_FOLDER
