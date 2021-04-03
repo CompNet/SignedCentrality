@@ -26,19 +26,14 @@ This package contains functions related to the classification and regression.
 """
 
 
-def initialize_data(features, output):
+def import_data(features, output):
     """
-    Initialize input and output sets for training and tests
+    Import data
 
     :param features: a list of features
-    :type features: string list
     :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-    :type output: string
     """
 
-    # =======================================================
-    # Read features and output from file
-    # =======================================================
     df = pd.read_csv(os.path.join(get_csv_folder_path(), consts.FILE_CSV_OUTPUTS + consts.CSV), usecols=output)
     Y = df.to_numpy()
 
@@ -51,13 +46,61 @@ def initialize_data(features, output):
     scaler.fit(X)
     X = scaler.transform(X)
 
-    # =======================================================
-    # Split data intro train and test sets
-    # =======================================================
+    return X, Y
+
+
+def split_data(X, Y):
+    """
+    Split data
+
+    :param X: Input data
+    :param Y: Output data
+    """
+
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=109)  # 70% training and 30% test
     Y_train = Y_train.ravel()  # convert into 1D array, due to the warning from 'train_test_split'
 
     return X_train, X_test, Y_train, Y_test
+
+
+def perform_imbalance_correction(X, Y):
+    """
+    Perform imbalance correction
+
+    :param X: Input data
+    :param Y: Output data
+    :return: Corrected X and Y
+    """
+
+    return X, Y
+
+
+def initialize_data(features, output, imbalance_correction=False):
+    """
+    Initialize input and output sets for training and tests
+
+    :param features: a list of features
+    :type features: string list
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :type output: string
+    :param imbalance_correction: True if imbalance correction must be performed
+    """
+
+    # =======================================================
+    # Read features and output from file
+    # =======================================================
+    X, Y = import_data(features, output)
+
+    # =======================================================
+    # Imbalance correction
+    # =======================================================
+    if imbalance_correction:
+        X, Y = perform_imbalance_correction(X, Y)
+
+    # =======================================================
+    # Split data intro train and test sets
+    # =======================================================
+    return split_data(X, Y)
 
 
 def initialize_hyper_parameters(default_values, user_defined_values):

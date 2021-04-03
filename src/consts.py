@@ -23,7 +23,7 @@ CENTR_FOLDER = os.path.join(OUT_FOLDER, "centralities")
 STAT_FOLDER = os.path.join(OUT_FOLDER, "stats")
 PLOT_FOLDER = os.path.join(OUT_FOLDER, "plots")
 GRAPHICS_FOLDER = os.path.join(OUT_FOLDER, "graphics")
-
+BEST_PARAM_SET = 'best_parameters_sets' + CSV
 
 # ===========================
 # Other Variables

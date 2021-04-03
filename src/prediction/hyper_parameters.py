@@ -6,8 +6,9 @@ This module contains functions related to hyper parameters tes and comparison.
 
 @author: Virgile Sucal
 """
+import os
 from math import isnan
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, join, isdir, exists, isfile
 from sys import stderr
 from deprecated import deprecated
 from sklearn import metrics
@@ -213,7 +214,26 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
     return best_param_set
 
 
-def compare_hyper_parameters(features):
+def export_best_params_set(output, prediction_function, best_param_set):
+    """
+    Create a CSV file containing best parameters sets for each prediction tasks and prediction functions.
+
+    :param output: prediction task
+    :param prediction_function: prediction technique
+    :param best_param_set: best parameters
+    """
+
+    param_names = [param_name for param_name in best_param_set[0][1].keys()]
+    headers = ['output', 'prediction_function', 'param_names', 'metric', 'metric_value']
+    ordered_results = [[output, prediction_function.__name__, ", ".join([str(param_name) + '=' + str(bps[1][param_name]) for param_name in param_names]) , bps[0], bps[2]] for bps in best_param_set]
+
+    file_path = join(get_csv_folder_path(), consts.BEST_PARAM_SET)
+    if not isfile(file_path):
+        write_csv(file_path, [headers])
+    write_csv(file_path, ordered_results, append=True)
+
+
+def compare_hyper_parameters(features, *tasks):
     """
     Compare all hyper parameters combinations for all predictors
 
@@ -261,11 +281,11 @@ def compare_hyper_parameters(features):
         ],
         # consts.MLP.ALPHA: [0.0001],
         # consts.MLP.BATCH_SIZE: [consts.MLP.AUTO],
-        # consts.MLP.LEARNING_RATE: [
-        #     consts.MLP.CONSTANT,
-        #     consts.MLP.INVSCALING,
-        #     consts.MLP.ADAPTIVE,
-        # ],
+        consts.MLP.LEARNING_RATE: [
+            consts.MLP.CONSTANT,
+            consts.MLP.INVSCALING,
+            consts.MLP.ADAPTIVE,
+        ],
         # consts.MLP.LEARNING_RATE_INIT: [0.001],
         # consts.MLP.POWER_T: [0.5],
         # consts.MLP.MAX_ITER: max_iter,
@@ -276,10 +296,10 @@ def compare_hyper_parameters(features):
         # consts.MLP.WARM_START: [False],
         # consts.MLP.MOMENTUM: [0.9],
         # consts.MLP.NESTEROVS_MOMENTUM: [True],
-        # consts.MLP.EARLY_STOPPING: [
-        #     True,
-        #     False
-        # ],
+        consts.MLP.EARLY_STOPPING: [
+            True,
+            # False
+        ],
         # consts.MLP.VALIDATION_FRACTION: [0.1],
         # consts.MLP.BETA_1: [0.9],
         # consts.MLP.BETA_2: [0.999],
@@ -346,10 +366,19 @@ def compare_hyper_parameters(features):
         consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
     }
 
+    # Reset best parameters export:
+    best_param_sets_path = join(get_csv_folder_path(), consts.BEST_PARAM_SET)
+    if exists(best_param_sets_path):
+        os.remove(best_param_sets_path)
+
     for output, prediction_functions in outputs.items():
+        if len(tasks) > 0 and output not in tasks:
+            continue
         for prediction_function, params_ranges in prediction_functions.items():
             print("####", output, ":", prediction_function.__name__, "####")
             best_param_set = test_hyper_parameters(prediction_function, features, [output], **params_ranges)
+            export_best_params_set(output, prediction_function, best_param_set)
+
             print("Best parameters sets:")
             for (metric_name, metric_best_param_set, metric_value) in best_param_set:
                 print("\tMetric:", metric_name, "=", metric_value)
