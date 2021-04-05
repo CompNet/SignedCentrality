@@ -123,7 +123,7 @@ if __name__ == '__main__':
     print("\nSVR :")
     prediction.regression.perform_regression(features, output3, kernel)
     print("\nLinear Regression :")
-    # prediction.regression.perform_linear_regression(features, output3)
+    prediction.regression.perform_linear_regression(features, output3)
     print("\nMLP Regression :")
     prediction.regression.perform_mlp_regression(features, output3)
 
@@ -142,6 +142,8 @@ if __name__ == '__main__':
     print("\nTask: feature ablation")
     print("\nSVC :")
     prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
+    print("\nRandomForestClassifier :")
+    prediction.feature_ablation.feature_ablation_random_forest_classification(features, output2)
     print("\nSVR :")
     prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
     print("\nLinear Regression :")
@@ -152,5 +154,12 @@ if __name__ == '__main__':
     # Hyper-parameters comparison
     print("\nCompare Hyper-Parameters")
     compare_hyper_parameters(features)  # Add outputs here to select comparisons to perform.
+
+
+    # feature ablation classification tests (TODO delete once tests finished)
+    """import prediction.tmp_feature_ablation
+    prediction.tmp_feature_ablation.feature_ablation_svc_classification_eq_sol(features, output)
+    prediction.tmp_feature_ablation.feature_ablation_svc_classification_eq_solclass(features, output2)"""
+
 
 
