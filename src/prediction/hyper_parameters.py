@@ -17,6 +17,8 @@ from collect.collect_graphics import generate_plot, generate_errorbar_plot
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
+from prediction.classification import perform_svc_classification
+from prediction.random_forest_classification import perform_random_forest_classification
 from util import write_csv, ProgressBar
 from path import get_csv_folder_path
 
@@ -325,6 +327,36 @@ def compare_hyper_parameters(features):
         ],
     }
 
+    random_forest_params_ranges = {
+        "n_estimators": [
+            1,
+            10,
+            50,
+            100,    # Default value
+            500,
+            1000,
+            5000,
+            10000,
+        ],
+        "max_depth": [
+            None,   # Default value
+            1,
+            5,
+            10,
+            20,
+        ],
+        "min_samples_split": [
+            2,  # Default value
+            5,
+            10,
+        ],
+        "min_samples_leaf": [
+            1,  # Default value
+            5,
+            10,
+        ],
+    }
+
     svr_params_ranges = {
         **svm_main_params_ranges,
     }
@@ -336,14 +368,15 @@ def compare_hyper_parameters(features):
     }
 
     classification_functions = {
-        # perform_svc_classification: svc_params_ranges,
+        #perform_svc_classification: svc_params_ranges,
+        perform_random_forest_classification: random_forest_params_ranges,
     }
 
     outputs = {
-        # consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
-        consts.OUTPUT_NB_SOLUTIONS: regression_functions,
-        # consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES: classification_functions,
-        consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
+        consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
+        # consts.OUTPUT_NB_SOLUTIONS: regression_functions,
+        consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES: classification_functions,
+        # consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
     }
 
     for output, prediction_functions in outputs.items():
