@@ -10,6 +10,10 @@ from sklearn import metrics
 # ===========================
 # Path variables
 # ===========================
+from centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+from centrality.eigenvector_centrality import compute_eigenvector_centrality
+from node_embeddings.sne.sne_embedding import SNEEmbedding
+
 CSV = ".csv"
 TXT = ".txt"
 PNG = ".png"
@@ -102,6 +106,7 @@ PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
 
 # embeddings
+EMB_SNE = "sne"
 SNE_SAVE_PATH_NAME = "save_path"
 SNE_TRAIN_DATA_NAME = "train_data"
 SNE_LABEL_DATA_NAME = "label_data"
@@ -190,3 +195,11 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
     metrics.mean_absolute_error.__name__: 0,
 }
 
+# Graph descriptors
+GRAPH_DESCRIPTORS = {
+    CENTR_DEGREE_NEG: NegativeCentrality.undirected,
+    CENTR_DEGREE_POS: PositiveCentrality.undirected,
+    CENTR_DEGREE_PN: PNCentrality.undirected,
+    CENTR_EIGEN: compute_eigenvector_centrality,
+    EMB_SNE: SNEEmbedding.undirected,
+}
