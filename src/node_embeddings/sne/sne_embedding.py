@@ -132,6 +132,11 @@ class SNEEmbedding(NodeEmbedding):
 	Length of a random walk
 	"""
 
+	FLAGS_ALREADY_SET = False
+	"""
+	True if Tensorflow flags have already been set.
+	"""
+
 	@staticmethod
 	def __initialize_directories():
 		"""
@@ -223,17 +228,19 @@ class SNEEmbedding(NodeEmbedding):
 		# Flags Initialization:
 		# tf.app.flags._global_parser = ArgumentParser()
 		flags = tf.app.flags
-		flags.DEFINE_string(SNE_SAVE_PATH_NAME, SNEEmbedding.SAVE_PATH, "Directory to write the model and training summaries.")
-		flags.DEFINE_string(SNE_TRAIN_DATA_NAME, SNEEmbedding.TRAIN_DATA, "Training text file.")
-		flags.DEFINE_string(SNE_LABEL_DATA_NAME, SNEEmbedding.LABEL_DATA, "Nodes labels text file.")
-		flags.DEFINE_string(SNE_WALKS_DATA_NAME, SNEEmbedding.WALKS_DATA, "Random walks on data")
-		flags.DEFINE_integer(SNE_EMBEDDING_SIZE_NAME, SNEEmbedding.EMBEDDING_SIZE, "The embedding dimension size.")
-		flags.DEFINE_integer(SNE_SAMPLES_TO_TRAIN_NAME, SNEEmbedding.SAMPLES_TO_TRAIN, "Number of samples to train(*Million).")
-		flags.DEFINE_float(SNE_LEARNING_RATE_NAME, SNEEmbedding.LEARNING_RATE, "Initial learning rate.")
-		flags.DEFINE_integer(SNE_NUM_SAMPLED_NAME, SNEEmbedding.NUM_SAMPLED, "The number of classes to randomly sample per batch.")
-		flags.DEFINE_integer(SNE_CONTEXT_SIZE_NAME, SNEEmbedding.CONTEXT_SIZE, "The number of context nodes .")
-		flags.DEFINE_integer(SNE_BATCH_SIZE_NAME, SNEEmbedding.BATCH_SIZE, "Number of training examples processed per step.")
-		flags.DEFINE_boolean(SNE_IS_TRAIN_NAME, SNEEmbedding.IS_TRAIN, "Train or restore")
+
+		if not SNEEmbedding.FLAGS_ALREADY_SET:
+			flags.DEFINE_string(SNE_SAVE_PATH_NAME, SNEEmbedding.SAVE_PATH, "Directory to write the model and training summaries.")
+			flags.DEFINE_string(SNE_TRAIN_DATA_NAME, SNEEmbedding.TRAIN_DATA, "Training text file.")
+			flags.DEFINE_string(SNE_LABEL_DATA_NAME, SNEEmbedding.LABEL_DATA, "Nodes labels text file.")
+			flags.DEFINE_string(SNE_WALKS_DATA_NAME, SNEEmbedding.WALKS_DATA, "Random walks on data")
+			flags.DEFINE_integer(SNE_EMBEDDING_SIZE_NAME, SNEEmbedding.EMBEDDING_SIZE, "The embedding dimension size.")
+			flags.DEFINE_integer(SNE_SAMPLES_TO_TRAIN_NAME, SNEEmbedding.SAMPLES_TO_TRAIN, "Number of samples to train(*Million).")
+			flags.DEFINE_float(SNE_LEARNING_RATE_NAME, SNEEmbedding.LEARNING_RATE, "Initial learning rate.")
+			flags.DEFINE_integer(SNE_NUM_SAMPLED_NAME, SNEEmbedding.NUM_SAMPLED, "The number of classes to randomly sample per batch.")
+			flags.DEFINE_integer(SNE_CONTEXT_SIZE_NAME, SNEEmbedding.CONTEXT_SIZE, "The number of context nodes .")
+			flags.DEFINE_integer(SNE_BATCH_SIZE_NAME, SNEEmbedding.BATCH_SIZE, "Number of training examples processed per step.")
+			flags.DEFINE_boolean(SNE_IS_TRAIN_NAME, SNEEmbedding.IS_TRAIN, "Train or restore")
 
 		for key, value in kwargs.items():
 			if key in [SNE_EMBEDDING_SIZE_NAME, SNE_SAMPLES_TO_TRAIN_NAME, SNE_NUM_SAMPLED_NAME, SNE_CONTEXT_SIZE_NAME, SNE_BATCH_SIZE_NAME]:
