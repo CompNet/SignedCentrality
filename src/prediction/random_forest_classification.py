@@ -61,7 +61,7 @@ def test_classification(cla, X_test, Y_test, output, print_results=True, export_
     return test_prediction(cla, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
 
-def perform_random_forest_classification(features, output, n_estimators, max_depth, min_samples_split, min_samples_leaf, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
+def perform_random_forest_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, **kwargs):
     """This method performs the task of classification for a single output.
 
     The classification is computed using SVM.
@@ -75,10 +75,10 @@ def perform_random_forest_classification(features, output, n_estimators, max_dep
 
     # Set default values for hyper parameters:
     default_values = {
-        "n_estimators": n_estimators,
-        "max_depth": max_depth,
-        "min_samples_split": min_samples_split,
-        "min_samples_leaf" : min_samples_leaf,
+        "n_estimators": 1000,
+        "max_depth": None,
+        "min_samples_split": 2,
+        "min_samples_leaf" : 1,
     }
 
     return perform_prediction(RandomForestClassifier, default_values, features, output, test_classification, print_results, export_predicted_values, export_graphical_results, **kwargs)
