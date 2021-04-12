@@ -272,7 +272,7 @@ def generate_boxplot(outputs_values, predicted_values, graphic_title):
     return generate_boxplot_clean(outputs_values, predicted_values, graphic_title)
 
 
-def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
+def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, interval_value=10, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
     """This method generate a boxplot using matplotlib.pyplot
 
     :param outputs_values: a list of values used for the Y Axis
@@ -281,6 +281,8 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, add_
     :type predicted_values: integer list
     :param graphic_title: the title of the graphic
     :type graphic_title: string
+    :param interval_value: Value used to set the interval range (initial value : 10)
+    :type interval_value: integer
     :param add_plot_to_name: True if plot type must be added
     :param dash_between_name_and_plot: True if plot type must be preceded by a dash
     :param verbose: True if information must be printed
@@ -292,7 +294,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, add_
     data = []  # will contain multiples dataset, each one stands fora different boxplot
     outputs_dictionary = {}  # will contain position of elements from outputs_values_updated
     x_axis_names = []  # will contain labels for the x axis
-    interval_value = 10  # Value used to set the interval range (initial value : 10)
+    # interval_value = 10  # Value used to set the interval range (initial value : 10)
 
     # Initial setup for file saving
     graphic_title = str(graphic_title)
@@ -326,6 +328,88 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, add_
     # collecting predicted values at the corresponding indexes
     for i in range(1, int(max_output), interval_value):  # loop from 1 to the max value of the list, with a step of 10
         tmp = i + (interval_value - 1)
+        tmp_string = str(i) + ":" + str(tmp)
+        tmp_index_list = outputs_dictionary[tmp_string]
+        tmp_list = []
+        if len(tmp_index_list) == 0:
+            data.append([])
+        else:
+            for x in tmp_index_list:
+                # tmp_list.append(float(predicted_values_updated[x]))
+                tmp_list.append(float(predicted_values_updated[x]) - float(outputs_values_updated[x]))
+            data.append(tmp_list)
+
+    # Generating boxplot
+    print("Generating boxplot for "+graphic_title, "\n")
+    axes = plt.gca()
+    plt.boxplot(data)
+    plt.title(graphic_title)
+    axes.set_xticklabels(x_axis_names)
+    plt.xticks(rotation=-90)
+    plt.tight_layout()
+    plt.savefig(path_to_file)
+    plt.close()
+
+
+def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, interval_value=10, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
+    """This method is nearly the same as generate_boxplot_clean, but I modified the interval range to be more modulable if there is a very large scale of solutions
+    It generate a boxplot using matplotlib.pyplot
+
+    :param outputs_values: a list of values used for the Y Axis
+    :type outputs_values: integer list
+    :param predicted_values: a list of values used for the Y Axis
+    :type predicted_values: integer list
+    :param graphic_title: the title of the graphic
+    :type graphic_title: string
+    :param interval_value: Value used to set the interval range (initial value : 10)
+    :type interval_value: integer
+    :param add_plot_to_name: True if plot type must be added
+    :param dash_between_name_and_plot: True if plot type must be preceded by a dash
+    :param verbose: True if information must be printed
+    """
+
+    # Variables Initialisation
+    outputs_values_updated = []  # will contain all outputs values
+    predicted_values_updated = []  # will contain all predicted values
+    data = []  # will contain multiples dataset, each one stands fora different boxplot
+    outputs_dictionary = {}  # will contain position of elements from outputs_values_updated
+    x_axis_names = []  # will contain labels for the x axis
+    # interval_value = 10  # Value used to set the interval range (initial value : 10)
+
+    # Initial setup for file saving
+    graphic_title = str(graphic_title)
+    graphic_title = util.prediction_name_refactor(graphic_title)
+    # filename = graphic_title+"_boxplot.png"
+    # path_to_file = os.path.join(path.get_graphics_folder_path(), filename)
+    path_to_file = __make_file_path(graphic_title, "boxplot", add_plot_to_name, dash_between_name_and_plot)
+
+    # transforming dataset to list with same shape
+    for x in np.nditer(outputs_values):  # method to select all values inside the ndarray : https://numpy.org/doc/stable/reference/arrays.nditer.html
+        outputs_values_updated.append(float(x))
+
+    for y in np.nditer(predicted_values):
+        predicted_values_updated.append(float(y))
+
+    # collecting max and min value of outputs list
+    max_output = max(outputs_values_updated)
+    min_output = min(outputs_values_updated)
+    interval_range = int((max_output-min_output)/interval_value)
+
+    # adding all index of outputs into a dictionary
+    for i in range(1, int(max_output), interval_range):  # loop from the min value to the max value of the list, with a range calculated with interval_value and nb_iteration
+        tmp = i + (interval_range - 1)
+        tmp_string = str(i) + ":" + str(tmp)
+        outputs_dictionary[tmp_string] = 0  # adding an element to the dict with the key and an initial value
+        x_axis_names.append(tmp_string)
+        tmp_list = []  # temporary list that will contain the indexes of elements within the actual range
+        for x in outputs_values_updated:
+            if i <= x < tmp+1:
+                tmp_list.append(outputs_values_updated.index(x))  # If multiple occurrences of the same value, only the first index will be added
+        outputs_dictionary[tmp_string] = tmp_list
+
+    # collecting predicted values at the corresponding indexes
+    for i in range(1, int(max_output), interval_range):  # loop from 1 to the max value of the list, with a step of 10
+        tmp = i + (interval_range - 1)
         tmp_string = str(i) + ":" + str(tmp)
         tmp_index_list = outputs_dictionary[tmp_string]
         tmp_list = []
