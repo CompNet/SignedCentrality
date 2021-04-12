@@ -374,7 +374,7 @@ def compare_hyper_parameters(features, *tasks):
     }
 
     classification_functions = {
-        #perform_svc_classification: svc_params_ranges,
+        perform_svc_classification: svc_params_ranges,
         perform_random_forest_classification: random_forest_params_ranges,
     }
     outputs = {

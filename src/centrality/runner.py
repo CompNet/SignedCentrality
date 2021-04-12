@@ -66,7 +66,7 @@ def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_des
 
                 # write the centrality values into file (as the number of values as the number of lines)
                 ################################
-                # TODO: This code shouldn't be here: mean values should be coputed in SRWRCentrality.
+                # TODO: This code shouldn't be here: mean values should be computed in SRWRCentrality.
                 try:  # To avoid problems with SRWRCentrality
                     util.format_4digits(result[0])
                 except:
