@@ -329,31 +329,16 @@ def compare_hyper_parameters(features):
 
     random_forest_params_ranges = {
         "n_estimators": [
-            1,
-            10,
-            50,
-            100,    # Default value
-            500,
-            1000,
-            5000,
-            10000,
+            n for n in range(1000)
         ],
         "max_depth": [
-            None,   # Default value
-            1,
-            5,
-            10,
-            20,
+            n for n in range(100)
         ],
         "min_samples_split": [
-            2,  # Default value
-            5,
-            10,
+            n for n in range(100)
         ],
         "min_samples_leaf": [
-            1,  # Default value
-            5,
-            10,
+            n for n in range(100)
         ],
     }
 
@@ -368,8 +353,8 @@ def compare_hyper_parameters(features):
     }
 
     classification_functions = {
-        #perform_svc_classification: svc_params_ranges,
-        perform_random_forest_classification: random_forest_params_ranges,
+        perform_svc_classification: svc_params_ranges,
+        #perform_random_forest_classification: random_forest_params_ranges,
     }
 
     outputs = {
