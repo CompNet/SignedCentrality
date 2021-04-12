@@ -4,20 +4,12 @@ Created on Sep 23, 2020
 @author: nejat
 '''
 
-from numpy import array
-import node_embeddings
 import util
-import centrality.degree_centrality
-import centrality.eigenvector_centrality
 import consts
 import path
 import os
 from statistics import mean, stdev 
-
 import pandas as pd
-
-from node_embeddings import sne
-from node_embeddings.sne.sne_embedding import SNEEmbedding
 
 
 def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, graph_descriptors, force=False, verbose=False):

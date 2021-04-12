@@ -2,29 +2,22 @@
 @author: alexandre
 '''
 
-import math
 import pandas
 import numpy
 import sys
-import random
-import csv
 from sklearn import svm
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-
 import os
-from descriptors import GraphDescriptor
+from descriptors.__init__ import GraphDescriptor
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from util import get_matrix, scale_centrality
+from util import get_matrix
 from igraph import *
-
-from prediction.regression import perform_regression
-from centrality import CentralityMeasure
 import consts
 
 

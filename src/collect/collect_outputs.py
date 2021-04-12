@@ -12,13 +12,9 @@ Created on Sep 23, 2020
 '''
 
 import util
-import centrality.degree_centrality
-import centrality.eigenvector_centrality
 import consts
 import path
 import os
-from statistics import mean, stdev
-
 import pandas as pd
 
 

@@ -10,12 +10,12 @@ from sklearn import metrics
 # ===========================
 # Path variables
 # ===========================
-from centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
-from centrality.eigenvector_centrality import compute_eigenvector_centrality, EigenvectorCentrality
-from centrality.srwr_centrality import perform_srwr, SRWRCentrality
-from centrality.trolltrust_centrality import TrollTrust
-from descriptors import GraphDescriptor
-from node_embeddings.sne.sne_embedding import SNEEmbedding
+from descriptors.centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+from descriptors.centrality import EigenvectorCentrality
+from descriptors.centrality import SRWRCentrality
+from descriptors.centrality import TrollTrust
+from descriptors.__init__ import GraphDescriptor
+from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
 
 CSV = ".csv"
 TXT = ".txt"

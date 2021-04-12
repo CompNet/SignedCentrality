@@ -7,30 +7,14 @@ Created on Sep 23, 2020
 import itertools
 
 import consts
-import centrality.runner
 import stats.runner
 import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
 import prediction.regression
-import prediction.random_forest_classification
 import prediction.feature_ablation
 from prediction.hyper_parameters import compare_hyper_parameters
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.under_sampling import NearMiss
-from imblearn.under_sampling import CondensedNearestNeighbour
-from imblearn.under_sampling import TomekLinks
 from imblearn.under_sampling import EditedNearestNeighbours
-from imblearn.under_sampling import OneSidedSelection
-from imblearn.under_sampling import NeighbourhoodCleaningRule
-from imblearn.over_sampling import RandomOverSampler
-from imblearn.over_sampling import SMOTE
-from imblearn.over_sampling import BorderlineSMOTE
-from imblearn.over_sampling import SVMSMOTE
-from imblearn.over_sampling import ADASYN
-
-
-
 
 # =====================================
 GRAPH_SIZES = [20,24]
@@ -68,7 +52,7 @@ VERBOSE = False
 
 if __name__ == '__main__':
 
-    centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
+    descriptors.centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
 
     stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE, VERBOSE)
 
