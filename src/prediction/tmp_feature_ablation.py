@@ -19,6 +19,7 @@ from sklearn import metrics
 from sklearn.feature_selection import RFE
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
+from sklearn.ensemble import RandomForestClassifier
 
 import collect.collect_graphics
 import collect.collect_predicted_values
@@ -85,6 +86,8 @@ def perform_feature_ablation_eq_sol(predictor, default_values, features, output,
     rfe = RFE(estimator=model)
     rfe.fit(X_train, Y_train)
     ranking = rfe.ranking_
+    print(features)
+    print(ranking)  # Contains the rankings for each feature
 
     base_score = 0
     if is_classifier:
@@ -281,6 +284,7 @@ def feature_ablation_svc_classification_eq_sol(features, output, is_classifier=T
 
     return perform_feature_ablation_eq_sol(svm.SVC, default_values, features, output, "SVC_eq_sol", is_classifier, **kwargs)
 
+
 def feature_ablation_svc_classification_eq_solclass(features, output, is_classifier=True, **kwargs):
     """This method performs the task of feature ablation for a single output using a classifier.
 
@@ -297,3 +301,37 @@ def feature_ablation_svc_classification_eq_solclass(features, output, is_classif
     }
 
     return perform_feature_ablation_eq_solclass(svm.SVC, default_values, features, output, "SVC_eq_solclass", is_classifier, **kwargs)
+
+
+def feature_ablation_random_forest_classification_eq_sol(features, output, is_classifier=True, **kwargs):
+    """This method performs the task of feature ablation for a single output using a classifier.
+
+    The classifier used is RandomForestClassifier.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param is_classifier : a simple boolean saying if it's a classifier or a regresser
+    """
+    # Set default values for hyper parameters:
+    default_values = {
+        "n_estimators": 10000,
+    }
+
+    return perform_feature_ablation_eq_sol(RandomForestClassifier, default_values, features, output, "Random_Forest_eq_sol", is_classifier, **kwargs)
+
+
+def feature_ablation_random_forest_classification_eq_solclass(features, output, is_classifier=True, **kwargs):
+    """This method performs the task of feature ablation for a single output using a classifier.
+
+    The classifier used is RandomForestClassifier.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param is_classifier : a simple boolean saying if it's a classifier or a regresser
+    """
+    # Set default values for hyper parameters:
+    default_values = {
+        "n_estimators": 10000,
+    }
+
+    return perform_feature_ablation_eq_solclass(RandomForestClassifier, default_values, features, output, "Random_Forest_eq_solclass", is_classifier, **kwargs)

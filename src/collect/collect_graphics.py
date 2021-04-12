@@ -74,9 +74,13 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     try:
         char_number = max(*[len(arg) for arg in args[0]], -1)  # -1 because if there is only one value, it is the second one.
         if len(args[0]) * char_number > max_char_number_per_line:
-            plt.xticks(rotation=-45)
+            # plt.xticks(rotation=-45)
+            plt.xticks(rotation=-90)
+            plt.tight_layout()
     except:
-        plt.xticks(rotation=-45)
+        # plt.xticks(rotation=-45)
+        plt.xticks(rotation=-90)
+        plt.tight_layout()
 
     plt.savefig(path_to_file)
     plt.close()
@@ -339,5 +343,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, add_
     plt.boxplot(data)
     plt.title(graphic_title)
     axes.set_xticklabels(x_axis_names)
+    plt.xticks(rotation=-90)
+    plt.tight_layout()
     plt.savefig(path_to_file)
     plt.close()
