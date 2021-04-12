@@ -67,12 +67,6 @@ OUTPUT_GRAPH_IMBALANCE_PERCENTAGE = "imbalance_percentage"
 
 
 # centralities
-# CENTR_DEGREE_NEG = "degree_neg"
-# CENTR_DEGREE_POS = "degree_pos"
-# CENTR_DEGREE_PN = "degree_pn"
-# CENTR_EIGEN = "eigen"
-# CENTR_TROLL_TRUST = "troll_trust"
-# CENTR_SRWR = "srwr"
 CENTR_DEGREE_NEG = NegativeCentrality.__name__
 CENTR_DEGREE_POS = PositiveCentrality.__name__
 CENTR_DEGREE_PN = PNCentrality.__name__
@@ -117,7 +111,6 @@ PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
 
 # embeddings
-# EMB_SNE = "sne"
 EMB_SNE = SNEEmbedding.__name__
 SNE_SAVE_PATH_NAME = "save_path"
 SNE_TRAIN_DATA_NAME = "train_data"
@@ -237,14 +230,6 @@ def __add_descriptor_classes(graph_descriptor_class):
 
 
 GRAPH_DESCRIPTORS = {
-    # # CENTR_DEGREE_NEG: NegativeCentrality.undirected,
-    # # CENTR_DEGREE_POS: PositiveCentrality.undirected,
-    # CENTR_DEGREE_PN: PNCentrality.undirected,
-    # CENTR_EIGEN: compute_eigenvector_centrality,
-    # EMB_SNE: SNEEmbedding.undirected,
-    # # CENTR_TROLL_TRUST: TrollTrust.perform_troll_trust,
-    # # CENTR_SRWR: perform_srwr,
-    # **{descriptor_class.__name__: descriptor_class.perform for descriptor_class in GraphDescriptor.__subclasses__()}
     **__add_descriptor_classes(GraphDescriptor)
 }
 

@@ -9,17 +9,17 @@ The embedding is computed by following the method of S.Yuan, X. Wu and Y. Xiang.
 .. note: S. Yuan, X. Wu and Y. Xiang. "SNE: signed network embedding". In: Pacific-Asia conference on knowledge discovery and data mining. 2017, p. 183-195. doi :10.1007/978-3-319-57529-2_15.
 """
 
-import consts
-from consts import *
 from logging import basicConfig, INFO
+from os import makedirs
 from os.path import dirname, abspath, exists
 from pathlib import Path
 from random import Random
 import tensorflow.compat.v1 as tf
-from os import system, makedirs
+from deprecated import deprecated
+import consts
+from consts import *
 from descriptors import GraphDescriptor
-from node_embeddings import NodeEmbedding
-from node_embeddings.sne.sne.SNE import SNE, Options, FLAGS
+from node_embeddings.sne.sne.SNE import SNE, Options
 from node_embeddings.sne.sne.walk import write_walks_to_disk, load_edgelist
 from util import get_matrix
 
@@ -211,6 +211,7 @@ class SNEEmbedding(GraphDescriptor):
 		)
 
 	@staticmethod
+	@deprecated("This function is deprecated, use 'perform()' instead")
 	def undirected(graph, **kwargs):
 		return SNEEmbedding.perform(graph, **kwargs)
 

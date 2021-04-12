@@ -135,7 +135,6 @@ class PositiveCentrality(DegreeCentrality):
 	def perform(graph, scaled=False):
 		return PositiveCentrality.undirected(graph, scaled)
 
-
 	@staticmethod
 	def undirected(graph, scaled=False):
 		A = get_matrix(graph).toarray()
@@ -196,7 +195,6 @@ class NegativeCentrality(DegreeCentrality):
 	@staticmethod
 	def perform(graph, scaled=False):
 		return NegativeCentrality.undirected(graph, scaled)
-
 
 	@staticmethod
 	def undirected(graph, scaled=False):
@@ -302,7 +300,6 @@ class PNCentrality(DegreeCentrality):
 	@staticmethod
 	def perform(graph, scaled=False):
 		return PNCentrality.undirected(graph, scaled)
-
 
 	@staticmethod
 	def undirected(graph, scaled=False):
