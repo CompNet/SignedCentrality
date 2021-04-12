@@ -93,8 +93,7 @@ def collect_outputs(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
   
                
 
-def collect_all_outputs(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks,
-                              network_desc, output_descs, force=False):
+def collect_all_outputs(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks, network_desc, output_descs, force=False, verbose=False):
     """This method handles the input signed networks before collecting the indicated outputs.
        
     :param graph_sizes: a list of number of nodes
@@ -134,12 +133,14 @@ def collect_all_outputs(graph_sizes, l0_values, d, prop_mispls, prop_negs, netwo
                     for prop_neg in my_prop_negs:
                         for network_no in networks:
                             desc = "n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d)+", propMispl="+util.format_4digits(prop_mispl)+", propNeg="+util.format_4digits(prop_neg)+", network="+str(network_no)
-                                
-                            print("... collecting outputs with n="+str(n)+", l0="+str(l0)+
-                                  ", dens="+util.format_4digits(d), ", propMispl="+
-                                  util.format_4digits(prop_mispl), 
-                                ", propNeg="+util.format_4digits(prop_neg), 
-                                ", network="+str(network_no))
+
+                            if verbose:
+                                print(
+                                    "... collecting outputs with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d),
+                                    ", propMispl="+util.format_4digits(prop_mispl),
+                                    ", propNeg="+util.format_4digits(prop_neg),
+                                    ", network="+str(network_no)
+                                )
         
                             row = collect_outputs(n, l0, d, prop_mispl, prop_neg, 
                                                  network_no, network_desc, output_descs)
@@ -150,5 +151,6 @@ def collect_all_outputs(graph_sizes, l0_values, d, prop_mispls, prop_negs, netwo
         outputs.index =  rownames          
         outputs.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
-        print(result_filepath+" already exists")   
-        
+        if verbose:
+            print(result_filepath+" already exists")
+

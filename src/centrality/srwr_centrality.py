@@ -7,6 +7,7 @@ import csv
 import sys
 import os
 
+from descriptors import GraphDescriptor
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
@@ -55,6 +56,27 @@ def perform_srwr(graph, seed = 0, c = 0.15, epsilon = 1e-9, beta = 0.5, gamma = 
         os.remove("srwr_temp.txt")
     
     return srwr_graph
+
+
+class SRWRCentrality(GraphDescriptor):
+    """
+    This class is used to compute SRWR centralities
+    """
+
+    @staticmethod
+    def perform(graph, **kwargs):
+        """
+        Compute the SRWR centrality.
+        """
+        return SRWRCentrality.undirected(graph, **kwargs)
+
+    @staticmethod
+    def undirected(graph, **kwargs):
+        """
+        Compute the SRWR centrality.
+        """
+
+        return perform_srwr(graph, **kwargs)
 
 
 #TESTS:

@@ -19,6 +19,8 @@ from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.classification import perform_svc_classification
 from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
+from prediction.classification import perform_svc_classification
+from prediction.random_forest_classification import perform_random_forest_classification
 from util import write_csv, ProgressBar
 from path import get_csv_folder_path
 
@@ -337,12 +339,27 @@ def compare_hyper_parameters(features, *tasks):
 
     svc_params_ranges = {
         **svm_main_params_ranges,
-        consts.SVM.PROBABILITY: [
-
-        ],
+        # consts.SVM.PROBABILITY: [
+        #
+        # ],
         consts.SVM.DECISION_FUNCTION_SHAPE: [
             consts.SVM.DECISION_FUNCTION_SHAPE_OVO,
             consts.SVM.DECISION_FUNCTION_SHAPE_OVR,  # Default value
+        ],
+    }
+
+    random_forest_params_ranges = {
+        "n_estimators": [
+            n for n in range(100)
+        ],
+        "max_depth": [
+            n for n in range(100)
+        ],
+        "min_samples_split": [
+            n for n in range(100)
+        ],
+        "min_samples_leaf": [
+            n for n in range(100)
         ],
     }
 
@@ -358,8 +375,8 @@ def compare_hyper_parameters(features, *tasks):
 
     classification_functions = {
         perform_svc_classification: svc_params_ranges,
+        perform_random_forest_classification: random_forest_params_ranges,
     }
-
     outputs = {
         consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
         consts.OUTPUT_NB_SOLUTIONS: regression_functions,
