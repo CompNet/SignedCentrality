@@ -396,7 +396,7 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
     interval_range = int((max_output-min_output)/interval_value)
 
     # adding all index of outputs into a dictionary
-    for i in range(1, int(max_output), interval_range):  # loop from the min value to the max value of the list, with a range calculated with interval_value and nb_iteration
+    for i in range(int(min_output), int(max_output), interval_range):  # loop from the min value to the max value of the list, with a range calculated with interval_value and nb_iteration
         tmp = i + (interval_range - 1)
         tmp_string = str(i) + ":" + str(tmp)
         outputs_dictionary[tmp_string] = 0  # adding an element to the dict with the key and an initial value
@@ -408,7 +408,7 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
         outputs_dictionary[tmp_string] = tmp_list
 
     # collecting predicted values at the corresponding indexes
-    for i in range(1, int(max_output), interval_range):  # loop from 1 to the max value of the list, with a step of 10
+    for i in range(int(min_output), int(max_output), interval_range):  # loop from the min value to the max value of the list, with a range calculated with interval_value and nb_iteration
         tmp = i + (interval_range - 1)
         tmp_string = str(i) + ":" + str(tmp)
         tmp_index_list = outputs_dictionary[tmp_string]
@@ -420,6 +420,7 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
                 # tmp_list.append(float(predicted_values_updated[x]))
                 tmp_list.append(float(predicted_values_updated[x]) - float(outputs_values_updated[x]))
             data.append(tmp_list)
+    print(data)
 
     # Generating boxplot
     print("Generating boxplot for "+graphic_title, "\n")

@@ -149,7 +149,7 @@ if __name__ == '__main__':
     print("\nLinear Regression :")
     prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
     print("\nMLP Regression :")
-    prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
+    # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO don't uncomment it, doesn't work, fix it
 
     # Hyper-parameters comparison
     print("\nCompare Hyper-Parameters")
