@@ -197,6 +197,10 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
     metrics.r2_score.__name__: 1,
     metrics.mean_squared_error.__name__: 0,
     metrics.mean_absolute_error.__name__: 0,
+    metrics.f1_score.__name__: 1,
+    metrics.accuracy_score.__name__: 1,
+    metrics.precision_score.__name__: 1,
+    metrics.recall_score.__name__: 1,
 }
 
 # Graph descriptors

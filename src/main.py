@@ -156,6 +156,11 @@ if __name__ == '__main__':
 
     # Hyper-parameters comparison
     print("\nCompare Hyper-Parameters")
-    compare_hyper_parameters(features, consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES)  # Add outputs here to select comparisons to perform.
+    compare_hyper_parameters(
+        features,
+        # consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES,
+        consts.OUTPUT_IS_SINGLE_SOLUTION, consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
+        # consts.OUTPUT_GRAPH_IMBALANCE_COUNT,
+    )  # Add outputs here to select comparisons to perform.
 
 

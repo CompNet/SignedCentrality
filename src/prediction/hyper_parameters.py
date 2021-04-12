@@ -337,9 +337,9 @@ def compare_hyper_parameters(features, *tasks):
 
     svc_params_ranges = {
         **svm_main_params_ranges,
-        consts.SVM.PROBABILITY: [
-
-        ],
+        # consts.SVM.PROBABILITY: [
+        #
+        # ],
         consts.SVM.DECISION_FUNCTION_SHAPE: [
             consts.SVM.DECISION_FUNCTION_SHAPE_OVO,
             consts.SVM.DECISION_FUNCTION_SHAPE_OVR,  # Default value
