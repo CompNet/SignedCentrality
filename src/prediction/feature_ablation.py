@@ -18,6 +18,8 @@ from sklearn import metrics
 from sklearn.feature_selection import RFE
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
+from sklearn.ensemble import RandomForestClassifier
+from imblearn.under_sampling import EditedNearestNeighbours
 
 import collect.collect_graphics
 import collect.collect_predicted_values
@@ -52,7 +54,7 @@ def score_model_regression(predictor, X_train, X_test, Y_train, Y_test):
     return metrics.mean_squared_error(Y_test, Y_pred)
 
 
-def perform_feature_ablation(predictor, default_values, features, output, prediction_name, is_classifier=True, **kwargs):
+def perform_feature_ablation(predictor, default_values, features, output, prediction_name, is_classifier=True, imbalance_correction_method=False, **kwargs):
     """This method is the general method to perform the task of feature ablation for a single output.
 
         :param predictor: prediction technique
@@ -63,13 +65,19 @@ def perform_feature_ablation(predictor, default_values, features, output, predic
         :param is_classifier : a simple boolean saying if it's a classifier or a regresser
         """
 
-    X_train, X_test, Y_train, Y_test = initialize_data(features, output)
+    if is_classifier:
+        X_train, X_test, Y_train, Y_test = initialize_data(features, output, imbalance_correction_method)
+    if not is_classifier:
+        X_train, X_test, Y_train, Y_test = initialize_data(features, output)
+    # X_train, X_test, Y_train, Y_test = initialize_data(features, output)
     hyper_parameters = initialize_hyper_parameters(default_values, kwargs)
 
     model = predictor(**hyper_parameters)
     rfe = RFE(estimator=model)
     rfe.fit(X_train, Y_train)
     ranking = rfe.ranking_
+    print(features)
+    print(ranking)  # Contains the rankings for each feature
 
     base_score = 0
     if is_classifier:
@@ -143,7 +151,7 @@ def perform_feature_ablation(predictor, default_values, features, output, predic
     collect.collect_graphics.generate_plot(feature_list, scores, "feature_ablation_"+str(prediction_name))
 
 
-def feature_ablation_svc_classification(features, output, is_classifier=True, **kwargs):
+def feature_ablation_svc_classification(features, output, is_classifier=True, imbalance_correction_method=EditedNearestNeighbours(n_neighbors=3), **kwargs):
     """This method performs the task of feature ablation for a single output using a classifier.
 
         The classifier used is svm.SVC.
@@ -158,16 +166,32 @@ def feature_ablation_svc_classification(features, output, is_classifier=True, **
         "kernel": consts.PREDICTION_KERNEL_LINEAR,
     }
 
-    return perform_feature_ablation(svm.SVC, default_values, features, output, "SVC", is_classifier, **kwargs)
+    return perform_feature_ablation(svm.SVC, default_values, features, output, "SVC", is_classifier, imbalance_correction_method, **kwargs)
+
+def feature_ablation_random_forest_classification(features, output, is_classifier=True, imbalance_correction_method=EditedNearestNeighbours(n_neighbors=3), **kwargs):
+    """This method performs the task of feature ablation for a single output using a classifier.
+
+    The classifier used is RandomForestClassifier.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_IS_SINGLE_SOLUTION
+    :param is_classifier : a simple boolean saying if it's a classifier or a regresser
+    """
+    # Set default values for hyper parameters:
+    default_values = {
+        "n_estimators": 10000,
+    }
+
+    return perform_feature_ablation(RandomForestClassifier, default_values, features, output, "Random_Forest", is_classifier, imbalance_correction_method, **kwargs)
 
 
 def feature_ablation_svr_regression(features, output, is_classifier=False, **kwargs):
     """Performs feature ablation using svm.SVR for regression
 
-        :param features: a list of features
-        :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
-        :param is_classifier : a simple boolean saying if it's a classifier or a regresser
-        """
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param is_classifier : a simple boolean saying if it's a classifier or a regresser
+    """
 
     # Set default values for hyper parameters:
     default_values = {
@@ -198,7 +222,7 @@ def feature_ablation_linear_regression(features, output, is_classifier=False, **
     return perform_feature_ablation(LinearRegression, default_values, features, output, "LinearRegression", is_classifier, **kwargs)
 
 
-def feature_ablation_mlp_regression(features, output, is_classifier=False, **kwargs): # TODO doesn't work, fix it
+def feature_ablation_mlp_regression(features, output, is_classifier=False, **kwargs): # TODO doesn't work, I need an attribute to select which features are more important than the others
     """
     Performs feature ablation using a multilayer perceptron
 

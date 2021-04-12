@@ -123,7 +123,7 @@ if __name__ == '__main__':
     print("\nSVR :")
     prediction.regression.perform_regression(features, output3, kernel)
     print("\nLinear Regression :")
-    # prediction.regression.perform_linear_regression(features, output3)
+    prediction.regression.perform_linear_regression(features, output3)
     print("\nMLP Regression :")
     prediction.regression.perform_mlp_regression(features, output3)
 
@@ -142,15 +142,31 @@ if __name__ == '__main__':
     print("\nTask: feature ablation")
     print("\nSVC :")
     prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
+    print("\nRandomForestClassifier :")
+    # prediction.feature_ablation.feature_ablation_random_forest_classification(features, output2) # TODO don't uncomment it, with the actual parameters, it could block the computer
     print("\nSVR :")
     prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
     print("\nLinear Regression :")
     prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
     print("\nMLP Regression :")
-    # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
+    # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO don't uncomment it, doesn't work, fix it
 
     # Hyper-parameters comparison
     print("\nCompare Hyper-Parameters")
     compare_hyper_parameters(features)  # Add outputs here to select comparisons to perform.
+
+
+    # feature ablation classification tests (TODO this code is to apply feature ablation on specific files already balanced, delete once tests finished)
+    import prediction.tmp_feature_ablation
+
+    """print("\nSVC (eq_sol) :")
+    prediction.tmp_feature_ablation.feature_ablation_svc_classification_eq_sol(features, output)
+    print("\nSVC (eq_solclass) :")
+    prediction.tmp_feature_ablation.feature_ablation_svc_classification_eq_solclass(features, output2)"""
+    print("\nRandom Forest (eq_sol) :")
+    prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_sol(features, output)
+    print("\nRandom Forest (eq_solclass) :")
+    prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_solclass(features, output2)
+
 
 
