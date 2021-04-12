@@ -48,10 +48,7 @@ PROP_NEGS = None # when density=1, this equals 'None'
 
 NETWORK_DESC = consts.SIGNED_UNWEIGHTED
 
-CENTRALITIES = [
-    consts.CENTR_DEGREE_PN, 
-    consts.CENTR_EIGEN
-]
+GRAPH_DESCRIPTORS = consts.GRAPH_DESCRIPTORS.keys()
 STATS = [
     consts.STATS_NB_NODES,
     consts.STATS_POS_PROP, 
@@ -70,22 +67,19 @@ OUTPUTS = [
 ]
 
 FORCE = False
+VERBOSE = False
 # =====================================
 
 
 if __name__ == '__main__':
 
-    centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                             INPUT_NETWORKS, NETWORK_DESC, CENTRALITIES, FORCE)
+    centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
 
-    stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                             INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE)
+    stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE, VERBOSE)
 
-    collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                           INPUT_NETWORKS, NETWORK_DESC, CENTRALITIES, STATS, FORCE)
+    collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, STATS, FORCE)
 
-    collect.collect_outputs.collect_all_outputs(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS,
-                                            INPUT_NETWORKS, NETWORK_DESC, OUTPUTS, FORCE)
+    collect.collect_outputs.collect_all_outputs(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, OUTPUTS, FORCE)
 
     features_list = [
         consts.COL_NAMES[consts.STATS_NB_NODES],
@@ -94,80 +88,95 @@ if __name__ == '__main__':
         consts.COL_NAMES[consts.STATS_POS_NEG_RATIO],
         consts.COL_NAMES[consts.STATS_SIGNED_TRIANGLES],
         consts.COL_NAMES[consts.STATS_LARGEST_EIGENVALUE],
-        [consts.PREFIX_MEAN+consts.CENTR_DEGREE_PN],
-        [consts.PREFIX_STD+consts.CENTR_DEGREE_PN],
-        [consts.PREFIX_MEAN+consts.CENTR_EIGEN],
-        [consts.PREFIX_STD+consts.CENTR_EIGEN]
+        # [consts.PREFIX_MEAN+consts.CENTR_DEGREE_PN],
+        # [consts.PREFIX_STD+consts.CENTR_DEGREE_PN],
+        # [consts.PREFIX_MEAN+consts.CENTR_EIGEN],
+        # [consts.PREFIX_STD+consts.CENTR_EIGEN],
+        # [consts.PREFIX_MEAN+consts.EMB_SNE],
+        # [consts.PREFIX_STD+consts.EMB_SNE],
+        # [consts.PREFIX_MEAN+consts.CENTR_TROLL_TRUST],
+        # [consts.PREFIX_STD+consts.CENTR_TROLL_TRUST],
+        # [consts.PREFIX_MEAN+consts.CENTR_SRWR],
+        # [consts.PREFIX_STD+consts.CENTR_SRWR],
     ]
-     
+    for descriptor in GRAPH_DESCRIPTORS:
+        features_list.extend([
+            [consts.PREFIX_MEAN + descriptor],
+            [consts.PREFIX_STD + descriptor]
+        ])
+
     features = list(itertools.chain.from_iterable(features_list))
-    print(features)
-    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    print(output)
-    kernel = consts.PREDICTION_KERNEL_LINEAR
 
+    # print(features)
+    # output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
+    # print(output)
+    # kernel = consts.PREDICTION_KERNEL_LINEAR
+    #
+    #
+    # # print(kernel)
+    # # classification task : one or more solutions
+    # print("\nSVC :")
+    # prediction.classification.perform_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3))
+    # print("\nRandom Forest :")
+    # prediction.random_forest_classification.perform_classification(features, output, 1000)
+    #
+    # # regression task : number of solutions
+    # output1 = [consts.OUTPUT_NB_SOLUTIONS]
+    # print("Task:", *output1)
+    # print("\nSVR :")
+    # prediction.regression.perform_regression(features, output1, kernel)
+    # print("\nLinear Regression :")
+    # prediction.regression.perform_linear_regression(features, output1)
+    # print("\nMLP Regression :")
+    # prediction.regression.perform_mlp_regression(features, output1)
+    #
+    # # classification task : one or more classes of solution
+    # output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+    # print("Task:", *output2)
+    # print("\nSVC :")
+    # prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
+    # print("\nRandom Forest :")
+    # prediction.random_forest_classification.perform_classification(features, output2, 1000)
+    #
+    #
+    # # regression task : number of classes of solution
+    # output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
+    # print("Task:", *output3)
+    # print("\nSVR :")
+    # prediction.regression.perform_regression(features, output3, kernel)
+    # print("\nLinear Regression :")
+    # # prediction.regression.perform_linear_regression(features, output3)
+    # print("\nMLP Regression :")
+    # prediction.regression.perform_mlp_regression(features, output3)
+    #
+    # # regression task : graph imbalance
+    # output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
+    # print("Task:", *output4)
+    # print("\nSVR :")
+    # prediction.regression.perform_regression(features, output4, kernel)
+    #
+    # output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
+    # print("Task:", *output4)
+    # print("\nSVR :")
+    # prediction.regression.perform_regression(features, output5, kernel)
+    #
+    # # feature ablation task
+    # print("\nTask: feature ablation")
+    # print("\nSVC :")
+    # prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
+    # print("\nSVR :")
+    # prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
+    # print("\nLinear Regression :")
+    # prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
+    # print("\nMLP Regression :")
+    # # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
 
-    # print(kernel)
-    # classification task : one or more solutions
-
-#    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
-
-
-##            print("\nRandom Forest n_estimators:")
-##          prediction.random_forest_classification.perform_classification(features, output, n_estimators=i)
-
-##
-    
-##    print("\nRandom Forest :")
-##    prediction.random_forest_classification.perform_classification(features, output)          
-            
-##
-####    # regression task : number of solutions
-####    output1 = [consts.OUTPUT_NB_SOLUTIONS]
-####    print("Task:", *output1)
-####    print("\nSVR :")
-####    prediction.regression.perform_regression(features, output1, kernel)
-####    print("\nLinear Regression :")
-####    prediction.regression.perform_linear_regression(features, output1)
-####    print("\nMLP Regression :")
-####    prediction.regression.perform_mlp_regression(features, output1)
-####
-##    # classification task : one or more classes of solution
-##    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
-##    print("Task:", *output2)
-####    print("\nSVC :")
-####    prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
-##    for i in range(0, 1000):
-##        print("\nRandom Forest :")
-##        prediction.random_forest_classification.perform_classification(features, output2, 10)
-
-##
-##    # regression task : number of classes of solution
-##    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
-##    print("Task:", *output3)
-##    print("\nSVR :")
-##    prediction.regression.perform_regression(features, output3, kernel)
-##    print("\nLinear Regression :")
-##    prediction.regression.perform_linear_regression(features, output3)
-##    print("\nMLP Regression :")
-##    prediction.regression.perform_mlp_regression(features, output3)
-##
-##    # regression task : graph imbalance
-##    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
-##    print("Task:", *output4)
-##    print("\nSVR :")
-##    prediction.regression.perform_regression(features, output4, kernel)
-##
-##    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
-##    print("Task:", *output4)
-##    print("\nSVR :")
-##    prediction.regression.perform_regression(features, output5, kernel)
-##
-##    # feature ablation test
-##    print("Task: feature ablation")
-##    # prediction.feature_ablation.feature_ablation(features, output2, kernel)
-##    prediction.feature_ablation.feature_ablation_1(features, output2, kernel)
-
-    compare_hyper_parameters(features)
-
+    # Hyper-parameters comparison
+    print("\nCompare Hyper-Parameters")
+    compare_hyper_parameters(
+        features,
+        # consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES,
+        consts.OUTPUT_IS_SINGLE_SOLUTION, consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
+        # consts.OUTPUT_GRAPH_IMBALANCE_COUNT,
+    )  # Add outputs here to select comparisons to perform.
 

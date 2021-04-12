@@ -23,7 +23,7 @@ from util import get_matrix, scale_centrality
 from igraph import *
 
 from prediction.regression import perform_regression
-from __init__ import CentralityMeasure
+from centrality import CentralityMeasure
 import consts
 
 

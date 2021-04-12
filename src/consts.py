@@ -10,6 +10,12 @@ from sklearn import metrics
 # ===========================
 # Path variables
 # ===========================
+from centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+from centrality.eigenvector_centrality import compute_eigenvector_centrality
+from centrality.srwr_centrality import perform_srwr
+from centrality.trolltrust_centrality import TrollTrust
+from node_embeddings.sne.sne_embedding import SNEEmbedding
+
 CSV = ".csv"
 TXT = ".txt"
 PNG = ".png"
@@ -23,7 +29,7 @@ CENTR_FOLDER = os.path.join(OUT_FOLDER, "centralities")
 STAT_FOLDER = os.path.join(OUT_FOLDER, "stats")
 PLOT_FOLDER = os.path.join(OUT_FOLDER, "plots")
 GRAPHICS_FOLDER = os.path.join(OUT_FOLDER, "graphics")
-
+BEST_PARAM_SET = 'best_parameters_sets' + CSV
 
 # ===========================
 # Other Variables
@@ -64,6 +70,8 @@ CENTR_DEGREE_NEG = "degree_neg"
 CENTR_DEGREE_POS = "degree_pos"
 CENTR_DEGREE_PN = "degree_pn"
 CENTR_EIGEN = "eigen"
+CENTR_TROLL_TRUST = "troll_trust"
+CENTR_SRWR = "srwr"
 
 # stats
 STATS_NB_NODES = "nb_nodes"
@@ -102,6 +110,7 @@ PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
 
 # embeddings
+EMB_SNE = "sne"
 SNE_SAVE_PATH_NAME = "save_path"
 SNE_TRAIN_DATA_NAME = "train_data"
 SNE_LABEL_DATA_NAME = "label_data"
@@ -194,3 +203,13 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
     metrics.recall_score.__name__: 1,
 }
 
+# Graph descriptors
+GRAPH_DESCRIPTORS = {
+    # CENTR_DEGREE_NEG: NegativeCentrality.undirected,
+    # CENTR_DEGREE_POS: PositiveCentrality.undirected,
+    CENTR_DEGREE_PN: PNCentrality.undirected,
+    CENTR_EIGEN: compute_eigenvector_centrality,
+    EMB_SNE: SNEEmbedding.undirected,
+    # CENTR_TROLL_TRUST: TrollTrust.perform_troll_trust,
+    # CENTR_SRWR: perform_srwr,
+}

@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 
 
-def collect_predicted_values(predicted_values, prediction_name):
+def collect_predicted_values(predicted_values, prediction_name, verbose=False):
     """ initial version, where only the predicted values are saved to file, by "brute force".
     """
     predicted_dataset = pd.DataFrame([])
@@ -35,7 +35,8 @@ def collect_predicted_values(predicted_values, prediction_name):
         print(type(x), end=' ')
         print(x, end=' ')"""
 
-    print("Collecting predicted data for " + prediction_name)
+    if verbose:
+        print("Collecting predicted data for " + prediction_name)
     if not os.path.exists(result_filepath):
         for x in np.nditer(predicted_values):  # method to select all values inside the ndarray : https://numpy.org/doc/stable/reference/arrays.nditer.html
             result = None
@@ -47,10 +48,11 @@ def collect_predicted_values(predicted_values, prediction_name):
         # predicted_dataset.append(predicted_values)
         predicted_dataset.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
-        print(result_filepath + " already exists", "\n")
+        if verbose:
+            print(result_filepath + " already exists", "\n")
 
 
-def collect_predicted_values_with_graph_name(predicted_values, prediction_name):
+def collect_predicted_values_with_graph_name(predicted_values, prediction_name, verbose=False):
     """ updated version, with the predicted values and the graph name associated.
     first, collect all graph names (from outputs.csv file for example)
     then, write it in csv the "same way" as "collect_all_outputs" method (at least for the graph name)
@@ -92,6 +94,7 @@ def collect_predicted_values_with_graph_name(predicted_values, prediction_name):
         # predicted_dataset.index = graph_names # too many graph names, because of the dataset split for prediction
         predicted_dataset.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
-        print(result_filepath + " already exists", "\n")
+        if verbose:
+            print(result_filepath + " already exists", "\n")
 
 
