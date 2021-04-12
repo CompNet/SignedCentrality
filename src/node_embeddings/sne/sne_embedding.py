@@ -9,20 +9,22 @@ The embedding is computed by following the method of S.Yuan, X. Wu and Y. Xiang.
 .. note: S. Yuan, X. Wu and Y. Xiang. "SNE: signed network embedding". In: Pacific-Asia conference on knowledge discovery and data mining. 2017, p. 183-195. doi :10.1007/978-3-319-57529-2_15.
 """
 
-from consts import *
 from logging import basicConfig, INFO
+from os import makedirs
 from os.path import dirname, abspath, exists
 from pathlib import Path
 from random import Random
 import tensorflow.compat.v1 as tf
-from os import system, makedirs
-from node_embeddings import NodeEmbedding
-from node_embeddings.sne.sne.SNE import SNE, Options, FLAGS
+from deprecated import deprecated
+import consts
+from consts import *
+from descriptors import GraphDescriptor
+from node_embeddings.sne.sne.SNE import SNE, Options
 from node_embeddings.sne.sne.walk import write_walks_to_disk, load_edgelist
 from util import get_matrix
 
 
-class SNEEmbedding(NodeEmbedding):
+class SNEEmbedding(GraphDescriptor):
 	"""
 	This class is used to compute SNE
 
@@ -209,7 +211,12 @@ class SNEEmbedding(NodeEmbedding):
 		)
 
 	@staticmethod
+	@deprecated("This function is deprecated, use 'perform()' instead")
 	def undirected(graph, **kwargs):
+		return SNEEmbedding.perform(graph, **kwargs)
+
+	@staticmethod
+	def perform(graph, **kwargs):
 		"""
 		Compute the SNE.
 
@@ -230,17 +237,18 @@ class SNEEmbedding(NodeEmbedding):
 		flags = tf.app.flags
 
 		if not SNEEmbedding.FLAGS_ALREADY_SET:
-			flags.DEFINE_string(SNE_SAVE_PATH_NAME, SNEEmbedding.SAVE_PATH, "Directory to write the model and training summaries.")
-			flags.DEFINE_string(SNE_TRAIN_DATA_NAME, SNEEmbedding.TRAIN_DATA, "Training text file.")
-			flags.DEFINE_string(SNE_LABEL_DATA_NAME, SNEEmbedding.LABEL_DATA, "Nodes labels text file.")
-			flags.DEFINE_string(SNE_WALKS_DATA_NAME, SNEEmbedding.WALKS_DATA, "Random walks on data")
-			flags.DEFINE_integer(SNE_EMBEDDING_SIZE_NAME, SNEEmbedding.EMBEDDING_SIZE, "The embedding dimension size.")
-			flags.DEFINE_integer(SNE_SAMPLES_TO_TRAIN_NAME, SNEEmbedding.SAMPLES_TO_TRAIN, "Number of samples to train(*Million).")
-			flags.DEFINE_float(SNE_LEARNING_RATE_NAME, SNEEmbedding.LEARNING_RATE, "Initial learning rate.")
-			flags.DEFINE_integer(SNE_NUM_SAMPLED_NAME, SNEEmbedding.NUM_SAMPLED, "The number of classes to randomly sample per batch.")
-			flags.DEFINE_integer(SNE_CONTEXT_SIZE_NAME, SNEEmbedding.CONTEXT_SIZE, "The number of context nodes .")
-			flags.DEFINE_integer(SNE_BATCH_SIZE_NAME, SNEEmbedding.BATCH_SIZE, "Number of training examples processed per step.")
-			flags.DEFINE_boolean(SNE_IS_TRAIN_NAME, SNEEmbedding.IS_TRAIN, "Train or restore")
+			SNEEmbedding.FLAGS_ALREADY_SET = True
+			flags.DEFINE_string(consts.SNE_SAVE_PATH_NAME, SNEEmbedding.SAVE_PATH, "Directory to write the model and training summaries.")
+			flags.DEFINE_string(consts.SNE_TRAIN_DATA_NAME, SNEEmbedding.TRAIN_DATA, "Training text file.")
+			flags.DEFINE_string(consts.SNE_LABEL_DATA_NAME, SNEEmbedding.LABEL_DATA, "Nodes labels text file.")
+			flags.DEFINE_string(consts.SNE_WALKS_DATA_NAME, SNEEmbedding.WALKS_DATA, "Random walks on data")
+			flags.DEFINE_integer(consts.SNE_EMBEDDING_SIZE_NAME, SNEEmbedding.EMBEDDING_SIZE, "The embedding dimension size.")
+			flags.DEFINE_integer(consts.SNE_SAMPLES_TO_TRAIN_NAME, SNEEmbedding.SAMPLES_TO_TRAIN, "Number of samples to train(*Million).")
+			flags.DEFINE_float(consts.SNE_LEARNING_RATE_NAME, SNEEmbedding.LEARNING_RATE, "Initial learning rate.")
+			flags.DEFINE_integer(consts.SNE_NUM_SAMPLED_NAME, SNEEmbedding.NUM_SAMPLED, "The number of classes to randomly sample per batch.")
+			flags.DEFINE_integer(consts.SNE_CONTEXT_SIZE_NAME, SNEEmbedding.CONTEXT_SIZE, "The number of context nodes .")
+			flags.DEFINE_integer(consts.SNE_BATCH_SIZE_NAME, SNEEmbedding.BATCH_SIZE, "Number of training examples processed per step.")
+			flags.DEFINE_boolean(consts.SNE_IS_TRAIN_NAME, SNEEmbedding.IS_TRAIN, "Train or restore")
 
 		for key, value in kwargs.items():
 			if key in [SNE_EMBEDDING_SIZE_NAME, SNE_SAMPLES_TO_TRAIN_NAME, SNE_NUM_SAMPLED_NAME, SNE_CONTEXT_SIZE_NAME, SNE_BATCH_SIZE_NAME]:
