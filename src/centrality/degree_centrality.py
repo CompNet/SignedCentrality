@@ -13,11 +13,12 @@ import abc
 from numpy import array, identity, dot, transpose
 from numpy.linalg import inv
 # noinspection PyProtectedMember
+from descriptors import GraphDescriptor
 from util import get_matrix, scale_centrality
 from centrality import CentralityMeasure
 
 
-class DegreeCentrality(CentralityMeasure):
+class DegreeCentrality(GraphDescriptor):
 	"""
 	Metaclass used as an interface for classes that contain methods computing measures of degree centrality
 	"""
@@ -57,6 +58,22 @@ class DegreeCentrality(CentralityMeasure):
 		"""
 
 		raise NotImplementedError
+
+	@staticmethod
+	def perform(graph, scaled=False):
+		"""
+		Compute degree centrality on both incoming and outgoing edges
+
+		:param graph: the graph
+		:type graph: igraph.Graph
+		:param scaled: indicates if the centrality must be scaled
+		:type scaled: bool
+		:return: the centrality
+		:rtype: list
+		"""
+
+		raise NotImplementedError
+
 
 	@staticmethod
 	@abc.abstractmethod
@@ -115,6 +132,11 @@ class PositiveCentrality(DegreeCentrality):
 		return scale_centrality(h_star)
 
 	@staticmethod
+	def perform(graph, scaled=False):
+		return PositiveCentrality.undirected(graph, scaled)
+
+
+	@staticmethod
 	def undirected(graph, scaled=False):
 		A = get_matrix(graph).toarray()
 		n = len(A)
@@ -170,6 +192,11 @@ class NegativeCentrality(DegreeCentrality):
 			return h_star
 
 		return scale_centrality(h_star)
+
+	@staticmethod
+	def perform(graph, scaled=False):
+		return NegativeCentrality.undirected(graph, scaled)
+
 
 	@staticmethod
 	def undirected(graph, scaled=False):
@@ -271,6 +298,11 @@ class PNCentrality(DegreeCentrality):
 			return PN
 
 		return scale_centrality(PN)
+
+	@staticmethod
+	def perform(graph, scaled=False):
+		return PNCentrality.undirected(graph, scaled)
+
 
 	@staticmethod
 	def undirected(graph, scaled=False):

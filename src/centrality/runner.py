@@ -3,6 +3,8 @@ Created on Sep 23, 2020
 
 @author: nejat
 '''
+
+from numpy import array
 import node_embeddings
 import util
 import centrality.degree_centrality
@@ -59,7 +61,8 @@ def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_des
                 result = None
 
                 if desc_name in consts.GRAPH_DESCRIPTORS:
-                    result = consts.GRAPH_DESCRIPTORS[desc_name](g, False).tolist()
+                    # result = consts.GRAPH_DESCRIPTORS[desc_name](g).tolist()
+                    result = [v for v in consts.GRAPH_DESCRIPTORS[desc_name](g)]
 
                 # if desc_name == consts.CENTR_DEGREE_NEG:
                 #     result = centrality.degree_centrality.NegativeCentrality.undirected(g, False).tolist()
@@ -74,6 +77,16 @@ def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_des
                 #     #print(result)
                     
                 # write the centrality values into file (as the number of values as the number of lines)
+
+                ################################
+                # TODO: This code shouldn't be here: mean values should be coputed in SRWRCentrality.
+                try:  # To avoid problems with SRWRCentrality
+                    util.format_4digits(result[0])
+                except:
+                    # Array size is above 1.
+                    result = [(sum(e) / len(e))[0] for e in result]
+                ################################
+
                 result_formatted = [util.format_4digits(e) for e in result]
                 df = pd.DataFrame({consts.CENT_COL_NAME : result_formatted})
                 df.to_csv(result_filepath, sep=",",quoting=1,index=False)
