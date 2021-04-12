@@ -420,7 +420,7 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
                 # tmp_list.append(float(predicted_values_updated[x]))
                 tmp_list.append(float(predicted_values_updated[x]) - float(outputs_values_updated[x]))
             data.append(tmp_list)
-    print(data)
+    # print(data)
 
     # Generating boxplot
     print("Generating boxplot for "+graphic_title, "\n")
