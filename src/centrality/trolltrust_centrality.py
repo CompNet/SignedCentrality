@@ -248,7 +248,7 @@ class TrollTrust(CentralityMeasure):
         return final_lambda1, final_beta
 
 
-    def perform_troll_trust(graph, iter_max, delta_min, lambda1_step, beta_step):
+    def perform_troll_trust(graph, iter_max = 10000, delta_min = 0, lambda1_step = 0.01, beta_step = 0.01):
         '''
         This method returns the best centrality values for the nodes of a graph
 

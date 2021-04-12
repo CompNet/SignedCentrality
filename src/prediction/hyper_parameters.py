@@ -350,7 +350,7 @@ def compare_hyper_parameters(features, *tasks):
 
     random_forest_params_ranges = {
         "n_estimators": [
-            n for n in range(1000)
+            n for n in range(100)
         ],
         "max_depth": [
             n for n in range(100)
@@ -374,9 +374,8 @@ def compare_hyper_parameters(features, *tasks):
     }
 
     classification_functions = {
-        perform_svc_classification: svc_params_ranges,
-
-        #perform_random_forest_classification: random_forest_params_ranges,
+        #perform_svc_classification: svc_params_ranges,
+        perform_random_forest_classification: random_forest_params_ranges,
     }
     outputs = {
         consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
