@@ -7,12 +7,14 @@ Created on Sep 23, 2020
 import itertools
 
 import consts
+import descriptors
 import stats.runner
 import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
 import prediction.regression
 import prediction.feature_ablation
+from descriptors.runner import compute_all_centralities
 from prediction.hyper_parameters import compare_hyper_parameters
 from imblearn.under_sampling import EditedNearestNeighbours
 
@@ -52,7 +54,7 @@ VERBOSE = False
 
 if __name__ == '__main__':
 
-    descriptors.centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
+    compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
 
     stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE, VERBOSE)
 

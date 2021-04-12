@@ -10,10 +10,10 @@ from sklearn import metrics
 # ===========================
 # Path variables
 # ===========================
-from descriptors.centrality import NegativeCentrality, PositiveCentrality, PNCentrality
-from descriptors.centrality import EigenvectorCentrality
-from descriptors.centrality import SRWRCentrality
-from descriptors.centrality import TrollTrust
+from descriptors.centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
+from descriptors.centrality.srwr_centrality import SRWRCentrality
+from descriptors.centrality.trolltrust_centrality import TrollTrust
 from descriptors.__init__ import GraphDescriptor
 from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
 
