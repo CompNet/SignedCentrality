@@ -115,7 +115,7 @@ def compute_all_centralities(graph_sizes, l0_values, d, prop_mispls, prop_negs, 
     :param graph_descriptors: centralities or embeddings, e.g. consts.CENTR_DEGREE_NEG, consts.CENTR_DEGREE_POS, etc.
     :type graph_descriptors: str list
     """
-    
+
     for n in graph_sizes:
         for l0 in l0_values:
             for prop_mispl in prop_mispls:
@@ -127,10 +127,11 @@ def compute_all_centralities(graph_sizes, l0_values, d, prop_mispls, prop_negs, 
                 for prop_neg in my_prop_negs:
                     for network_no in networks:
                         if verbose:
-                            print("... computing centralities with n="+str(n)+", l0="+str(l0)+
-                              ", dens="+util.format_4digits(d), ", propMispl="+
-                              util.format_4digits(prop_mispl), 
-                            ", propNeg="+util.format_4digits(prop_neg), 
-                            ", network="+str(network_no))
+                            print(
+                                "... computing centralities with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d)
+                                , ", propMispl="+util.format_4digits(prop_mispl),
+                                ", propNeg="+util.format_4digits(prop_neg)
+                                , ", network="+str(network_no)
+                            )
     
                         compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, graph_descriptors, force, verbose=verbose)

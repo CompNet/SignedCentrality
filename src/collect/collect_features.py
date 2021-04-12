@@ -122,29 +122,30 @@ def collect_all_features(graph_sizes, l0_values, d, prop_mispls, prop_negs, netw
         for n in graph_sizes:
             for l0 in l0_values:
                 for prop_mispl in prop_mispls:
-                    
+
                     my_prop_negs = prop_negs
                     if my_prop_negs is None and d == 1:
                         my_prop_negs = [util.compute_prop_neg(n, l0)]
-                        
+
                     for prop_neg in my_prop_negs:
                         for network_no in networks:
                             desc = "n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d)+", propMispl="+util.format_4digits(prop_mispl)+", propNeg="+util.format_4digits(prop_neg)+", network="+str(network_no)
                                 
-                            print("... collecting features with n="+str(n)+", l0="+str(l0)+
-                                  ", dens="+util.format_4digits(d), ", propMispl="+
-                                  util.format_4digits(prop_mispl), 
-                                ", propNeg="+util.format_4digits(prop_neg), 
-                                ", network="+str(network_no))
+                            print(
+                                "... collecting features with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d),
+                                ", propMispl="+util.format_4digits(prop_mispl),
+                                ", propNeg="+util.format_4digits(prop_neg),
+                                ", network="+str(network_no)
+                            )
         
                             row = collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, graph_descriptors, stats)
                             if row.size != 0:
                                 features = features.append(row)
                                 rownames.append(desc)
-            
-        features.index =  rownames          
+
+        features.index = rownames
         features.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
         if verbose:
             print(result_filepath+" already exists")
-        
+

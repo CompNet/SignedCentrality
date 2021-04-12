@@ -32,11 +32,7 @@ PROP_NEGS = None # when density=1, this equals 'None'
 
 NETWORK_DESC = consts.SIGNED_UNWEIGHTED
 
-GRAPH_DESCRIPTORS = [
-    consts.CENTR_DEGREE_PN, 
-    consts.CENTR_EIGEN,
-    consts.EMB_SNE,
-]
+GRAPH_DESCRIPTORS = consts.GRAPH_DESCRIPTORS.keys()
 STATS = [
     consts.STATS_NB_NODES,
     consts.STATS_POS_PROP, 
@@ -76,14 +72,23 @@ if __name__ == '__main__':
         consts.COL_NAMES[consts.STATS_POS_NEG_RATIO],
         consts.COL_NAMES[consts.STATS_SIGNED_TRIANGLES],
         consts.COL_NAMES[consts.STATS_LARGEST_EIGENVALUE],
-        [consts.PREFIX_MEAN+consts.CENTR_DEGREE_PN],
-        [consts.PREFIX_STD+consts.CENTR_DEGREE_PN],
-        [consts.PREFIX_MEAN+consts.CENTR_EIGEN],
-        [consts.PREFIX_STD+consts.CENTR_EIGEN],
-        [consts.PREFIX_MEAN+consts.EMB_SNE],
-        [consts.PREFIX_STD+consts.EMB_SNE],
+        # [consts.PREFIX_MEAN+consts.CENTR_DEGREE_PN],
+        # [consts.PREFIX_STD+consts.CENTR_DEGREE_PN],
+        # [consts.PREFIX_MEAN+consts.CENTR_EIGEN],
+        # [consts.PREFIX_STD+consts.CENTR_EIGEN],
+        # [consts.PREFIX_MEAN+consts.EMB_SNE],
+        # [consts.PREFIX_STD+consts.EMB_SNE],
+        # [consts.PREFIX_MEAN+consts.CENTR_TROLL_TRUST],
+        # [consts.PREFIX_STD+consts.CENTR_TROLL_TRUST],
+        # [consts.PREFIX_MEAN+consts.CENTR_SRWR],
+        # [consts.PREFIX_STD+consts.CENTR_SRWR],
     ]
-     
+    for descriptor in GRAPH_DESCRIPTORS:
+        features_list.extend([
+            [consts.PREFIX_MEAN + descriptor],
+            [consts.PREFIX_STD + descriptor]
+        ])
+
     features = list(itertools.chain.from_iterable(features_list))
     # print(features)
     # output = [consts.OUTPUT_IS_SINGLE_SOLUTION]

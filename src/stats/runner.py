@@ -126,10 +126,11 @@ def compute_all_stats(graph_sizes, l0_values, d, prop_mispls, prop_negs, network
                 for prop_neg in my_prop_negs:
                     for network_no in networks:
                         if verbose:
-                            print("... computing stats with n="+str(n)+", l0="+str(l0)+
-                              ", dens="+util.format_4digits(d), ", propMispl="+
-                              util.format_4digits(prop_mispl), 
-                            ", propNeg="+util.format_4digits(prop_neg), 
-                            ", network="+str(network_no))
+                            print(
+                                "... computing stats with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d),
+                                ", propMispl="+util.format_4digits(prop_mispl),
+                                ", propNeg="+util.format_4digits(prop_neg),
+                                ", network="+str(network_no)
+                            )
     
                         compute_stats(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, stats, force, verbose=verbose)

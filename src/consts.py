@@ -12,6 +12,8 @@ from sklearn import metrics
 # ===========================
 from centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
 from centrality.eigenvector_centrality import compute_eigenvector_centrality
+from centrality.srwr_centrality import perform_srwr
+from centrality.trolltrust_centrality import TrollTrust
 from node_embeddings.sne.sne_embedding import SNEEmbedding
 
 CSV = ".csv"
@@ -68,6 +70,8 @@ CENTR_DEGREE_NEG = "degree_neg"
 CENTR_DEGREE_POS = "degree_pos"
 CENTR_DEGREE_PN = "degree_pn"
 CENTR_EIGEN = "eigen"
+CENTR_TROLL_TRUST = "troll_trust"
+CENTR_SRWR = "srwr"
 
 # stats
 STATS_NB_NODES = "nb_nodes"
@@ -197,9 +201,11 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
 
 # Graph descriptors
 GRAPH_DESCRIPTORS = {
-    CENTR_DEGREE_NEG: NegativeCentrality.undirected,
-    CENTR_DEGREE_POS: PositiveCentrality.undirected,
+    # CENTR_DEGREE_NEG: NegativeCentrality.undirected,
+    # CENTR_DEGREE_POS: PositiveCentrality.undirected,
     CENTR_DEGREE_PN: PNCentrality.undirected,
     CENTR_EIGEN: compute_eigenvector_centrality,
     EMB_SNE: SNEEmbedding.undirected,
+    # CENTR_TROLL_TRUST: TrollTrust.perform_troll_trust,
+    # CENTR_SRWR: perform_srwr,
 }
