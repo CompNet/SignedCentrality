@@ -12,7 +12,7 @@ The measure is computed by following the method of Phillip Bonacich and Paulette
 import numpy as np
 from scipy.sparse.linalg import eigs
 # noinspection PyProtectedMember
-from descriptors.__init__ import GraphDescriptor
+from descriptors import GraphDescriptor
 from util import get_matrix, get_scale, which
 #from sphinx.ext import todo
 

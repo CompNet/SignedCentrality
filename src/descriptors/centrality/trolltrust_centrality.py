@@ -10,7 +10,7 @@ from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import os
-from descriptors.__init__ import GraphDescriptor
+from descriptors import GraphDescriptor
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))

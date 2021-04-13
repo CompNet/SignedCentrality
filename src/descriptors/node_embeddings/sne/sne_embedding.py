@@ -18,7 +18,7 @@ import tensorflow.compat.v1 as tf
 from deprecated import deprecated
 import consts
 from consts import *
-from descriptors.__init__ import GraphDescriptor
+from descriptors import GraphDescriptor
 from descriptors.node_embeddings.sne.sne.SNE import SNE, Options
 from descriptors.node_embeddings.sne.sne.walk import write_walks_to_disk, load_edgelist
 from util import get_matrix

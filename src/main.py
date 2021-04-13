@@ -98,7 +98,8 @@ if __name__ == '__main__':
     print("\nSVC :")
     prediction.classification.perform_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3))
     print("\nRandom Forest :")
-    prediction.random_forest_classification.perform_classification(features, output, 1000)
+    # prediction.random_forest_classification.perform_classification(features, output, 1000)
+    prediction.random_forest_classification.perform_classification(features, output, EditedNearestNeighbours())
 
     # regression task : number of solutions
     output1 = [consts.OUTPUT_NB_SOLUTIONS]
@@ -116,7 +117,8 @@ if __name__ == '__main__':
     print("\nSVC :")
     prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
     print("\nRandom Forest :")
-    prediction.random_forest_classification.perform_classification(features, output2, 1000)
+    # prediction.random_forest_classification.perform_classification(features, output2, 1000)
+    prediction.random_forest_classification.perform_classification(features, output2, EditedNearestNeighbours())
 
 
     # regression task : number of classes of solution

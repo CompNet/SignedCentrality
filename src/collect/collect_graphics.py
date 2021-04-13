@@ -4,6 +4,7 @@ Created on Feb 25, 2021
 @author: Laurent PEREIRA DA SILVA
 '''
 import os
+from math import ceil
 from statistics import stdev
 import consts
 import path
@@ -393,7 +394,7 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
     # collecting max and min value of outputs list
     max_output = max(outputs_values_updated)
     min_output = min(outputs_values_updated)
-    interval_range = int((max_output-min_output)/interval_value)
+    interval_range = max(ceil(int((max_output-min_output)/interval_value)), 1)
 
     # adding all index of outputs into a dictionary
     for i in range(int(min_output), int(max_output), interval_range):  # loop from the min value to the max value of the list, with a range calculated with interval_value and nb_iteration
