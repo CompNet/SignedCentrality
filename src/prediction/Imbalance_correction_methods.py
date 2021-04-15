@@ -18,7 +18,7 @@ import prediction.random_forest_classification
 
 import prediction.feature_ablation
 from prediction.hyper_parameters import compare_hyper_parameters
-
+from collect.collect_graphics import __make_file_path
 
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss
@@ -60,8 +60,8 @@ def test_best_imbalance_method(classifier, features, output, iterations):
         precision = 0
         recall = 0
         
-        for i in iterations:
-            metrics = prediction.classifier.perform_classification(features, output, kernel,
+        for i in range(0,iterations):
+            metrics = prediction.classification.perform_classification(features, output, kernel = "linear",
                                                                        imbalance_correction_method=imbalanceMethod)
             f1_score += metrics[1]['f1_score']
             accuracy += metrics[1]['accuracy_score']
@@ -72,7 +72,11 @@ def test_best_imbalance_method(classifier, features, output, iterations):
         accuracy /= iterations
         precision /= iterations
         recall /= iterations
-        perfs = [type(imbMethod), f1_score, accuracy, precision, recall]
+        f1_scores.append(f1_score)
+        accuracy_scores.append(accuracy)
+        precision_scores.append(precision)
+        recall_scores.append(recall)
+        perfs = [type(imbalanceMethod), f1_score, accuracy, precision, recall]
         results.append(perfs)
 
         if best_f1_score < f1_score:
@@ -86,7 +90,7 @@ def test_best_imbalance_method(classifier, features, output, iterations):
 
     fig, ax = plt.subplots()
     index = np.arange(n_groups)
-    bar_width = 1 / len(imbalance_methods)
+    bar_width = 0.1
     opacity = 1
 
     rects1 = plt.bar(index, f1_scores, bar_width,
@@ -99,22 +103,28 @@ def test_best_imbalance_method(classifier, features, output, iterations):
     color='y',
     label='accuracy')
 
-    rects3 = plt.bar(index + bar_width, precision_scores, bar_width,
+    rects3 = plt.bar(index + bar_width * 2, precision_scores, bar_width,
     alpha=opacity,
     color='r',
     label='precision')
 
-    rects4 = plt.bar(index + bar_width, recall_scores, bar_width,
+    rects4 = plt.bar(index + bar_width * 3, recall_scores, bar_width,
     alpha=opacity,
     color='g',
     label='recall')
 
     plt.ylabel('Scores')
-    plt.title('Imbalance correction method influance on '+ classifier +' scores')
+    plt.title('Imbalance correction method influence on '+ (classifier) +' scores')
     plt.xticks(index + bar_width, (imbalance_methods))
     plt.legend()
 
     plt.tight_layout()
     plt.show()
+    graphic_title = "Imbalance correction method influence"
+    
+    path_to_file = __make_file_path(graphic_title, "barplot")
+    
+    plt.savefig(path_to_file)
+    print("end")
 
     return results

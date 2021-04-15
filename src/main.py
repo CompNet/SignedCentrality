@@ -18,7 +18,7 @@ import prediction.random_forest_classification
 
 import prediction.feature_ablation
 from prediction.hyper_parameters import compare_hyper_parameters
-
+from prediction.Imbalance_correction_methods import test_best_imbalance_method
 
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss
@@ -107,10 +107,13 @@ if __name__ == '__main__':
 
     features = list(itertools.chain.from_iterable(features_list))
 
-    # print(features)
-    # output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    # print(output)
-    # kernel = consts.PREDICTION_KERNEL_LINEAR
+    print(features)
+    output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
+    print(output)
+    kernel = consts.PREDICTION_KERNEL_LINEAR
+
+    test_best_imbalance_method("classification", features, output, 1)
+    
     #
     #
     # # print(kernel)
@@ -172,11 +175,11 @@ if __name__ == '__main__':
     # # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
 
     # Hyper-parameters comparison
-    print("\nCompare Hyper-Parameters")
-    compare_hyper_parameters(
-        features,
-        # consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES,
-        consts.OUTPUT_IS_SINGLE_SOLUTION, consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
-        # consts.OUTPUT_GRAPH_IMBALANCE_COUNT,
-    )  # Add outputs here to select comparisons to perform.
+##    print("\nCompare Hyper-Parameters")
+##    compare_hyper_parameters(
+##        features,
+##        # consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES,
+##        consts.OUTPUT_IS_SINGLE_SOLUTION, consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
+##        # consts.OUTPUT_GRAPH_IMBALANCE_COUNT,
+##    )  # Add outputs here to select comparisons to perform.
 
