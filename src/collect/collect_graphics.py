@@ -305,11 +305,17 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, inte
     path_to_file = __make_file_path(graphic_title, "boxplot", add_plot_to_name, dash_between_name_and_plot)
 
     # transforming dataset to list with same shape
-    for x in np.nditer(outputs_values):  # method to select all values inside the ndarray : https://numpy.org/doc/stable/reference/arrays.nditer.html
-        outputs_values_updated.append(float(x))
+    for x in np.nditer(np.array(outputs_values)):  # method to select all values inside the ndarray : https://numpy.org/doc/stable/reference/arrays.nditer.html
+        if x in ['True', 'False']:
+            outputs_values_updated.append(bool(x))
+        else:
+            outputs_values_updated.append(float(x))
 
-    for y in np.nditer(predicted_values):
-        predicted_values_updated.append(float(y))
+    for y in np.nditer(np.array(predicted_values)):
+        if y in ['True', 'False']:
+            predicted_values_updated.append(bool(y))
+        else:
+            predicted_values_updated.append(float(y))
 
     # collecting max value of both lists
     max_output = max(outputs_values_updated)
@@ -341,7 +347,8 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, inte
             data.append(tmp_list)
 
     # Generating boxplot
-    print("Generating boxplot for "+graphic_title, "\n")
+    if verbose:
+        print("Generating boxplot for "+graphic_title, "\n")
     axes = plt.gca()
     plt.boxplot(data)
     plt.title(graphic_title)
@@ -424,7 +431,8 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
     # print(data)
 
     # Generating boxplot
-    print("Generating boxplot for "+graphic_title, "\n")
+    if verbose:
+        print("Generating boxplot for "+graphic_title, "\n")
     axes = plt.gca()
     plt.boxplot(data)
     plt.title(graphic_title)

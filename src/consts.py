@@ -209,7 +209,7 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
 __NOT_IN_GRAPH_DESCRIPTORS = [  # These classes aren't used as descriptors in models.
     PositiveCentrality,
     NegativeCentrality,
-    SRWRCentrality,
+    # SRWRCentrality,
     TrollTrust,
 ]
 
