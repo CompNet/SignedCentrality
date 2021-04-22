@@ -14,7 +14,7 @@ from deprecated import deprecated
 from sklearn import metrics
 import consts
 import sys
-from collect.collect_graphics import generate_plot, generate_errorbar_plot
+from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean, generate_boxplot_clean1
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.classification import perform_svc_classification
@@ -109,7 +109,8 @@ def print_parameters_comparison(param_name, param_values, metric_name, metric_va
 
     param_name = str(param_name)
     metric_name = str(metric_name)
-    generate_errorbar_plot(param_values, metric_values, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
+    # generate_errorbar_plot(param_values, metric_values, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
+    generate_boxplot_clean1(param_values, metric_values, graphic_name, dash_between_name_and_plot=True)
 
 
 def print_parameters_comparisons(prediction_function_name, best_param_set, results, output):
