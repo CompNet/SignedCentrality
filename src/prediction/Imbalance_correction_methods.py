@@ -60,9 +60,9 @@ def test_best_imbalance_method(classifier, features, output, iterations):
         precision = 0
         recall = 0
         
-        for i in range(0,iterations):
-            metrics = prediction.classification.perform_classification(features, output, kernel = "linear",
-                                                                       imbalance_correction_method=imbalanceMethod)
+        for i in range(0, iterations, 1):
+            metrics = prediction.classification.perform_classification(features, output,
+                                                                       imbalance_correction_method=imbalanceMethod, kernel='linear')
             f1_score += metrics[1]['f1_score']
             accuracy += metrics[1]['accuracy_score']
             precision += metrics[1]['precision_score']
@@ -114,13 +114,13 @@ def test_best_imbalance_method(classifier, features, output, iterations):
     label='recall')
 
     plt.ylabel('Scores')
-    plt.title('Imbalance correction method influence on '+ (classifier) +' scores')
-    plt.xticks(index + bar_width, (imbalance_methods))
+    plt.title('Imbalance correction method influence on '+ 'SVC' +' scores')
+    plt.xticks(index + bar_width, (imbalance_methods), rotation='vertical')
     plt.legend()
 
     plt.tight_layout()
     plt.show()
-    graphic_title = "Imbalance correction method influence"
+    graphic_title = "Imbalance correction method influence" + "SVC"
     
     path_to_file = __make_file_path(graphic_title, "barplot")
     

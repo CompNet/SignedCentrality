@@ -112,7 +112,7 @@ if __name__ == '__main__':
     print(output)
     kernel = consts.PREDICTION_KERNEL_LINEAR
 
-    test_best_imbalance_method("classification", features, output, 1)
+    test_best_imbalance_method("classification", features, output, 10)
     
     #
     #

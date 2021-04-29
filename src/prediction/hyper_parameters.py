@@ -353,8 +353,7 @@ def compare_hyper_parameters(features, *tasks):
             n for n in range(10, 101, 10)
         ],
         "max_depth": [
-            None,
-            *n for n in range(10, 101, 10)
+            n for n in range(10, 101, 10)
         ],
         "min_samples_split": [
             n for n in range(2, 11)
