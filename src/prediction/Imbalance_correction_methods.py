@@ -44,6 +44,15 @@ imbalance_methods = [RandomUnderSampler(), NearMiss(version=1), NearMiss(version
                         BorderlineSMOTE(), SVMSMOTE(), ADASYN()]
 
 def test_best_imbalance_method(classifier, features, output, iterations):
+    """
+    This method generates the barplot comparing the influence of several
+    imbalance correction methods on a given classifier scores
+
+    :param classifier:
+    :type classifier:
+    :param iterations:
+    :type iterations:
+    """
 
     results = []
     f1_scores = []
