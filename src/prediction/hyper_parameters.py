@@ -295,9 +295,11 @@ def compare_hyper_parameters(features, *tasks):
     # layer_sizes = [n for n in range(10, 301, 50)]
     # layer_sizes = [n for n in range(1, 20, 4)]
     layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
+    # layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)]]
     # layers_numbers = [n for n in range(10, 101, 50)]
     # layers_numbers = [n for n in range(1, 10, 2)]
     layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
+    # layers_numbers = [1, 2, *[n for n in range(3, 10, 2)]]
     layers = []
     for layer_size in layer_sizes:
         layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
@@ -307,8 +309,8 @@ def compare_hyper_parameters(features, *tasks):
     mlp_params_ranges = {
         consts.MLP.HIDDEN_LAYER_SIZES: layers,
         consts.MLP.ACTIVATION: [
-            consts.MLP.IDENTITY,
-            consts.MLP.LOGISTIC,
+            # consts.MLP.IDENTITY,
+            # consts.MLP.LOGISTIC,
             consts.MLP.TANH,
             consts.MLP.RELU,  # Default Value
         ],
@@ -319,11 +321,11 @@ def compare_hyper_parameters(features, *tasks):
         ],
         # consts.MLP.ALPHA: [0.0001],
         # consts.MLP.BATCH_SIZE: [consts.MLP.AUTO],
-        consts.MLP.LEARNING_RATE: [
-            consts.MLP.CONSTANT,
-            consts.MLP.INVSCALING,
-            consts.MLP.ADAPTIVE,
-        ],
+        # consts.MLP.LEARNING_RATE: [
+        #     consts.MLP.CONSTANT,
+        #     consts.MLP.INVSCALING,
+        #     consts.MLP.ADAPTIVE,
+        # ],
         # consts.MLP.LEARNING_RATE_INIT: [0.001],
         # consts.MLP.POWER_T: [0.5],
         # consts.MLP.MAX_ITER: max_iter,
