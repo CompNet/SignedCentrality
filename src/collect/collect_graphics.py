@@ -66,6 +66,9 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     # graphic_title = util.prediction_name_refactor(graphic_title)
     path_to_file = __make_file_path(graphic_title, name, add_plot_to_name, dash_between_name_and_plot)
 
+    f = plt.figure()
+    f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
+
     if verbose:
         print("Generating " + name + " for " + graphic_title)
     if isinstance(plot_function, list):
@@ -147,7 +150,7 @@ def generate_errorbar_plot(x_values, y_values, y_values_ranges, graphic_title, x
 
     stddev = None
     if len(y_values) > 1:
-        stddev = [stdev([float(y) for y in y_values_range]) for y_values_range in y_values_ranges]
+        stddev = [stdev([float(y) for y in y_values_range]) for y_values_range in y_values_ranges] if len(y_values_ranges[0]) > 1 else [stdev([float(y) for y in [*y_values_range, *y_values_range]]) for y_values_range in y_values_ranges]
     __make_plot(
         plt.errorbar,
         graphic_title,
@@ -454,7 +457,7 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
     plt.close()
 
 
-def generate_std_boxplot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True,dash_between_name_and_plot=False, verbose=False):
+def generate_std_boxplot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
     """
     This method generate a boxplot plot using matplotlib.pyplot
 
