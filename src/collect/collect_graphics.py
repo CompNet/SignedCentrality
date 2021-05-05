@@ -127,7 +127,7 @@ def generate_plot(x_values, y_values, graphic_title, x_label=None, y_label=None,
     )
 
 
-def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True,dash_between_name_and_plot=False, verbose=False):
+def generate_errorbar_plot(x_values, y_values, y_values_ranges, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
     """
     This method generate an errorbar plot using matplotlib.pyplot
 
@@ -135,6 +135,7 @@ def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_la
     :type x_values: integer list
     :param y_values: a list of values used for y axis
     :type y_values: integer list
+    :type y_values_ranges: values ranges for y
     :param graphic_title: the title of the graphic
     :type graphic_title: string
     :param x_label: label for x axis
@@ -146,7 +147,7 @@ def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_la
 
     stddev = None
     if len(y_values) > 1:
-        stddev = stdev([float(y) for y in y_values])
+        stddev = [stdev([float(y) for y in y_values_range]) for y_values_range in y_values_ranges]
     __make_plot(
         plt.errorbar,
         graphic_title,
@@ -155,7 +156,7 @@ def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_la
         add_plot_to_name, dash_between_name_and_plot,
         verbose,
         x_values, y_values,
-        yerr=stddev, linestyle='none', marker='o', c='blue', markersize=5
+        yerr=stddev, linestyle='-', marker=',', c='blue', markersize=5
     )
 
 

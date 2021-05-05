@@ -129,7 +129,7 @@ def print_parameters_comparison(param_name, param_values, metric_name, metric_va
 
     param_name = str(param_name)
     metric_name = str(metric_name)
-    generate_errorbar_plot(param_values, metric_values, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
+    generate_errorbar_plot(param_values, metric_values, metric_values_ranges, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
     generate_std_boxplot(param_values, metric_values_ranges, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
 
 
@@ -401,8 +401,8 @@ def compare_hyper_parameters(features, *tasks):
     }
 
     regression_functions = {
-        # perform_linear_regression: linear_params_ranges,
-        # perform_mlp_regression: mlp_params_ranges,
+        perform_linear_regression: linear_params_ranges,
+        perform_mlp_regression: mlp_params_ranges,
         perform_svr_regression: svr_params_ranges,
     }
 
