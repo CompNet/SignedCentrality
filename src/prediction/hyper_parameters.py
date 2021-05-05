@@ -14,7 +14,7 @@ from deprecated import deprecated
 from sklearn import metrics
 import consts
 import sys
-from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean, generate_boxplot_clean1
+from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean, generate_boxplot_clean1, generate_std_boxplot
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.classification import perform_svc_classification
@@ -66,7 +66,7 @@ def __initialize_hyper_parameters_sets(param_set=None, **parameters_range):
     return results
 
 
-def __initialize_graphic_data(best_param_set, results):
+def __initialize_graphic_data(best_param_set, results, results_ranges):
     """
     Initialise data for graphic functions
 
@@ -78,9 +78,28 @@ def __initialize_graphic_data(best_param_set, results):
     data = {}
 
     for (metric_name, param_set, metric_value) in best_param_set:
-        metric_data = {param_name: [(param_set[param_name], metric_value)] for param_name in param_set.keys()}
+        metric_range = None
+        ok = True
+        for results_range in results_ranges:
+            if sum(results_range[metric_name]) / len(results_range[metric_name]) == metric_value:
+                metric_range = results_range
+                break
+            # for k in param_set.keys():
+            #     print(k, ":", results_range[k], "!=", param_set[k])
+            #     if results_range[k] != param_set[k]:
+            #         ok = False
+            #         break
+            # print()
+            # if not ok:
+            #     continue
+            # metric_range = results_range[metric_name]
+            # break
+        # print('metric_range:', metric_range)
+        metric_data = {param_name: [(param_set[param_name], metric_value, metric_range[metric_name])] for param_name in param_set.keys()}
 
-        for result in results:
+        for i in range(len(results)):
+            result = results[i]
+            results_range = results_ranges[i]
             non_optimal_values = []
             for param, value in param_set.items():  # Don't use result, because it contains more columns than best_param_set.
                 if value != result[param]:
@@ -89,14 +108,14 @@ def __initialize_graphic_data(best_param_set, results):
                 continue
 
             tested_param_name = non_optimal_values[0]
-            metric_data[tested_param_name].append((result[tested_param_name], result[metric_name]))
+            metric_data[tested_param_name].append((result[tested_param_name], result[metric_name], results_range[metric_name]))
 
         data[metric_name] = {param_name: tuple(data_list) for param_name, data_list in metric_data.items()}
 
     return data
 
 
-def print_parameters_comparison(param_name, param_values, metric_name, metric_values, graphic_name):
+def print_parameters_comparison(param_name, param_values, metric_name, metric_values, metric_values_ranges, graphic_name):
     """
     Export graphic for all values of all hyper parameters
 
@@ -104,31 +123,37 @@ def print_parameters_comparison(param_name, param_values, metric_name, metric_va
     :param param_values: values for the parameter
     :param metric_name: name of the metric
     :param metric_values: values for the metric
+    :param metric_values_ranges: values ranges for the metric
     :param graphic_name: name of the graphic
     """
 
     param_name = str(param_name)
     metric_name = str(metric_name)
-    # generate_errorbar_plot(param_values, metric_values, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
-    generate_boxplot_clean1(param_values, metric_values, graphic_name, dash_between_name_and_plot=True)
+    generate_errorbar_plot(param_values, metric_values, metric_values_ranges, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
+    generate_std_boxplot(param_values, metric_values_ranges, graphic_name, param_name.replace("_", " "), metric_name.replace("_", " "), print_title=False, dash_between_name_and_plot=True)
 
 
-def print_parameters_comparisons(prediction_function_name, best_param_set, results, output):
+def print_parameters_comparisons(prediction_function_name, best_param_set, results, results_ranges, output):
     """
     Export graphic for all values of all hyper parameters
 
     :param prediction_function_name: name of the function that makes the predictions
     :param best_param_set: best parameters set
     :param results: all parameters set
+    :param results_ranges: all parameters set with values ranges for the metric
     :param output: prediction task
     """
 
-    data = __initialize_graphic_data(best_param_set, results)
+    data = __initialize_graphic_data(best_param_set, results, results_ranges)
 
     for metric_name, metric_data in data.items():
-        for param_name, values in metric_data.items():
+        # for param_name, values in metric_data.items():
+        for param_name in metric_data.keys():
+            values = metric_data[param_name]
+            # print(values)
             param_values = [value[0] for value in values]
             metric_values = [value[1] for value in values]
+            metric_values_ranges = [value[2] for value in values]
 
             if param_name == consts.MLP.HIDDEN_LAYER_SIZES:
                 param_values = [str(len(param_value)) + '*' + str(param_value[0]) for param_value in param_values]
@@ -136,7 +161,7 @@ def print_parameters_comparisons(prediction_function_name, best_param_set, resul
                 param_values = [str(param_value) for param_value in param_values]  # str() even is parameter is a number because numeric parameters are defined in a discrete set.
 
             graphic_name = output + "_-_" + prediction_function_name + "_-_" + param_name + "_-_" + metric_name
-            print_parameters_comparison(param_name, param_values, metric_name, metric_values, graphic_name)
+            print_parameters_comparison(param_name, param_values, metric_name, metric_values, metric_values_ranges, graphic_name)
 
 
 def test_hyper_parameters(prediction_function, features, output, train_iterations_number=10, **parameters_range):
@@ -154,6 +179,7 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
     """
 
     results = []
+    results_ranges = []
     best_param_set = None
     param_sets = __initialize_hyper_parameters_sets(**parameters_range)
     print("There are", len(param_sets), "parameters sets and", train_iterations_number, "train iterations.", file=stderr)
@@ -164,7 +190,8 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
 
     # Run tests:
     for hyper_parameters in param_sets:
-        prediction_metrics = None
+        # prediction_metrics = None
+        prediction_metrics_all_values = None
 
         # Compute a mean value to make results more accurate:
         for it in range(train_iterations_number):
@@ -175,15 +202,20 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
                 False, False, False,
                 **hyper_parameters
             )
-            if prediction_metrics is None:
-                prediction_metrics = {**it_prediction_metrics}
+            # if prediction_metrics is None:  # prediction_metrics_all_values is None too
+            if prediction_metrics_all_values is None:
+                # prediction_metrics = {**it_prediction_metrics}
+                prediction_metrics_all_values = {k: [v] for k, v in it_prediction_metrics.items()}
             else:
                 for metric_name, it_metric_value in it_prediction_metrics.items():
-                    prediction_metrics[metric_name] += it_metric_value
+                    # prediction_metrics[metric_name] += it_metric_value
+                    prediction_metrics_all_values[metric_name].append(it_metric_value)
 
-        for metric_name, metric_value in prediction_metrics.items():
-            prediction_metrics[metric_name] = metric_value / train_iterations_number
+        # for metric_name, metric_value in prediction_metrics.items():
+        #     prediction_metrics[metric_name] = metric_value / train_iterations_number
+        prediction_metrics = {metric_name: sum(metric_values) / train_iterations_number for metric_name, metric_values in prediction_metrics_all_values.items()}
         results = [*results, {**hyper_parameters, **prediction_metrics}]  # If there have been an error in model training, it will be shown in CSV file by a NAN value for the metric.
+        results_ranges = [*results_ranges, {**hyper_parameters, **prediction_metrics_all_values}]
 
         if best_param_set is None:
             best_param_set = [(metric_name, hyper_parameters, metric_value) if metric_value is not None else (metric_name, None, None) for metric_name, metric_value in prediction_metrics.items()]
@@ -213,7 +245,7 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
             # print("Excluded parameters set:", r, file=stderr)
             continue  # NAN values aren't taken into account in the graphic to keep accuracy of right values.
         graphic_results.append(r)
-    print_parameters_comparisons(prediction_function.__name__, best_param_set, graphic_results, *output)
+    print_parameters_comparisons(prediction_function.__name__, best_param_set, graphic_results, results_ranges, *output)
 
     return best_param_set
 
@@ -261,9 +293,11 @@ def compare_hyper_parameters(features, *tasks):
     }
 
     # layer_sizes = [n for n in range(10, 301, 50)]
-    layer_sizes = [n for n in range(1, 20, 4)]
+    # layer_sizes = [n for n in range(1, 20, 4)]
+    layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
     # layers_numbers = [n for n in range(10, 101, 50)]
-    layers_numbers = [n for n in range(1, 10, 2)]
+    # layers_numbers = [n for n in range(1, 10, 2)]
+    layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
     layers = []
     for layer_size in layer_sizes:
         layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
@@ -390,12 +424,14 @@ def compare_hyper_parameters(features, *tasks):
     if exists(best_param_sets_path):
         os.remove(best_param_sets_path)
 
+    train_iterations_number = 10
+
     for output, prediction_functions in outputs.items():
         if len(tasks) > 0 and output not in tasks:
             continue
         for prediction_function, params_ranges in prediction_functions.items():
             print("####", output, ":", prediction_function.__name__, "####")
-            best_param_set = test_hyper_parameters(prediction_function, features, [output], **params_ranges)
+            best_param_set = test_hyper_parameters(prediction_function, features, [output], train_iterations_number=train_iterations_number, **params_ranges)
             export_best_params_set(output, prediction_function, best_param_set)
 
             print("Best parameters sets:")

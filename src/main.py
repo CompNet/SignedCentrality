@@ -188,5 +188,5 @@ if __name__ == '__main__':
     # print("\nRandom Forest (eq_solclass) :")
     # prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_solclass(features, output2)
 
-
+    print("All tests have been executed successfully.")
 

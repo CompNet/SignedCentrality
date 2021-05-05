@@ -58,12 +58,25 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     """
 
     graphic_title = str(graphic_title)
+    name = None
+    if not isinstance(plot_function, list):
+        name = plot_function.__name__
+    else:
+        name = plot_function[0].__name__
     # graphic_title = util.prediction_name_refactor(graphic_title)
-    path_to_file = __make_file_path(graphic_title, plot_function.__name__, add_plot_to_name, dash_between_name_and_plot)
+    path_to_file = __make_file_path(graphic_title, name, add_plot_to_name, dash_between_name_and_plot)
+
+    f = plt.figure()
+    f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
 
     if verbose:
-        print("Generating " + plot_function.__name__ + " for " + graphic_title)
-    plot_function(*args, **kwargs)
+        print("Generating " + name + " for " + graphic_title)
+    if isinstance(plot_function, list):
+        for i in range(len(plot_function)):
+            plot_function[i](args[i], **kwargs)
+
+    else:
+        plot_function(*args, **kwargs)
     if print_title:
         plt.title(graphic_title)
     if x_label is not None:
@@ -117,7 +130,7 @@ def generate_plot(x_values, y_values, graphic_title, x_label=None, y_label=None,
     )
 
 
-def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True,dash_between_name_and_plot=False, verbose=False):
+def generate_errorbar_plot(x_values, y_values, y_values_ranges, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
     """
     This method generate an errorbar plot using matplotlib.pyplot
 
@@ -125,6 +138,7 @@ def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_la
     :type x_values: integer list
     :param y_values: a list of values used for y axis
     :type y_values: integer list
+    :type y_values_ranges: values ranges for y
     :param graphic_title: the title of the graphic
     :type graphic_title: string
     :param x_label: label for x axis
@@ -136,7 +150,7 @@ def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_la
 
     stddev = None
     if len(y_values) > 1:
-        stddev = stdev([float(y) for y in y_values])
+        stddev = [stdev([float(y) for y in y_values_range]) for y_values_range in y_values_ranges] if len(y_values_ranges[0]) > 1 else [stdev([float(y) for y in [*y_values_range, *y_values_range]]) for y_values_range in y_values_ranges]
     __make_plot(
         plt.errorbar,
         graphic_title,
@@ -145,7 +159,7 @@ def generate_errorbar_plot(x_values, y_values, graphic_title, x_label=None, y_la
         add_plot_to_name, dash_between_name_and_plot,
         verbose,
         x_values, y_values,
-        yerr=stddev, linestyle='none', marker='o', c='blue', markersize=5
+        yerr=stddev, linestyle='-', marker=',', c='blue', markersize=5
     )
 
 
@@ -441,3 +455,32 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
     plt.tight_layout()
     plt.savefig(path_to_file)
     plt.close()
+
+
+def generate_std_boxplot(x_values, y_values, graphic_title, x_label=None, y_label=None, print_title=True, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
+    """
+    This method generate a boxplot plot using matplotlib.pyplot
+
+    :param x_values: a list of values used for x axis
+    :type x_values: integer list
+    :param y_values: a list of values used for y axis
+    :type y_values: integer list
+    :param graphic_title: the title of the graphic
+    :type graphic_title: string
+    :param x_label: label for x axis
+    :param y_label: label for y axis
+    :param print_title: True if title must be printed
+    :param add_plot_to_name: True if plot type must be added
+    :param dash_between_name_and_plot: True if plot type must be preceded by a dash
+    :param verbose: True if information must be printed
+    """
+
+    __make_plot(
+        [plt.boxplot for _ in range(len(y_values))],
+        graphic_title,
+        x_label, y_label,
+        print_title,
+        add_plot_to_name, dash_between_name_and_plot,
+        verbose,
+        *y_values,
+    )
