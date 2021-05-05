@@ -293,9 +293,11 @@ def compare_hyper_parameters(features, *tasks):
     }
 
     # layer_sizes = [n for n in range(10, 301, 50)]
-    layer_sizes = [n for n in range(1, 20, 4)]
+    # layer_sizes = [n for n in range(1, 20, 4)]
+    layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
     # layers_numbers = [n for n in range(10, 101, 50)]
-    layers_numbers = [n for n in range(1, 10, 2)]
+    # layers_numbers = [n for n in range(1, 10, 2)]
+    layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
     layers = []
     for layer_size in layer_sizes:
         layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
@@ -422,12 +424,14 @@ def compare_hyper_parameters(features, *tasks):
     if exists(best_param_sets_path):
         os.remove(best_param_sets_path)
 
+    train_iterations_number = 10
+
     for output, prediction_functions in outputs.items():
         if len(tasks) > 0 and output not in tasks:
             continue
         for prediction_function, params_ranges in prediction_functions.items():
             print("####", output, ":", prediction_function.__name__, "####")
-            best_param_set = test_hyper_parameters(prediction_function, features, [output], **params_ranges)
+            best_param_set = test_hyper_parameters(prediction_function, features, [output], train_iterations_number=train_iterations_number, **params_ranges)
             export_best_params_set(output, prediction_function, best_param_set)
 
             print("Best parameters sets:")
