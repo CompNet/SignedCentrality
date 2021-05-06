@@ -6,7 +6,6 @@ Created on Apr 6, 2021
 
 import itertools
 import consts
-import centrality.runner
 import stats.runner
 import collect.collect_features
 import collect.collect_outputs
