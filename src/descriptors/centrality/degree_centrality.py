@@ -15,7 +15,6 @@ from numpy.linalg import inv
 # noinspection PyProtectedMember
 from descriptors import GraphDescriptor
 from util import get_matrix, scale_centrality
-from centrality import CentralityMeasure
 
 
 class DegreeCentrality(GraphDescriptor):

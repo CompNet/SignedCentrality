@@ -7,19 +7,17 @@ Created on Sep 23, 2020
 import itertools
 
 import consts
-import centrality.runner
+import descriptors
 import stats.runner
 import collect.collect_features
 import collect.collect_outputs
 import prediction.classification
 import prediction.regression
-
 import prediction.random_forest_classification
-
 import prediction.feature_ablation
+from descriptors.runner import compute_all_centralities
 from prediction.hyper_parameters import compare_hyper_parameters
 from prediction.Imbalance_correction_methods import test_best_imbalance_method
-
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss
 from imblearn.under_sampling import CondensedNearestNeighbour
@@ -27,14 +25,11 @@ from imblearn.under_sampling import TomekLinks
 from imblearn.under_sampling import EditedNearestNeighbours
 from imblearn.under_sampling import OneSidedSelection
 from imblearn.under_sampling import NeighbourhoodCleaningRule
-
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import BorderlineSMOTE
 from imblearn.over_sampling import SVMSMOTE
 from imblearn.over_sampling import ADASYN
-
-
 
 
 # =====================================
@@ -73,7 +68,7 @@ VERBOSE = False
 
 if __name__ == '__main__':
 
-    centrality.runner.compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
+    compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
 
     stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE, VERBOSE)
 
@@ -106,25 +101,25 @@ if __name__ == '__main__':
         ])
 
     features = list(itertools.chain.from_iterable(features_list))
-
     print(features)
     output = [consts.OUTPUT_IS_SINGLE_SOLUTION]
-    print(output)
+    output1 = [consts.OUTPUT_NB_SOLUTIONS]
+    output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+    output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
+    output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
+    output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
     kernel = consts.PREDICTION_KERNEL_LINEAR
 
-    test_best_imbalance_method("classification", features, output, 10)
-    
-    #
-    #
+
     # # print(kernel)
     # # classification task : one or more solutions
     # print("\nSVC :")
     # prediction.classification.perform_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3))
     # print("\nRandom Forest :")
-    # prediction.random_forest_classification.perform_classification(features, output, 1000)
+    # # prediction.random_forest_classification.perform_classification(features, output, 1000)
+    # prediction.random_forest_classification.perform_classification(features, output, EditedNearestNeighbours())
     #
     # # regression task : number of solutions
-    # output1 = [consts.OUTPUT_NB_SOLUTIONS]
     # print("Task:", *output1)
     # print("\nSVR :")
     # prediction.regression.perform_regression(features, output1, kernel)
@@ -134,31 +129,28 @@ if __name__ == '__main__':
     # prediction.regression.perform_mlp_regression(features, output1)
     #
     # # classification task : one or more classes of solution
-    # output2 = [consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
     # print("Task:", *output2)
     # print("\nSVC :")
     # prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
     # print("\nRandom Forest :")
-    # prediction.random_forest_classification.perform_classification(features, output2, 1000)
+    # # prediction.random_forest_classification.perform_classification(features, output2, 1000)
+    # prediction.random_forest_classification.perform_classification(features, output2, EditedNearestNeighbours())
     #
     #
     # # regression task : number of classes of solution
-    # output3 = [consts.OUTPUT_NB_SOLUTION_CLASSES]
     # print("Task:", *output3)
     # print("\nSVR :")
     # prediction.regression.perform_regression(features, output3, kernel)
     # print("\nLinear Regression :")
-    # # prediction.regression.perform_linear_regression(features, output3)
+    # prediction.regression.perform_linear_regression(features, output3)
     # print("\nMLP Regression :")
     # prediction.regression.perform_mlp_regression(features, output3)
     #
     # # regression task : graph imbalance
-    # output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
     # print("Task:", *output4)
     # print("\nSVR :")
     # prediction.regression.perform_regression(features, output4, kernel)
     #
-    # output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
     # print("Task:", *output4)
     # print("\nSVR :")
     # prediction.regression.perform_regression(features, output5, kernel)
@@ -167,19 +159,48 @@ if __name__ == '__main__':
     # print("\nTask: feature ablation")
     # print("\nSVC :")
     # prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
+    # print("\nRandomForestClassifier :")
+    # # prediction.feature_ablation.feature_ablation_random_forest_classification(features, output2) # TODO don't uncomment it, with the actual parameters, it could block the computer
     # print("\nSVR :")
     # prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
     # print("\nLinear Regression :")
     # prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
     # print("\nMLP Regression :")
-    # # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO doesn't work, fix it
+    # # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO don't uncomment it, doesn't work, fix it
 
     # Hyper-parameters comparison
-##    print("\nCompare Hyper-Parameters")
-##    compare_hyper_parameters(
-##        features,
-##        # consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES,
-##        consts.OUTPUT_IS_SINGLE_SOLUTION, consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
-##        # consts.OUTPUT_GRAPH_IMBALANCE_COUNT,
-##    )  # Add outputs here to select comparisons to perform.
+    print("\nCompare Hyper-Parameters")
+    compare_hyper_parameters(
+        features,
+        consts.OUTPUT_NB_SOLUTIONS, consts.OUTPUT_NB_SOLUTION_CLASSES,
+        consts.OUTPUT_IS_SINGLE_SOLUTION, consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES,
+        consts.OUTPUT_GRAPH_IMBALANCE_COUNT,
+    )  # Add outputs here to select comparisons to perform.
+
+    # feature ablation task
+    print("\nTask: feature ablation")
+    print("\nSVC :")
+    prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
+    print("\nRandomForestClassifier :")
+    prediction.feature_ablation.feature_ablation_random_forest_classification(features, output2) # TODO don't uncomment it, with the actual parameters, it could block the computer
+    print("\nSVR :")
+    prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
+    print("\nLinear Regression :")
+    prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
+    print("\nMLP Regression :")
+    # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO don't uncomment it, doesn't work, fix it
+
+    # # feature ablation classification tests (TODO this code is to apply feature ablation on specific files already balanced, delete once tests finished)
+    # import prediction.tmp_feature_ablation
+    #
+    # # print("\nSVC (eq_sol) :")
+    # # prediction.tmp_feature_ablation.feature_ablation_svc_classification_eq_sol(features, output)
+    # # print("\nSVC (eq_solclass) :")
+    # # prediction.tmp_feature_ablation.feature_ablation_svc_classification_eq_solclass(features, output2)
+    # print("\nRandom Forest (eq_sol) :")
+    # prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_sol(features, output)
+    # print("\nRandom Forest (eq_solclass) :")
+    # prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_solclass(features, output2)
+
+    print("All tests have been executed successfully.")
 

@@ -10,13 +10,13 @@ from sklearn import metrics
 # ===========================
 # Path variables
 # ===========================
-from centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
-from centrality.eigenvector_centrality import compute_eigenvector_centrality, EigenvectorCentrality
-from centrality.srwr_centrality import perform_srwr, SRWRCentrality
-from centrality.trolltrust_centrality import TrollTrust
-from centrality.diversity_coef_centrality import diversity_coef_centrality
+from descriptors.centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
+from descriptors.centrality.srwr_centrality import SRWRCentrality
+from descriptors.centrality.trolltrust_centrality import TrollTrust
+from descriptors.centrality.diversity_coef_centrality import diversity_coef_centrality
 from descriptors import GraphDescriptor
-from node_embeddings.sne.sne_embedding import SNEEmbedding
+from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
 
 CSV = ".csv"
 TXT = ".txt"
@@ -210,7 +210,7 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
 __NOT_IN_GRAPH_DESCRIPTORS = [  # These classes aren't used as descriptors in models.
     PositiveCentrality,
     NegativeCentrality,
-    SRWRCentrality,
+    # SRWRCentrality,
     TrollTrust,
 ]
 
