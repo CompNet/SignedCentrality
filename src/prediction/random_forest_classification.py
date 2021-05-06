@@ -32,17 +32,10 @@ from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction, \
     perform_prediction
 
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.under_sampling import NearMiss
-from imblearn.under_sampling import CondensedNearestNeighbour
-from imblearn.under_sampling import TomekLinks
-from imblearn.under_sampling import EditedNearestNeighbours
-from imblearn.under_sampling import OneSidedSelection
-
 import collect.collect_graphics
 
 
-def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=False):
+def test_classification(cla, X_test, Y_test, output, print_results=True, export_predicted_values=True, export_graphical_results=True):
     """
     Perform validation tests for classification
 
@@ -61,7 +54,7 @@ def test_classification(cla, X_test, Y_test, output, print_results=True, export_
     return test_prediction(cla, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)
 
 
-def perform_random_forest_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=False, **kwargs):
+def perform_random_forest_classification(features, output, print_results=True, export_predicted_values=True, export_graphical_results=True, imbalance_correction_method=False, **kwargs):
     """This method performs the task of classification for a single output.
 
     The classification is computed using SVM.
@@ -75,14 +68,18 @@ def perform_random_forest_classification(features, output, print_results=True, e
 
     # Set default values for hyper parameters:
     default_values = {
-        "n_estimators": 10000,
+        "n_estimators": 100,
+        "max_depth": None,
+        "min_samples_split": 2,
+        "min_samples_leaf" : 1,
     }
 
-    return perform_prediction(RandomForestClassifier, default_values, features, output, test_classification, print_results, export_predicted_values, export_graphical_results, **kwargs)
+    return perform_prediction(RandomForestClassifier, default_values, features, output, test_classification, print_results, export_predicted_values,
+                              export_graphical_results, imbalance_correction_method=imbalance_correction_method, **kwargs)
 
 
 @deprecated("This function is deprecated, use 'perform_svc_classification()' instead")
-def perform_classification(features, output, n_estimators):
+def perform_classification(features, output, imbalance_correction_method=False, n_estimators=1000, max_depth=None, min_samples_split=2, min_samples_leaf=1):
     """
     Alias for perform_svc_classification().
 
@@ -95,31 +92,5 @@ def perform_classification(features, output, n_estimators):
     :param kernel: a kernel model, e.g. consts.PREDICTION_KERNEL_LINEAR, etc.
     """
 
-    return perform_random_forest_classification(features, output, n_estimators=n_estimators)
+    return perform_random_forest_classification(features, output, imbalance_correction_method=imbalance_correction_method, n_estimators=n_estimators, max_depth=max_depth, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf)
 
-
-
-
-##    #Rectify the imbalance in the data UNDERSAMPLING
-##    undersample = RandomUnderSampler(sampling_strategy='majority')
-##    undersample = NearMiss(version=1)
-##    undersample = NearMiss(version=2, n_neighbors=3)
-##    undersample = NearMiss(version=3, n_neighbors_ver3=3)
-##    undersample = CondensedNearestNeighbour(n_neighbors=1)
-##    undersample = TomekLinks()
-##    undersample = EditedNearestNeighbours(n_neighbors=3)
-##    undersample = OneSidedSelection(n_neighbors=1, n_seeds_S=200)
-##    undersample = NeighbourhoodCleaningRule(n_neighbors=3, threshold_cleaning=0.5)
-
-##    # fit and apply the transform
-##    X, Y = undersample.fit_resample(X, Y)
-
-
-##    #Rectify the imbalance in the data OVERSAMPLING
-##    oversample = RandomOverSampler(sampling_strategy='majority')
-##    oversample = SMOTE()
-##    oversample = BorderlineSMOTE()
-##    oversample = SVMSMOTE()
-##    oversample = ADASYN()
-
-##    X, Y = oversample.fit_resample(X, Y)

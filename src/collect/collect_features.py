@@ -12,18 +12,13 @@ Created on Sep 23, 2020
 '''
 
 import util
-import centrality.degree_centrality
-import centrality.eigenvector_centrality
 import consts
 import path
 import os
-from statistics import mean, stdev
-
 import pandas as pd
 
 
-def collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
-                         centralities, stats):
+def collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, graph_descriptors, stats):
     """This method collects all the indicated features, which are centrality measures
     and graph-related statistics (number of nodes, etc.).
        
@@ -41,8 +36,8 @@ def collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
     :type network_no: int
     :param network_desc: network description, i.e. whether network is weighted or unweighted
     :type network_desc: str. One of them: SIGNED_UNWEIGHTED, SIGNED_WEIGHTED
-    :param centralities: centralities, e.g. consts.CENTR_DEGREE_NEG, consts.CENTR_DEGREE_POS, etc. 
-    :type centralities: str list
+    :param graph_descriptors: centralities or embeddings, e.g. consts.CENTR_DEGREE_NEG, consts.CENTR_DEGREE_POS, etc.
+    :type graph_descriptors: str list
     :param stats: graph related statistics, e.g. consts.STATS_SIGNED_TRIANGLES, consts.STATS_POS_NEG_RATIO
     :type stats: str list
     """
@@ -70,15 +65,15 @@ def collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
         cent_folder_path = path.get_centrality_folder_path(n, l0, d, prop_mispl, prop_neg,
                                                              network_no, network_desc)
         #print("..... collecting features in "+cent_folder_path)
-        for centr_name in centralities:
-            desc = consts.PREFIX_MEAN+centr_name
+        for desc_name in graph_descriptors:
+            desc = consts.PREFIX_MEAN+desc_name
             result_filepath = os.path.join(cent_folder_path,desc+".csv")
             if os.path.exists(result_filepath):
                 df = pd.read_csv(result_filepath, 
                             usecols=[desc])
                 features = pd.concat([features, df], axis=1)
                             
-            desc = consts.PREFIX_STD+centr_name
+            desc = consts.PREFIX_STD+desc_name
             result_filepath = os.path.join(cent_folder_path,desc+".csv")
             if os.path.exists(result_filepath):
                 df = pd.read_csv(result_filepath, 
@@ -88,8 +83,7 @@ def collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
     return features       
                  
 
-def collect_all_features(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks,
-                              network_desc, centralities, stats, force=False):
+def collect_all_features(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks, network_desc, graph_descriptors, stats, force=False, verbose=False):
     """This method handles the input singed networks before collecting all the
     indicated features. Those features will be later used in the prediction tasks.
        
@@ -107,8 +101,8 @@ def collect_all_features(graph_sizes, l0_values, d, prop_mispls, prop_negs, netw
     :type networks: a list of int
     :param network_desc: network description, i.e. whether network is weighted or unweighted
     :type network_desc: str. One of them: SIGNED_UNWEIGHTED, SIGNED_WEIGHTED
-    :param centralities: centralities, e.g. consts.CENTR_DEGREE_NEG, consts.CENTR_DEGREE_POS, etc. 
-    :type centralities: str list
+    :param graph_descriptors: centralities or embeddings, e.g. consts.CENTR_DEGREE_NEG, consts.CENTR_DEGREE_POS, etc.
+    :type graph_descriptors: str list
     :param stats: graph related statistics, e.g. consts.STATS_SIGNED_TRIANGLES, consts.STATS_POS_NEG_RATIO
     :type stats: str list
     """
@@ -124,29 +118,30 @@ def collect_all_features(graph_sizes, l0_values, d, prop_mispls, prop_negs, netw
         for n in graph_sizes:
             for l0 in l0_values:
                 for prop_mispl in prop_mispls:
-                    
+
                     my_prop_negs = prop_negs
                     if my_prop_negs is None and d == 1:
                         my_prop_negs = [util.compute_prop_neg(n, l0)]
-                        
+
                     for prop_neg in my_prop_negs:
                         for network_no in networks:
                             desc = "n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d)+", propMispl="+util.format_4digits(prop_mispl)+", propNeg="+util.format_4digits(prop_neg)+", network="+str(network_no)
                                 
-                            print("... collecting features with n="+str(n)+", l0="+str(l0)+
-                                  ", dens="+util.format_4digits(d), ", propMispl="+
-                                  util.format_4digits(prop_mispl), 
-                                ", propNeg="+util.format_4digits(prop_neg), 
-                                ", network="+str(network_no))
+                            print(
+                                "... collecting features with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d),
+                                ", propMispl="+util.format_4digits(prop_mispl),
+                                ", propNeg="+util.format_4digits(prop_neg),
+                                ", network="+str(network_no)
+                            )
         
-                            row = collect_features(n, l0, d, prop_mispl, prop_neg, 
-                                                 network_no, network_desc, centralities, stats)
+                            row = collect_features(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, graph_descriptors, stats)
                             if row.size != 0:
                                 features = features.append(row)
                                 rownames.append(desc)
-            
-        features.index =  rownames          
+
+        features.index = rownames
         features.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
-        print(result_filepath+" already exists")        
-        
+        if verbose:
+            print(result_filepath+" already exists")
+

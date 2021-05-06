@@ -2,34 +2,28 @@
 @author: alexandre
 '''
 
-import math
 import pandas
 import numpy
 import sys
-import random
-import csv
 from sklearn import svm
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-
 import os
+from descriptors import GraphDescriptor
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from util import get_matrix, scale_centrality
+from util import get_matrix
 from igraph import *
-
-from prediction.regression import perform_regression
-from __init__ import CentralityMeasure
 import consts
 
 
-class TrollTrust(CentralityMeasure):
+class TrollTrust(GraphDescriptor):
     
-
+    @staticmethod
     def calculate_rep_values(graph, pi):
         """This method calculates a list of Reputation values for each nodes.
 
@@ -60,7 +54,7 @@ class TrollTrust(CentralityMeasure):
                 rep[i] = (o1 - o2) / (o1 + o2)
         graph.vs['rep'] = rep
         
-            
+    @staticmethod
     def calculate_opt_values(graph, pi):
         """This method calculates a list of Optimization values for each nodes.
 
@@ -92,6 +86,7 @@ class TrollTrust(CentralityMeasure):
         graph.vs['opt'] = opt
         
 
+    @staticmethod
     def troll_trust(graph, beta, lambda1, iter_max, delta_min):
         """This method returns a list pi containing centrality values for each
         nodes from the graph.
@@ -144,7 +139,7 @@ class TrollTrust(CentralityMeasure):
             
         return piT2
 
-
+    @staticmethod
     def logistic_regression(graph, kernel):
         '''
         This method trains a regressor to predict the sign from the links of a
@@ -199,7 +194,7 @@ class TrollTrust(CentralityMeasure):
         print("Mean squared error:", metrics.mean_squared_error(Y_test, Y_pred),"\n")
         return metrics.mean_squared_error(Y_test, Y_pred)
 
-
+    @staticmethod
     def choose_parameters(graph, iter_max, delta_min, lambda1_step, beta_step):
         '''
         This method returns the optimal parameters to perform the troll-trust algorithm on a
@@ -247,8 +242,8 @@ class TrollTrust(CentralityMeasure):
 
         return final_lambda1, final_beta
 
-
-    def perform_troll_trust(graph, iter_max, delta_min, lambda1_step, beta_step):
+    @staticmethod
+    def perform_troll_trust(graph, iter_max = 10000, delta_min = 0, lambda1_step = 0.01, beta_step = 0.01):
         '''
         This method returns the best centrality values for the nodes of a graph
 
@@ -274,7 +269,23 @@ class TrollTrust(CentralityMeasure):
     
         return pi
 
-    
+    @staticmethod
+    def perform(graph, **kwargs):
+        """
+        Compute the Troll Trust centrality.
+        """
+        return TrollTrust.perform_troll_trust(graph, **kwargs)
+
+    @staticmethod
+    def undirected(graph, **kwargs):
+        """
+        Compute the Troll Trust centrality.
+        """
+
+        return TrollTrust.perform(graph, **kwargs)
+
+
+
 
 # TESTS:
 
