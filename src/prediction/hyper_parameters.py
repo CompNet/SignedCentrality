@@ -388,16 +388,16 @@ def compare_hyper_parameters(features, *tasks):
 
     random_forest_params_ranges = {
         "n_estimators": [
-            n for n in range(100)
+            n for n in range(10, 101, 10)
         ],
         "max_depth": [
-            n for n in range(100)
+            n for n in range(10, 101, 10)
         ],
         "min_samples_split": [
-            n for n in range(100)
+            n for n in range(2, 11)
         ],
         "min_samples_leaf": [
-            n for n in range(100)
+            n for n in range(1, 11)
         ],
     }
 
