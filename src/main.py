@@ -61,12 +61,18 @@ OUTPUTS = [
     consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE
 ]
 
-FORCE = False
+# FORCE = False
+FORCE = True
 VERBOSE = False
 # =====================================
 
 
 if __name__ == '__main__':
+
+    print(NETWORK_DESC)
+    print(GRAPH_DESCRIPTORS)
+    print(STATS)
+    print(OUTPUTS)
 
     compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
 
