@@ -5,12 +5,14 @@ Created on Sep 23, 2020
 '''
 import csv
 import itertools as iter
+from os.path import join, isfile
 import numpy as np
 import math
 import consts
 from csv import reader, writer, Sniffer, Dialect
 from sys import float_info, stdout
 from igraph import Graph
+from path import get_csv_folder_path
 
 
 def format_4digits(x):
@@ -314,6 +316,25 @@ def write_csv(path: str, matrix, append=False):
 
     with open(path, 'w' if not append else 'a') as file:
         writer(file, Dialect.delimiter).writerows([[str(col) for col in row] for row in matrix])
+
+
+def export_running_time(label=None, time=None, unit="seconds", new_file=False):
+    """
+    Create a CSV file containing running times
+
+    :param label: Label for the value
+    :param time: Value
+    :param unit: Unit for the value
+    :param new_file: True if previous values must be overwritten
+    """
+
+    headers = ['label', 'running time', 'unit']
+    file_path = join(get_csv_folder_path(), consts.BEST_PARAM_SET)
+
+    if new_file or not isfile(file_path):
+        write_csv(file_path, [headers], append=False)
+    if label is not None and time is not None:
+        write_csv(file_path, [[str(label), str(time), str(unit)]], append=True)
 
 
 def prediction_name_refactor(prediction_name):

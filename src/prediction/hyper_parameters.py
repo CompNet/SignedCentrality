@@ -24,7 +24,7 @@ from prediction.classification import perform_svc_classification
 from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
 from prediction.classification import perform_svc_classification
 from prediction.random_forest_classification import perform_random_forest_classification
-from util import write_csv, ProgressBar
+from util import write_csv, ProgressBar, export_running_time
 from path import get_csv_folder_path
 
 
@@ -279,6 +279,8 @@ def compare_hyper_parameters(features, *tasks):
     :param features: features to train predictors
     """
 
+    train_iterations_number = 10
+
     max_iter = {  # Max number of iterations for all predictors
         # 10_000,
         # 100_000,
@@ -440,10 +442,11 @@ def compare_hyper_parameters(features, *tasks):
             print("####", output, ":", prediction_function_name, "####")
             prediction_function_start_time = time()
             best_param_set = test_hyper_parameters(prediction_function, features, [output], train_iterations_number=train_iterations_number, **params_ranges)
-            hyper_parameters_end_time = time() - hyper_parameters_start_time
+            prediction_function_end_time = time() - prediction_function_start_time
             export_best_params_set(output, prediction_function, best_param_set)
+            export_running_time(output + "_-_" + prediction_function_name, prediction_function_end_time)
+            print("Running time for " + prediction_function_name + ":", prediction_function_end_time, "seconds")
 
-            print("Running time for " + prediction_function_name + ":", hyper_parameters_end_time, "seconds")
             print("Best parameters sets:")
             for (metric_name, metric_best_param_set, metric_value) in best_param_set:
                 print("\tMetric:", metric_name, "=", metric_value)
@@ -452,4 +455,5 @@ def compare_hyper_parameters(features, *tasks):
             print()
 
     hyper_parameters_end_time = time() - hyper_parameters_start_time
+    export_running_time("all hyper-parameters", hyper_parameters_end_time)
     print("Running time for hyper-parameters tuning:", hyper_parameters_end_time, "seconds")

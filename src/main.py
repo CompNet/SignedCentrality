@@ -31,9 +31,11 @@ from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import BorderlineSMOTE
 from imblearn.over_sampling import SVMSMOTE
 from imblearn.over_sampling import ADASYN
+from util import export_running_time
 
 
 # =====================================
+
 GRAPH_SIZES = [20,24]
 L0_VALS = [3]
 PROP_MISPLS = [0.2, 0.3] #[x/20 for x in range(0, 11)] # float range from 0.0 to 1.0 with decimal steps
@@ -62,8 +64,8 @@ OUTPUTS = [
     consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE
 ]
 
-# FORCE = False
-FORCE = True
+FORCE = False
+# FORCE = True
 VERBOSE = False
 # =====================================
 
@@ -71,12 +73,14 @@ VERBOSE = False
 if __name__ == '__main__':
 
     program_start_time = time()
+    export_running_time(new_file=True)
 
     print(NETWORK_DESC)
     print(GRAPH_DESCRIPTORS)
     print(STATS)
     print(OUTPUTS)
 
+    features_start_time = time()
     compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
 
     stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE, VERBOSE)
@@ -84,6 +88,8 @@ if __name__ == '__main__':
     collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, STATS, FORCE)
 
     collect.collect_outputs.collect_all_outputs(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, OUTPUTS, FORCE)
+    features_end_time = time() - features_start_time
+    export_running_time("features computing", features_end_time)
 
     features_list = [
         consts.COL_NAMES[consts.STATS_NB_NODES],
@@ -187,6 +193,7 @@ if __name__ == '__main__':
     )  # Add outputs here to select comparisons to perform.
 
     # feature ablation task
+    feature_ablation_start_time = time()
     print("\nTask: feature ablation")
     print("\nSVC :")
     prediction.feature_ablation.feature_ablation_svc_classification(features, output2)
@@ -196,8 +203,11 @@ if __name__ == '__main__':
     prediction.feature_ablation.feature_ablation_svr_regression(features, output1)
     print("\nLinear Regression :")
     prediction.feature_ablation.feature_ablation_linear_regression(features, output1)
-    print("\nMLP Regression :")
+    # print("\nMLP Regression :")
     # prediction.feature_ablation.feature_ablation_mlp_regression(features, output1)  # TODO don't uncomment it, doesn't work, fix it
+    feature_ablation_end_time = time() - feature_ablation_start_time
+    export_running_time("feature_ablation", feature_ablation_end_time)
+    print("Running time for feature ablation:", feature_ablation_end_time, "seconds")
 
     # # feature ablation classification tests (TODO this code is to apply feature ablation on specific files already balanced, delete once tests finished)
     # import prediction.tmp_feature_ablation
@@ -212,6 +222,7 @@ if __name__ == '__main__':
     # prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_solclass(features, output2)
 
     program_end_time = time() - program_start_time
+    export_running_time("full program", program_end_time)
     print("Running time of the full program:", program_end_time, "seconds")
 
     print("All tests have been executed successfully.")
