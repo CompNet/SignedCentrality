@@ -297,22 +297,31 @@ def compare_hyper_parameters(features, *tasks):
         consts.LinearRegression.POSITIVE: [True, False],
     }
 
-    # layer_sizes = [n for n in range(10, 301, 50)]
-    # layer_sizes = [n for n in range(1, 20, 4)]
-    layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
-    # layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)]]
-    # layers_numbers = [n for n in range(10, 101, 50)]
-    # layers_numbers = [n for n in range(1, 10, 2)]
-    layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
-    # layers_numbers = [1, 2, *[n for n in range(3, 10, 2)]]
-    layers = []
-    for layer_size in layer_sizes:
-        layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
-    # print(len(layers))
-    # layers = [(n, ) for n in range(10, 101, 20)]  # TODO: Only for tests ...
+    # # Initial values:
+    # layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
+    # layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
+    # layers = []
+    # for layer_size in layer_sizes:
+    #     layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
+    # # print(len(layers))
+
+    # New values (chosen using results for initial ones):
+    layer_sizes_for_nb_solutions = [*[n for n in range(4, 13, 1)]]
+    layer_sizes_for_nb_solutions_classes = [*[n for n in range(3, 10, 1)]]
+
+    layers_numbers_for_nb_solutions = [*[n for n in range(20, 71, 5)]]
+    layers_numbers_for_nb_solutions_classes = [*[n for n in range(60, 200, 40)], 200, 250, 300]
+
+    layers_for_nb_solutions = []
+    for layer_size_for_nb_solutions in layer_sizes_for_nb_solutions:
+        layers_for_nb_solutions.extend([tuple(layer_size_for_nb_solutions for _ in range(layers_number)) for layers_number in layers_numbers_for_nb_solutions])
+
+    layers_for_nb_solutions_classes = []
+    for layer_size_for_nb_solutions_classes in layer_sizes_for_nb_solutions_classes:
+        layers_for_nb_solutions_classes.extend([tuple(layer_size_for_nb_solutions_classes for _ in range(layers_number)) for layers_number in layers_numbers_for_nb_solutions_classes])
 
     mlp_params_ranges = {
-        consts.MLP.HIDDEN_LAYER_SIZES: layers,
+        # consts.MLP.HIDDEN_LAYER_SIZES: layers,
         consts.MLP.ACTIVATION: [
             # consts.MLP.IDENTITY,
             # consts.MLP.LOGISTIC,
@@ -351,6 +360,16 @@ def compare_hyper_parameters(features, *tasks):
         # consts.MLP.EPSILON: [1e-08],
         # consts.MLP.N_ITER_NO_CHANGE: [10],
         # consts.MLP.MAX_FUN: [15_000],
+    }
+
+    mlp_params_ranges_for_nb_solutions = {
+        **mlp_params_ranges,
+        consts.MLP.HIDDEN_LAYER_SIZES: layers_for_nb_solutions,
+    }
+
+    mlp_params_ranges_for_nb_solutions_classes = {
+        **mlp_params_ranges,
+        consts.MLP.HIDDEN_LAYER_SIZES: layers_for_nb_solutions_classes,
     }
 
     svm_main_params_ranges = {
@@ -411,8 +430,18 @@ def compare_hyper_parameters(features, *tasks):
 
     regression_functions = {
         perform_linear_regression: linear_params_ranges,
-        perform_mlp_regression: mlp_params_ranges,
+        # perform_mlp_regression: mlp_params_ranges,
         perform_svr_regression: svr_params_ranges,
+    }
+
+    regression_functions_for_nb_solutions = {
+        **regression_functions,
+        perform_mlp_regression: mlp_params_ranges_for_nb_solutions,
+    }
+
+    regression_functions_for_nb_solutions_classes = {
+        **regression_functions,
+        perform_mlp_regression: mlp_params_ranges_for_nb_solutions_classes,
     }
 
     classification_functions = {
@@ -421,9 +450,11 @@ def compare_hyper_parameters(features, *tasks):
     }
     outputs = {
         consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
-        consts.OUTPUT_NB_SOLUTIONS: regression_functions,
+        # consts.OUTPUT_NB_SOLUTIONS: regression_functions,
+        consts.OUTPUT_NB_SOLUTIONS: regression_functions_for_nb_solutions,
         consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES: classification_functions,
-        consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
+        # consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
+        consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions_for_nb_solutions_classes,
     }
 
     # Reset best parameters export:
@@ -431,9 +462,7 @@ def compare_hyper_parameters(features, *tasks):
     if exists(best_param_sets_path):
         os.remove(best_param_sets_path)
 
-    running_times = {}
     hyper_parameters_start_time = time()
-
     for output, prediction_functions in outputs.items():
         if len(tasks) > 0 and output not in tasks:
             continue

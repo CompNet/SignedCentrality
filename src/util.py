@@ -329,7 +329,7 @@ def export_running_time(label=None, time=None, unit="seconds", new_file=False):
     """
 
     headers = ['label', 'running time', 'unit']
-    file_path = join(get_csv_folder_path(), consts.BEST_PARAM_SET)
+    file_path = join(get_csv_folder_path(), consts.RUNNING_TIMES)
 
     if new_file or not isfile(file_path):
         write_csv(file_path, [headers], append=False)
