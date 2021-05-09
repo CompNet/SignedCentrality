@@ -5,6 +5,7 @@ Created on Sep 23, 2020
 '''
 
 import itertools
+from time import time
 
 import consts
 import descriptors
@@ -207,6 +208,9 @@ if __name__ == '__main__':
     # prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_sol(features, output)
     # print("\nRandom Forest (eq_solclass) :")
     # prediction.tmp_feature_ablation.feature_ablation_random_forest_classification_eq_solclass(features, output2)
+
+    program_end_time = time() - program_start_time
+    print("Running time of the full program:", program_end_time, "seconds")
 
     print("All tests have been executed successfully.")
 

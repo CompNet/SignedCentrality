@@ -108,6 +108,8 @@ def compute_all_centralities(graph_sizes, l0_values, d, prop_mispls, prop_negs, 
     :type graph_descriptors: str list
     """
 
+    print("compute_all_centralities")
+
     for n in graph_sizes:
         for l0 in l0_values:
             for prop_mispl in prop_mispls:

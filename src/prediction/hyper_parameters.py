@@ -10,6 +10,8 @@ import os
 from math import isnan
 from os.path import abspath, dirname, join, isdir, exists, isfile
 from sys import stderr
+from time import time
+
 from deprecated import deprecated
 from sklearn import metrics
 import consts
@@ -427,19 +429,27 @@ def compare_hyper_parameters(features, *tasks):
     if exists(best_param_sets_path):
         os.remove(best_param_sets_path)
 
-    train_iterations_number = 10
+    running_times = {}
+    hyper_parameters_start_time = time()
 
     for output, prediction_functions in outputs.items():
         if len(tasks) > 0 and output not in tasks:
             continue
         for prediction_function, params_ranges in prediction_functions.items():
-            print("####", output, ":", prediction_function.__name__, "####")
+            prediction_function_name = str(prediction_function.__name__).replace("_", " ")[8:]
+            print("####", output, ":", prediction_function_name, "####")
+            prediction_function_start_time = time()
             best_param_set = test_hyper_parameters(prediction_function, features, [output], train_iterations_number=train_iterations_number, **params_ranges)
+            hyper_parameters_end_time = time() - hyper_parameters_start_time
             export_best_params_set(output, prediction_function, best_param_set)
 
+            print("Running time for " + prediction_function_name + ":", hyper_parameters_end_time, "seconds")
             print("Best parameters sets:")
             for (metric_name, metric_best_param_set, metric_value) in best_param_set:
                 print("\tMetric:", metric_name, "=", metric_value)
                 for param, value in metric_best_param_set.items():
                     print("\t\t", param, ": ", value, sep="")
             print()
+
+    hyper_parameters_end_time = time() - hyper_parameters_start_time
+    print("Running time for hyper-parameters tuning:", hyper_parameters_end_time, "seconds")
