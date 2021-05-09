@@ -70,6 +70,8 @@ VERBOSE = False
 
 if __name__ == '__main__':
 
+    program_start_time = time()
+
     print(NETWORK_DESC)
     print(GRAPH_DESCRIPTORS)
     print(STATS)

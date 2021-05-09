@@ -63,45 +63,20 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     # graphic_title = util.prediction_name_refactor(graphic_title)
     path_to_file = __make_file_path(graphic_title, name, add_plot_to_name, dash_between_name_and_plot)
 
-    f = None
+    f = plt.figure()
+    f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
 
     if verbose:
         print("Generating " + name + " for " + graphic_title)
     if plot_function == plt.violinplot or plot_function == plt.boxplot:
+        axes = plt.gca()
         x_values, y_values = args
-        x_len = min(len(x_values), 10)
-        x_remainer = len(x_values) % x_len
-        y_len = max(len(x_values) // x_len, 1) + int(x_remainer > 0 and len(x_values) > 6)
+        plot_function(y_values, **kwargs)
+        axes.set_xticks([x + 1 for x in range(len(x_values))])
+        axes.set_xticklabels([str(v) for v in x_values])
 
-        print(len(x_values), x_len, y_len)
 
-        f, axis = plt.subplots(nrows=y_len, ncols=x_len)
-        f.set_figwidth(max(ceil(x_len * 2), 6.4))  # x values are set first ; 6.4 is default value
-        f.set_figheight(max(ceil(y_len * 4), 4.8))  # y values are set first ; 4.8 is default value
-        if not isinstance(axis, numpy.ndarray):
-            axis = numpy.array([axis])
-        if not isinstance(axis[0], numpy.ndarray):
-            axis = numpy.array([axis])
-        for i in range(y_len):
-            for j in range(x_len):
-                y_value_index = i * x_len + j
-                if y_value_index >= len(y_values):
-                    continue
-                if plot_function == plt.violinplot:
-                    axis[i][j].violinplot(y_values[y_value_index], **kwargs)
-                if plot_function == plt.boxplot:
-                    axis[i][j].boxplot(y_values[y_value_index], **kwargs)
-                axis[i][j].set_title(x_values[y_value_index])
-                if y_label is not None:
-                    axis[i][j].set_ylabel(y_label)
-                    y_label = None
-        # axes = plt.gca()
-        # plot_function(y_values, **kwargs)
-        # axes.set_xticklabels([str(v) for v in x_values])
-        x_label = None
     else:
-        f = plt.figure()
-        f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
         plot_function(*args, **kwargs)
 
     if print_title:
