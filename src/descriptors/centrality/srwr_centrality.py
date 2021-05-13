@@ -1,21 +1,14 @@
-import math
-import pandas
-import numpy
-import sys
-import random
-import csv
 import sys
 import os
 
+from descriptors import GraphDescriptor
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from util import get_matrix, scale_centrality
 from igraph import *
-from centrality.srwr.srwr.srwr import SRWR
-import consts
+from descriptors.centrality.srwr.srwr.srwr import SRWR
 
 
 def perform_srwr(graph, seed = 0, c = 0.15, epsilon = 1e-9, beta = 0.5, gamma = 0.5,
@@ -55,6 +48,27 @@ def perform_srwr(graph, seed = 0, c = 0.15, epsilon = 1e-9, beta = 0.5, gamma = 
         os.remove("srwr_temp.txt")
     
     return srwr_graph
+
+
+class SRWRCentrality(GraphDescriptor):
+    """
+    This class is used to compute SRWR centralities
+    """
+
+    @staticmethod
+    def perform(graph, **kwargs):
+        """
+        Compute the SRWR centrality.
+        """
+        return SRWRCentrality.undirected(graph, **kwargs)
+
+    @staticmethod
+    def undirected(graph, **kwargs):
+        """
+        Compute the SRWR centrality.
+        """
+
+        return perform_srwr(graph, **kwargs)
 
 
 #TESTS:

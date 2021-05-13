@@ -34,9 +34,9 @@ def test_regression(reg, X_test, Y_test, output, print_results=True, export_pred
     """
 
     prediction_metrics = [
-        metrics.r2_score,  # Best value: 1
+        # metrics.r2_score,  # Best value: 1
         metrics.mean_squared_error,  # Best value: 0
-        metrics.mean_absolute_error  # Best value: 0
+        # metrics.mean_absolute_error  # Best value: 0
     ]
 
     return test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_results, export_predicted_values, export_graphical_results)

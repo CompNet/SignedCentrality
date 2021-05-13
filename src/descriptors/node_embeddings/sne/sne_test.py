@@ -5,8 +5,7 @@
 This module contains functions related to the SNE tests.
 """
 
-from consts import FILE_FORMAT_GRAPHML
-from node_embeddings.sne.sne_embedding import *
+from descriptors.node_embeddings.sne.sne_embedding import *
 from util import read_graph
 
 if __name__ == '__main__':

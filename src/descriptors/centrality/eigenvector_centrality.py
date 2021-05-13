@@ -10,16 +10,14 @@ The measure is computed by following the method of Phillip Bonacich and Paulette
 """
 
 import numpy as np
-from numpy import real
-from numpy.linalg import norm
 from scipy.sparse.linalg import eigs
 # noinspection PyProtectedMember
+from descriptors import GraphDescriptor
 from util import get_matrix, get_scale, which
-from centrality import CentralityMeasure
 #from sphinx.ext import todo
 
 
-class EigenvectorCentrality(CentralityMeasure):
+class EigenvectorCentrality(GraphDescriptor):
 	#todo
 	"""
 	TODO: Check again this function
@@ -29,6 +27,10 @@ class EigenvectorCentrality(CentralityMeasure):
 	This processing is done in a class because it is used in the classifier.
 	This classifier calls a method "undirected()" for all centrality computing classes which are in the package centrality.
 	"""
+
+	@staticmethod
+	def perform(graph, scaled=False):
+		return EigenvectorCentrality.undirected(graph, scaled)
 
 	@staticmethod
 	def undirected(graph, scaled=False):

@@ -5,12 +5,23 @@ Created on Sep 23, 2020
 '''
 
 import os
+from sklearn import metrics
 
 # ===========================
 # Path variables
 # ===========================
+from descriptors.centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
+from descriptors.centrality.srwr_centrality import SRWRCentrality
+from descriptors.centrality.trolltrust_centrality import TrollTrust
+from descriptors.centrality.diversity_coef_centrality import diversity_coef_centrality
+from descriptors import GraphDescriptor
+from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
+
 CSV = ".csv"
 TXT = ".txt"
+PNG = ".png"
+PDF = ".pdf"
 MAIN_FOLDER = os.path.abspath("..") # the absolute path of the previous level
 IN_FOLDER = os.path.join(MAIN_FOLDER, "in")
 OUT_FOLDER = os.path.join(MAIN_FOLDER, "out")
@@ -20,7 +31,8 @@ CENTR_FOLDER = os.path.join(OUT_FOLDER, "centralities")
 STAT_FOLDER = os.path.join(OUT_FOLDER, "stats")
 PLOT_FOLDER = os.path.join(OUT_FOLDER, "plots")
 GRAPHICS_FOLDER = os.path.join(OUT_FOLDER, "graphics")
-
+BEST_PARAM_SET = 'best_parameters_sets' + CSV
+RUNNING_TIMES = 'running_times' + CSV
 
 # ===========================
 # Other Variables
@@ -57,10 +69,12 @@ OUTPUT_GRAPH_IMBALANCE_PERCENTAGE = "imbalance_percentage"
 
 
 # centralities
-CENTR_DEGREE_NEG = "degree_neg"
-CENTR_DEGREE_POS = "degree_pos"
-CENTR_DEGREE_PN = "degree_pn"
-CENTR_EIGEN = "eigen"
+CENTR_DEGREE_NEG = NegativeCentrality.__name__
+CENTR_DEGREE_POS = PositiveCentrality.__name__
+CENTR_DEGREE_PN = PNCentrality.__name__
+CENTR_EIGEN = EigenvectorCentrality.__name__
+CENTR_TROLL_TRUST = TrollTrust.__name__
+CENTR_SRWR = SRWRCentrality.__name__
 
 # stats
 STATS_NB_NODES = "nb_nodes"
@@ -99,6 +113,7 @@ PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
 
 # embeddings
+EMB_SNE = SNEEmbedding.__name__
 SNE_SAVE_PATH_NAME = "save_path"
 SNE_TRAIN_DATA_NAME = "train_data"
 SNE_LABEL_DATA_NAME = "label_data"
@@ -178,4 +193,45 @@ class MLP:
     INVSCALING = 'invscaling'
     ADAPTIVE = 'adaptive'
     AUTO = 'auto'
+
+
+# Optimal values for prediction metrics
+PREDICTION_METRICS_OPTIMAL_VALUES = {
+    metrics.r2_score.__name__: 1,
+    metrics.mean_squared_error.__name__: 0,
+    metrics.mean_absolute_error.__name__: 0,
+    metrics.f1_score.__name__: 1,
+    metrics.accuracy_score.__name__: 1,
+    metrics.precision_score.__name__: 1,
+    metrics.recall_score.__name__: 1,
+}
+
+
+# Graph descriptors
+__NOT_IN_GRAPH_DESCRIPTORS = [  # These classes aren't used as descriptors in models.
+    PositiveCentrality,
+    NegativeCentrality,
+    # SRWRCentrality,
+    TrollTrust,
+]
+
+
+def __add_descriptor_classes(graph_descriptor_class):
+    graph_descriptors_dict = {}
+    for subclass in graph_descriptor_class.__subclasses__():
+        if subclass not in __NOT_IN_GRAPH_DESCRIPTORS:
+            if len(subclass.__subclasses__()) > 0:
+                graph_descriptors_dict = {**graph_descriptors_dict, **__add_descriptor_classes(subclass)}
+            else:
+                graph_descriptors_dict = {
+                    **graph_descriptors_dict,
+                    subclass.__name__: subclass.perform,
+                }
+
+    return graph_descriptors_dict
+
+
+GRAPH_DESCRIPTORS = {
+    **__add_descriptor_classes(GraphDescriptor)
+}
 

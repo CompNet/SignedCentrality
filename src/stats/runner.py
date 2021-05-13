@@ -17,8 +17,7 @@ from statistics import mean, stdev
 import pandas as pd
 
 
-def compute_stats(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
-                         mystats, force=False):
+def compute_stats(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, mystats, force=False, verbose=False):
     """This method computes all the implemented stats for the given signed network.
        
     :param n: int
@@ -48,7 +47,8 @@ def compute_stats(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
         for stat_name in mystats:
             stat_folder_path = path.get_stat_folder_path(n, l0, d, prop_mispl, prop_neg,
                                                                  network_no, network_desc)
-            print("computing stats: "+stat_name+" in "+stat_folder_path)
+            if verbose:
+                print("computing stats: "+stat_name+" in "+stat_folder_path)
             os.makedirs(stat_folder_path, exist_ok=True)
         
             result_filename = stat_name+".csv"
@@ -87,11 +87,11 @@ def compute_stats(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
                 df.to_csv(result_filepath, sep=",",quoting=1,index=False)
                 
             else:
-                print("already exists")        
+                if verbose:
+                    print("already exists")
                  
 
-def compute_all_stats(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks,
-                              network_desc, stats, force=False):
+def compute_all_stats(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks, network_desc, stats, force=False, verbose=False):
     """This method handles the input signed networks before computing all the 
     implemented stats.
        
@@ -121,15 +121,16 @@ def compute_all_stats(graph_sizes, l0_values, d, prop_mispls, prop_negs, network
                 if my_prop_negs is None and d == 1:
                     my_prop_negs = [util.compute_prop_neg(n, l0)]
                     
-                print(util.compute_prop_neg(n, l0))
+                # print(util.compute_prop_neg(n, l0))
                 
                 for prop_neg in my_prop_negs:
                     for network_no in networks:
-                        print("... computing stats with n="+str(n)+", l0="+str(l0)+
-                              ", dens="+util.format_4digits(d), ", propMispl="+
-                              util.format_4digits(prop_mispl), 
-                            ", propNeg="+util.format_4digits(prop_neg), 
-                            ", network="+str(network_no))
+                        if verbose:
+                            print(
+                                "... computing stats with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d),
+                                ", propMispl="+util.format_4digits(prop_mispl),
+                                ", propNeg="+util.format_4digits(prop_neg),
+                                ", network="+str(network_no)
+                            )
     
-                        compute_stats(n, l0, d, prop_mispl, prop_neg, 
-                                             network_no, network_desc, stats, force)
+                        compute_stats(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, stats, force, verbose=verbose)
