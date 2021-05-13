@@ -8,15 +8,15 @@ The embedding is computed by following the method of S. Wang, J. Tang, C. Aggarw
 
 .. note: S. Wang, J. Tang, C. Aggarwal, Y. Chang and H. Liu. "Signed Network Embedding in SocialMedia". In :Proceedings of the 2017 SIAM International Conference on Data Mining(SDM), p. 327-335. doi :10.1137/1.9781611974973.37.
 """
-from os.path import abspath, dirname
 
-from node_embeddings import NodeEmbedding
-from node_embeddings.sine.sine.graph import *
-from node_embeddings.sine.sine.model import *
+from os.path import abspath, dirname
+from descriptors import GraphDescriptor
+from descriptors.node_embeddings.sine.sine.graph import *
+from descriptors.node_embeddings.sine.sine.model import SiNE, fit_model
 from util import write_csv, get_matrix
 
 
-class SiNEEmbedding(NodeEmbedding):
+class SiNEEmbedding(GraphDescriptor):
 	"""
 	This class is used to compute SiNE
 
