@@ -14,6 +14,7 @@ from descriptors.centrality.degree_centrality import NegativeCentrality, Positiv
 from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
 from descriptors.centrality.srwr_centrality import SRWRCentrality
 from descriptors.centrality.trolltrust_centrality import TrollTrust
+from descriptors.centrality.node_effect_centrality import NodeEffect
 from descriptors.centrality.diversity_coef_centrality import diversity_coef_centrality
 from descriptors import GraphDescriptor
 from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
@@ -74,6 +75,7 @@ CENTR_DEGREE_PN = PNCentrality.__name__
 CENTR_EIGEN = EigenvectorCentrality.__name__
 CENTR_TROLL_TRUST = TrollTrust.__name__
 CENTR_SRWR = SRWRCentrality.__name__
+CENTR_NODE_EFFECT = NodeEffect.__name__
 
 # stats
 STATS_NB_NODES = "nb_nodes"
