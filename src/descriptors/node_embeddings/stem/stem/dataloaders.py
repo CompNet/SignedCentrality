@@ -9,8 +9,8 @@ from collections import defaultdict
 from sklearn.model_selection import train_test_split
 from scipy.spatial.distance import  hamming
 import pickle
-import util
-import graph
+import descriptors.node_embeddings.stem.stem.util as util
+import descriptors.node_embeddings.stem.stem.graph as graph
 import re
 import networkx as nx
 

@@ -7,11 +7,13 @@ This package contains an altered version of SiNE implementation for the paper "S
 The changes have been made to add final embedding export.
 Added lines are tagged with "Added code." comments.
 
+SiNE is tested in StEM Package because this implementation has been made by an author of StEM.
+This SiNE implementation has been made in order to compare its results with StEM ones.
+
 .. note: Inzamam Rahaman is the author of the initial code. Virgile Sucal has only made some changes.
 .. note: S. Wang, J. Tang, C. Aggarwal, Y. Chang and H. Liu. "Signed Network Embedding in SocialMedia". In :Proceedings of the 2017 SIAM International Conference on Data Mining(SDM), p. 327-335. doi :10.1137/1.9781611974973.37.
 
 
 @author: Inzamam Rahaman
-@author: Virgile Sucal
 """
 

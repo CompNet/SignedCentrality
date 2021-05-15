@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
 from collections import OrderedDict
-import graph
+import descriptors.node_embeddings.stem.stem.graph as graph  # Altered code.
 import networkx as nx
 
 

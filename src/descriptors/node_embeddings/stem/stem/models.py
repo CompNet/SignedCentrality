@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from imblearn.under_sampling import RandomUnderSampler
 import numpy as np
-import util
+import descriptors.node_embeddings.stem.stem.util as util  # Altered code.
 import numpy as np
 
 

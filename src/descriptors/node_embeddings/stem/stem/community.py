@@ -1,5 +1,5 @@
 import hdbscan
-import models
+import descriptors.node_embeddings.stem.stem.models as models
 import numpy as np
 import sklearn.manifold as manifold
 import matplotlib.pyplot as plt

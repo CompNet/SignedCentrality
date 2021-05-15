@@ -64,6 +64,11 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * tensorflow 2.4.0
   * torch 1.7.1
   * deprecated 1.2.11
+  * hdbscan 0.8.24
+  * pony 0.7.14
+  * gem
+  * keras
+  * seaborn
 
 * Download this project from GitHub
 
@@ -83,6 +88,11 @@ All the modules listed below are the python modules
 * tensorflow 2.4.0
 * torch 1.7.1
 * deprecated 1.2.11
+* hdbscan 0.8.24
+* pony 0.7.14
+* gem
+* keras
+* seaborn
 
 
 

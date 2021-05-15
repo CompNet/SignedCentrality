@@ -1,4 +1,4 @@
-import models
+import descriptors.node_embeddings.stem.stem.models as models
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.linear_model import LogisticRegression
