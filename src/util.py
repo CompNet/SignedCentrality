@@ -185,6 +185,30 @@ def get_matrix(graph):
     return graph.get_adjacency_sparse(consts.EDGE_WEIGHT_ATTR)  # scipy.sparse.csr_matrix
 
 
+def get_adj_list(graph):
+    """
+    Returns the adjacency list of the given graph.
+
+    :param graph: the graph to be used to extract the adjacency list
+    :type graph: igraph.Graph
+    :return: the adjacency list
+    :rtype: list
+    """
+
+    matrix = get_matrix(graph).toarray()
+    adj_list = []
+    pairs = []
+    size = len(matrix)
+    for i in range(size):
+        for j in range(size):
+            if matrix[i][j] != 0 and i <= j and (i != j or i not in pairs):
+                if i == j:
+                    pairs.append(i)
+                adj_list.append([i, j, matrix[i][j]])
+
+    return adj_list
+
+
 def get_scale(centrality, fit_sign=False):
     """
     Compute the scale value to scale a centrality
