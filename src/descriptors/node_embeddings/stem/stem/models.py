@@ -172,7 +172,11 @@ class PseudoKernelRankingModel(GraphEmbeddingModel):
 
         res = torch.max(zeros, negative + delta - positive)
         res = torch.sum(res)
+        res = torch.tensor([res])  # Altered code.
         return res
+
+    def get_embeddings(self):  # Added code.
+        return self.embeddings.weight  # Added code.
 
 
 def fit_ranking_model(num_nodes, dims, triples, triples0, delta, delta0, batch_size, batch_size0, epochs,

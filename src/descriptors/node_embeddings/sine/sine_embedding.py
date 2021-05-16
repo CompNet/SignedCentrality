@@ -24,7 +24,7 @@ class SiNEEmbedding(GraphDescriptor):
 	This classifier calls a method "undirected()" for all centrality or embedding computing classes.
 	"""
 
-	ROOT_PATH = dirname(abspath(__file__)) + '/../../..'
+	ROOT_PATH = dirname(abspath(__file__)) + '/../../../..'
 	"""
 	Path to the root directory
 	"""
@@ -39,17 +39,17 @@ class SiNEEmbedding(GraphDescriptor):
 	Path to the embeddings directory
 	"""
 
-	SNE_PATH = EMBEDDINGS_PATH + '/sine'
+	SINE_PATH = EMBEDDINGS_PATH + '/sine'
 	"""
 	Path to the SiNE directory
 	"""
 
-	SAVE_PATH = SNE_PATH + '/save_path'
+	SAVE_PATH = SINE_PATH + '/save_path'
 	"""
 	Path to save the model.
 	"""
 
-	DATA = SNE_PATH + "/data"
+	DATA = SINE_PATH + "/data"
 	"""
 	Path to write the files containing graph data to be read by SNE class.
 	"""

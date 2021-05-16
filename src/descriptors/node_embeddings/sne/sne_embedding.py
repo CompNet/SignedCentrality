@@ -32,7 +32,7 @@ class SNEEmbedding(GraphDescriptor):
 	This classifier calls a method "undirected()" for all centrality computing classes which are in the package centrality.
 	"""
 
-	ROOT_PATH = dirname(abspath(__file__)) + '/../../..'
+	ROOT_PATH = dirname(abspath(__file__)) + '/../../../..'
 	"""
 	Path to the root directory
 	"""
@@ -52,17 +52,17 @@ class SNEEmbedding(GraphDescriptor):
 	Path to the sne directory
 	"""
 
-	MAIN_PATH = dirname(abspath(__file__)) + '/../../../out/embeddings/sne'
+	MAIN_PATH = dirname(abspath(__file__)) + '/../../../../out/embeddings/sne'
 	"""
 	Path to read and write files for SNE computing
 	"""
 
-	SAVE_PATH = MAIN_PATH + '/save_path'
+	SAVE_PATH = SNE_PATH + '/save_path'
 	"""
 	Path to save the model.
 	"""
 
-	DATA = MAIN_PATH + "/data"
+	DATA = SNE_PATH + "/data"
 	"""
 	Path to write the files containing graph data to be read by SNE class.
 	"""

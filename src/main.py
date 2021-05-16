@@ -16,6 +16,7 @@ import prediction.classification
 import prediction.regression
 import prediction.random_forest_classification
 import prediction.feature_ablation
+from descriptors import select_predictors
 from descriptors.runner import compute_all_centralities
 from prediction.hyper_parameters import compare_hyper_parameters
 from prediction.Imbalance_correction_methods import test_best_imbalance_method
@@ -46,7 +47,7 @@ PROP_NEGS = None # when density=1, this equals 'None'
 
 NETWORK_DESC = consts.SIGNED_UNWEIGHTED
 
-GRAPH_DESCRIPTORS = consts.GRAPH_DESCRIPTORS.keys()
+GRAPH_DESCRIPTORS = select_predictors.GRAPH_DESCRIPTORS.keys()
 STATS = [
     consts.STATS_NB_NODES,
     consts.STATS_POS_PROP, 
@@ -124,7 +125,6 @@ if __name__ == '__main__':
     output4 = [consts.OUTPUT_GRAPH_IMBALANCE_COUNT]
     output5 = [consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
     kernel = consts.PREDICTION_KERNEL_LINEAR
-
 
     # # print(kernel)
     # # classification task : one or more solutions
