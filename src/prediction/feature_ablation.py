@@ -21,10 +21,11 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.ensemble import RandomForestClassifier
 from imblearn.under_sampling import EditedNearestNeighbours
 
-import collect.collect_graphics
+# import collect.collect_graphics
 import collect.collect_predicted_values
 import prediction.classification
 import prediction.regression
+from collect import collect_graphics
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics, test_prediction, \
     perform_prediction
 
@@ -148,7 +149,17 @@ def perform_feature_ablation(predictor, default_values, features, output, predic
     print(scores)
     print("feature ramaining : "+features_updated[0])
 
+    # setting Y axis max and min values
+    for it_metric_value in scores:
+        if it_metric_value < collect_graphics.Y_MIN:
+            collect_graphics.Y_MIN = it_metric_value
+        if it_metric_value > collect_graphics.Y_MAX:
+            collect_graphics.Y_MAX = it_metric_value
+
     collect.collect_graphics.generate_plot(feature_list, scores, "feature_ablation_"+str(prediction_name))
+
+    # resetting Y axis max and min values to their original values
+    collect_graphics.reset_y_lims()
 
 
 def feature_ablation_svc_classification(features, output, is_classifier=True, imbalance_correction_method=EditedNearestNeighbours(n_neighbors=3), **kwargs):
