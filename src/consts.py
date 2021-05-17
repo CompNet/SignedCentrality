@@ -72,6 +72,7 @@ OUTPUT_GRAPH_IMBALANCE_PERCENTAGE = "imbalance_percentage"
 # CENTR_EIGEN = EigenvectorCentrality.__name__
 # CENTR_TROLL_TRUST = TrollTrust.__name__
 # CENTR_SRWR = SRWRCentrality.__name__
+# CENTR_NODE_EFFECT = NodeEffect.__name__
 
 # stats
 STATS_NB_NODES = "nb_nodes"

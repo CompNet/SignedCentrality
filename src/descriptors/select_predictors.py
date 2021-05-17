@@ -13,6 +13,7 @@ from descriptors.centrality.diversity_coef_centrality import diversity_coef_cent
 from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
 from descriptors.node_embeddings.sine.sine_embedding import SiNEEmbedding
 from descriptors.node_embeddings.stem.stem_embedding import StEMEmbedding
+from descriptors.centrality.node_effect_centrality import *
 
 
 # Graph descriptors

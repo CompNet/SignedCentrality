@@ -65,8 +65,8 @@ OUTPUTS = [
     consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE
 ]
 
-FORCE = False
-# FORCE = True
+# FORCE = False
+FORCE = True
 VERBOSE = False
 # =====================================
 
