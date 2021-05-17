@@ -81,11 +81,7 @@ def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_des
                 # write the standard deviation of the centrality values
                 desc = consts.PREFIX_STD+desc_name
                 result_filepath = os.path.join(centr_folder_path, consts.PREFIX_STD+result_filename)
-                result_formatted = "0.0000"  # Because standard deviation computing for StEM final embedding may cause errors. Mean doesn't.
-                try:
-                    result_formatted = util.format_4digits(stdev(result))
-                except:
-                    pass
+                result_formatted = util.format_4digits(stdev(result))
                 df = pd.DataFrame({desc: [result_formatted]})
                 df.to_csv(result_filepath, sep=",", quoting=1, index=False)
 
