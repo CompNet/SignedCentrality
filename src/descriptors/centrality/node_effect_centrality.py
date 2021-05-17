@@ -18,10 +18,15 @@ doi :10.1007/s41109-020-00288-w
 import os
 from os import makedirs
 from os.path import abspath, dirname, exists
+
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
+
 import consts
 from descriptors import GraphDescriptor
 import util
 import rpy2.robjects as robjects
+import pandas
 
 
 class NodeEffect(GraphDescriptor):
@@ -163,7 +168,7 @@ class NodeEffect(GraphDescriptor):
         resu
         ''')
 
-        resu_to_csv = robjects.globalenv['resu']
+        """resu_to_csv = robjects.globalenv['resu']
         print("Resultat :"+resu_to_csv)
         util.write_csv(NodeEffect.GENERATED_OUTPUT_DATA, resu_to_csv)
 
@@ -175,7 +180,13 @@ class NodeEffect(GraphDescriptor):
         node_effect_vector.append(total_net_effect_exerted)
         node_effect_vector.append(total_net_effect_received)
 
-        return node_effect_vector
+        return node_effect_vector"""
+
+        resu_R_dataframe = robjects.globalenv['resu']
+        with localconverter(robjects.default_converter + pandas2ri.converter):
+            resu_pandas_dataframe = robjects.conversion.rpy2py(resu_R_dataframe)
+        # print(resu_pandas_dataframe)
+        return resu_pandas_dataframe
 
 
 class NodeEffectTotalIndex(NodeEffect):
@@ -188,12 +199,12 @@ class NodeEffectTotalIndex(NodeEffect):
         """
         return total effect value
         """
-        # robjects.globalenv['resu'] = global_resu
-        robjects.globalenv['output_data_path'] = NodeEffect.GENERATED_OUTPUT_DATA
-        robjects.r('''resu<-read.csv(output_data_path, header=TRUE, sep=",")
-        totalTotalIndex<-sum(resu$TotalIndex) # somme de tous les effets totaux ''')
-        total_total_effect = robjects.globalenv['totalTotalIndex']
+        """total_total_effect = NodeEffect.perform_all(graph)['TotalIndex']
         total_effect_vector = [total_total_effect]
+        return total_effect_vector"""
+        
+        total_total_effect = NodeEffect.perform_all(graph)['TotalIndex']
+        total_effect_vector = total_total_effect.values.tolist()
         return total_effect_vector
 
 
@@ -207,13 +218,14 @@ class NodeEffectNetIndex(NodeEffect):
         """
         return net effect exerted value
         """
-        # robjects.globalenv['resu'] = global_resu
-        robjects.globalenv['output_data_path'] = NodeEffect.GENERATED_OUTPUT_DATA
-        robjects.r('''resu<-read.csv(output_data_path, header=TRUE, sep=",")
-        totalNetIndex<-sum(resu$NetIndex) # somme de tous les net effect exercés''')
-        total_net_effect_exerted = robjects.globalenv['totalNetIndex']
+        """total_net_effect_exerted = NodeEffect.perform_all(graph)['NetIndex']
         net_effect_exerted_vector = [total_net_effect_exerted]
+        return net_effect_exerted_vector"""
+        
+        total_net_effect_exerted = NodeEffect.perform_all(graph)['NetIndex']
+        net_effect_exerted_vector = total_net_effect_exerted.values.tolist()
         return net_effect_exerted_vector
+
 
 
 class NodeEffectNetIndex1(NodeEffect):
@@ -226,10 +238,10 @@ class NodeEffectNetIndex1(NodeEffect):
         """
         return net effet received value
         """
-        # robjects.globalenv['resu'] = global_resu
-        robjects.globalenv['output_data_path'] = NodeEffect.GENERATED_OUTPUT_DATA
-        robjects.r('''resu<-read.csv(output_data_path, header=TRUE, sep=",")
-        totalNetIndex1<-sum(resu$NetIndex1) # somme de tous les net effect reçus''')
-        total_net_effect_received = robjects.globalenv['totalNetIndex1']
+        """total_net_effect_received = NodeEffect.perform_all(graph)['NetIndex1']
         net_effect_received_vector = [total_net_effect_received]
+        return net_effect_received_vector"""
+        
+        total_net_effect_received = NodeEffect.perform_all(graph)['NetIndex1']
+        net_effect_received_vector = total_net_effect_received.values.tolist()
         return net_effect_received_vector
