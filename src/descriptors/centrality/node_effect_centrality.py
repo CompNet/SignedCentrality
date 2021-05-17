@@ -16,6 +16,8 @@ doi :10.1007/s41109-020-00288-w
 
 """
 import os
+from os import makedirs
+from os.path import abspath, dirname, exists
 import consts
 from descriptors import GraphDescriptor
 import util
@@ -26,9 +28,76 @@ class NodeEffect(GraphDescriptor):
     """
     This class is used to compute node effects centralities
     """
+    ROOT_PATH = dirname(abspath(__file__)) + '/../../../..'
+    """
+    Path to the root directory
+    """
 
-    GENERATED_INPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectInputData.csv") # AttributeError: partially initialized module 'consts' has no attribute 'CSV_FOLDER' (most likely due to a circular import)
-    GENERATED_OUTPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectOutputData.csv")
+    OUT_PATH = ROOT_PATH + '/out'
+    """
+    Path to the out directory
+    """
+
+    EMBEDDINGS_PATH = OUT_PATH + '/embeddings'
+    """
+    Path to the embeddings directory
+    """
+
+    NODE_EFFECT_PATH = EMBEDDINGS_PATH + '/node_effect'
+    """
+    Path to the StEM directory
+    """
+
+    SAVE_PATH = NODE_EFFECT_PATH + '/save_path'
+    """
+    Path to save the model.
+    """
+
+    DATA = NODE_EFFECT_PATH + "/data"
+    """
+    Path to write the files containing graph data to be read by StEM classes.
+    """
+
+    TRAIN_DATA = DATA + "/soc-sign-Slashdot090221.txt"
+    """
+    Path to the training file.
+    """
+
+    GENERATED_INPUT_DATA = DATA + "/nodeEffectInputData.csv"
+    """
+    Path to the generated CSV file.
+    """
+
+    GENERATED_OUTPUT_DATA = DATA + "/nodeEffectOutputData.csv"
+    """
+    Path to the generated CSV file.
+    """
+
+    # EMBEDDING_SIZE = 32  # Default value in paper
+    EMBEDDING_SIZE = 10  # To have the same size in all embeddings
+    """
+    Embedding dimension size. 
+    """
+
+    @staticmethod
+    def __initialize_directories():
+        """
+        Create files and directories if they don't already exist
+        """
+        if not exists(NodeEffect.TRAIN_DATA):
+            if not exists(NodeEffect.DATA):
+                if not exists(NodeEffect.NODE_EFFECT_PATH):
+                    if not exists(NodeEffect.EMBEDDINGS_PATH):
+                        if not exists(NodeEffect.OUT_PATH):
+                            makedirs(NodeEffect.OUT_PATH)
+                        makedirs(NodeEffect.EMBEDDINGS_PATH)
+                    makedirs(NodeEffect.NODE_EFFECT_PATH)
+                makedirs(NodeEffect.DATA)
+            makedirs(NodeEffect.TRAIN_DATA)
+
+
+    # GENERATED_INPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectInputData.csv") # AttributeError: partially initialized module 'consts' has no attribute 'CSV_FOLDER' (most likely due to a circular import)
+    # GENERATED_OUTPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectOutputData.csv")
 
     @staticmethod
     def perform_all(graph, **kwargs):
@@ -36,6 +105,7 @@ class NodeEffect(GraphDescriptor):
         Compute this centrality.
         """
 
+        NodeEffect.__initialize_directories()
         robjects.globalenv['input_data_path'] = NodeEffect.GENERATED_INPUT_DATA # https://stackoverflow.com/questions/30525027/passing-a-python-variable-to-r-using-rpy2
         util.write_csv(NodeEffect.GENERATED_INPUT_DATA, util.get_adj_list(graph)) #saving input data into a csv file
         robjects.r('''
@@ -95,7 +165,7 @@ class NodeEffect(GraphDescriptor):
 
         resu_to_csv = robjects.globalenv['resu']
         print("Resultat :"+resu_to_csv)
-        util.write_csv(NodeEffect.GENERATED_INPUT_DATA, resu_to_csv)
+        util.write_csv(NodeEffect.GENERATED_OUTPUT_DATA, resu_to_csv)
 
         node_effect_vector = []
         total_total_effect = NodeEffectTotalIndex.perform(graph, **kwargs)

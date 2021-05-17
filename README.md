@@ -70,7 +70,8 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * keras 2.4.3
   * seaborn 0.11.1
   * imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
-
+  * rpy2 3.4.4
+  
 * Download this project from GitHub
 
   You also need to retrieve the data from Figshare. Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place the contents of them into folders `in` and `output`, respectively. Finally, configure the input parameters in `src/main.py` and then run it inside the folder `src`.
@@ -95,7 +96,7 @@ All the modules listed below are the python modules
 * keras 2.4.3
 * seaborn 0.11.1
 * imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
-
+* rpy2 3.4.4
 
 
 ## To-do list
