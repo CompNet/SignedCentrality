@@ -320,6 +320,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, inte
     """
 
     # Variables Initialisation
+    global Y_MIN, Y_MAX
     outputs_values_updated = []  # will contain all outputs values
     predicted_values_updated = []  # will contain all predicted values
     data = []  # will contain multiples dataset, each one stands fora different boxplot
@@ -373,13 +374,21 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, inte
         else:
             for x in tmp_index_list:
                 # tmp_list.append(float(predicted_values_updated[x]))
-                tmp_list.append(float(predicted_values_updated[x]) - float(outputs_values_updated[x]))
+                # tmp_list.append(float(predicted_values_updated[x]) - float(outputs_values_updated[x]))
+                tmp_value = float(predicted_values_updated[x]) - float(outputs_values_updated[x])
+                tmp_list.append(tmp_value)
+                if tmp_value < Y_MIN:
+                    Y_MIN = tmp_value
+                if tmp_value > Y_MAX:
+                    Y_MAX = tmp_value
+
             data.append(tmp_list)
 
     # Generating boxplot
     if verbose:
         print("Generating boxplot for "+graphic_title, "\n")
     axes = plt.gca()
+    axes.set_ylim([Y_MIN, Y_MAX])
     plt.boxplot(data)
     plt.title(graphic_title)
     axes.set_xticklabels(x_axis_names)
@@ -387,6 +396,7 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, inte
     plt.tight_layout()
     plt.savefig(path_to_file)
     plt.close()
+    reset_y_lims()
 
 
 def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, interval_value=10, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
