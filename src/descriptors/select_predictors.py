@@ -11,6 +11,7 @@ from descriptors.centrality.srwr_centrality import SRWRCentrality
 from descriptors.centrality.trolltrust_centrality import TrollTrust
 from descriptors.centrality.diversity_coef_centrality import diversity_coef_centrality
 from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
+from descriptors.node_embeddings.sine.sine_embedding import SiNEEmbedding
 from descriptors.node_embeddings.stem.stem_embedding import StEMEmbedding
 
 

@@ -172,7 +172,7 @@ class PseudoKernelRankingModel(GraphEmbeddingModel):
 
         res = torch.max(zeros, negative + delta - positive)
         res = torch.sum(res)
-        res = torch.tensor([res])  # Altered code.
+        res = torch.tensor([res])  # Added code.
         return res
 
     def get_embeddings(self):  # Added code.
@@ -288,6 +288,7 @@ class SiNE(GraphEmbeddingModel):
 
         loss = torch.max(zeros, f_neg + delta - f_pos)
         loss = torch.sum(loss)
+        loss = torch.tensor([loss])  # Added code.
 
         return loss
 
@@ -296,6 +297,9 @@ class SiNE(GraphEmbeddingModel):
         emb = self.embeddings(x)
         emb = emb.data.numpy()[0]
         return emb
+
+    def get_x(self):                                        # Added code.
+        return self.layers[-1].layer.weight.data            # Added code.
 
 
 

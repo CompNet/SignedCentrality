@@ -9,8 +9,9 @@ The embedding is computed by following the method of I. Rahaman and P. Hosein.
 .. note: I. Rahaman and P. Hosein. "A method for learning representations of signed networks". In :14th International Workshop on Mining and Learning with Graphs. 2018, p. 31. doi :doi.org/10.475/123_4.
 """
 
-
-from os.path import abspath, dirname
+from os import makedirs
+from os.path import abspath, dirname, exists
+from pathlib import Path
 from descriptors import GraphDescriptor
 from descriptors.node_embeddings.stem.stem.graph import *
 from descriptors.node_embeddings.stem.stem.dataloaders import *
@@ -78,6 +79,22 @@ class StEMEmbedding(GraphDescriptor):
 	"""
 
 	@staticmethod
+	def __initialize_directories():
+		"""
+		Create files and directories if they don't already exist
+		"""
+		if not exists(StEMEmbedding.TRAIN_DATA):
+			if not exists(StEMEmbedding.DATA):
+				if not exists(StEMEmbedding.STEM_PATH):
+					if not exists(StEMEmbedding.EMBEDDINGS_PATH):
+						if not exists(StEMEmbedding.OUT_PATH):
+							makedirs(StEMEmbedding.OUT_PATH)
+						makedirs(StEMEmbedding.EMBEDDINGS_PATH)
+					makedirs(StEMEmbedding.STEM_PATH)
+				makedirs(StEMEmbedding.DATA)
+			makedirs(StEMEmbedding.TRAIN_DATA)
+
+	@staticmethod
 	def perform_csv(file=GENERATED_INPUT_DATA, **kwargs):
 		"""
 		Train StEM embedding
@@ -100,8 +117,6 @@ class StEMEmbedding(GraphDescriptor):
 			ratio = kwargs['ratio']
 		data = UnsplitDataset(file, delimiter=delimiter, ratio=ratio)  # ratio=1 means "no train set"
 		triples, triples0 = data.get_training_triples(True)
-		# print("triples =", triples)
-		# print("triples0 =", triples0)
 		batch_size = int(0.4 * len(triples))
 		batch_size0 = int(0.4 * len(triples0))
 
@@ -135,70 +150,15 @@ class StEMEmbedding(GraphDescriptor):
 
 		train_kwargs['p0'] = len(triples0) > 0
 
-		# num_nodes = data.get_num_nodes()
-		# print("num_nodes =", num_nodes)
-		# print_loss = False
-		# epochs = 150
-		# dims = StEMEmbedding.EMBEDDING_SIZE
-		# lr = 0.5
-		# lr_decay = 0.0
-		# weight_decay = 0.0
-		# lam = 0.00055
-		# p = 2
-		# delta = 1
-		# delta0 = 0.5
-		# if 'print_loss' in kwargs:
-		# 	print_loss = kwargs['print_loss']
-		# if 'epochs' in kwargs:
-		# 	epochs = kwargs['epochs']
-		# if 'dims' in kwargs:
-		# 	dims = kwargs['dims']
-		# if 'lr' in kwargs:
-		# 	lr = kwargs['lr']
-		# if 'lr_decay' in kwargs:
-		# 	lr_decay = kwargs['lr_decay']
-		# if 'weight_decay' in kwargs:
-		# 	weight_decay = kwargs['weight_decay']
-		# if 'lam' in kwargs:
-		# 	lam = kwargs['lam']
-		# if 'p' in kwargs:
-		# 	p = kwargs['p']
-		# if 'delta' in kwargs:
-		# 	delta = kwargs['delta']
-		# if 'delta0' in kwargs:
-		# 	delta0 = kwargs['delta0']
-		# dims_array = [dims, 20, 20]
-
 		# Train model
 		ranking_model = models.fit_ranking_model(
 			**train_kwargs
-			# num_nodes=num_nodes,
-			# dims=dims_array[0],
-			# triples=triples,
-			# triples0=triples0,
-			# delta=delta,
-			# delta0=delta0,
-			# batch_size=batch_size,
-			# batch_size0=batch_size0,
-			# epochs=epochs,
-			# lr=lr,
-			# print_loss=print_loss
 		)
-
-		# X, y = data.get_testing_set()
-		#
-		# # Train model
-		# ranking_model = models.fit_pseudo_kernel_model(
-		# 	num_nodes,
-		# 	dims_array[0],
-		# 	X=X,
-		# 	y=y
-		# )
 
 		# Get embedding
 		embedding = ranking_model.get_embeddings()
 		embedding = torch.mean(embedding, dim=0)
-		embedding = embedding.detach().numpy()
+		embedding = embedding.detach().numpy().tolist()
 
 		return embedding, ranking_model
 
@@ -216,6 +176,7 @@ class StEMEmbedding(GraphDescriptor):
 
 		# Write CSV graph in GENERATED_INPUT_DATA as an edgelist.
 		# Each line is "<source>,<target>,<sign>".
+		StEMEmbedding.__initialize_directories()
 		write_csv(StEMEmbedding.GENERATED_INPUT_DATA, get_adj_list(graph))
 
 		return StEMEmbedding.perform_csv(**kwargs)[0]

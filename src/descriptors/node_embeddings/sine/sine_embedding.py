@@ -9,11 +9,13 @@ The embedding is computed by following the method of S. Wang, J. Tang, C. Aggarw
 .. note: S. Wang, J. Tang, C. Aggarwal, Y. Chang and H. Liu. "Signed Network Embedding in SocialMedia". In :Proceedings of the 2017 SIAM International Conference on Data Mining(SDM), p. 327-335. doi :10.1137/1.9781611974973.37.
 """
 
-from os.path import abspath, dirname
+
+from os import makedirs
+from os.path import abspath, dirname, exists
 from descriptors import GraphDescriptor
 from descriptors.node_embeddings.sine.sine.graph import *
-from descriptors.node_embeddings.sine.sine.model import SiNE, fit_model
-from util import write_csv, get_matrix
+from descriptors.node_embeddings.stem.stem.models import SiNE, fit_sine_model as fit_model
+from util import write_csv, get_matrix, get_adj_list
 
 
 class SiNEEmbedding(GraphDescriptor):
@@ -79,7 +81,8 @@ class SiNEEmbedding(GraphDescriptor):
 	Parameter N in the article.
 	"""
 
-	ALPHA = 0.0001
+	# ALPHA = 0.0001  # First version
+	ALPHA = 0.0055  # Second version
 	"""
 	Parameter 𝛂 in the article.
 	"""
@@ -115,7 +118,23 @@ class SiNEEmbedding(GraphDescriptor):
 	"""
 
 	@staticmethod
-	def undirected_csv(file=GENERATED_INPUT_DATA, **kwargs):
+	def __initialize_directories():
+		"""
+		Create files and directories if they don't already exist
+		"""
+		if not exists(SiNEEmbedding.TRAIN_DATA):
+			if not exists(SiNEEmbedding.DATA):
+				if not exists(SiNEEmbedding.SINE_PATH):
+					if not exists(SiNEEmbedding.EMBEDDINGS_PATH):
+						if not exists(SiNEEmbedding.OUT_PATH):
+							makedirs(SiNEEmbedding.OUT_PATH)
+						makedirs(SiNEEmbedding.EMBEDDINGS_PATH)
+					makedirs(SiNEEmbedding.SINE_PATH)
+				makedirs(SiNEEmbedding.DATA)
+			makedirs(SiNEEmbedding.TRAIN_DATA)
+
+	@staticmethod
+	def perform_csv(file=GENERATED_INPUT_DATA, **kwargs):
 		"""
 		Train SiNE embedding
 
@@ -127,21 +146,35 @@ class SiNEEmbedding(GraphDescriptor):
 		"""
 
 		# Create graph from CSV
-		graph = Graph.read_from_file(file, True)
-
-		# Create model
-		model = SiNE(len(graph), SiNEEmbedding.LAYER_INPUT_DIM, SiNEEmbedding.LAYER_OUTPUT_DIM)
+		graph = Graph.read_from_file(file, delimiter=',', directed=True)
 
 		# Train model
-		fit_model(model, graph.get_triplets(), SiNEEmbedding.DELTA, SiNEEmbedding.MINI_BATCH_SIZE, SiNEEmbedding.EPOCHS, SiNEEmbedding.ALPHA)
+		model = fit_model(
+			num_nodes=len(graph),
+			dims_arr=[SiNEEmbedding.LAYER_INPUT_DIM, SiNEEmbedding.LAYER_OUTPUT_DIM],
+			triples=graph.get_triplets(),
+			triples0=None,
+			delta=SiNEEmbedding.DELTA,
+			delta0=SiNEEmbedding.DELTA,
+			batch_size=SiNEEmbedding.MINI_BATCH_SIZE,
+			batch_size0=SiNEEmbedding.MINI_BATCH_SIZE,
+			epochs=SiNEEmbedding.EPOCHS,
+			lr=0.01,
+			lam=SiNEEmbedding.ALPHA,
+			lr_decay=0.0,
+			p=2,
+			print_loss=kwargs['verbose'] if 'verbose' in kwargs else True,
+			p0=False,
+		)
 
 		# Get embedding
 		embedding = model.get_x()
+		embedding = embedding.detach().numpy().tolist()[0]
 
 		return embedding, model
 
 	@staticmethod
-	def undirected(graph, **kwargs):
+	def perform(graph, **kwargs):
 		"""
 		Train SiNE embedding
 
@@ -153,8 +186,9 @@ class SiNEEmbedding(GraphDescriptor):
 		"""
 
 		# Write CSV graph in GENERATED_INPUT_DATA.
-		write_csv(SiNEEmbedding.GENERATED_INPUT_DATA, get_matrix(graph).toarray())
+		SiNEEmbedding.__initialize_directories()
+		write_csv(SiNEEmbedding.GENERATED_INPUT_DATA, get_adj_list(graph))
 
-		return SiNEEmbedding.undirected_csv(**kwargs)[0]
+		return SiNEEmbedding.perform_csv(**kwargs)[0]
 
 

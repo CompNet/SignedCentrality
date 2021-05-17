@@ -115,7 +115,11 @@ def tensorfy_col(x, col_idx, tensor_type='long'):
 
 def get_triples_training_batch(triples, batch_size):
     nrows = triples.shape[0]
-    rows = np.random.choice(nrows, batch_size, replace=False)
+    rows = None  # Added code.
+    try:  # Added code.
+         rows = np.random.choice(nrows, batch_size, replace=False)  # Altered code.
+    except:  # Added code.
+        rows = np.random.choice(nrows, batch_size, replace=True)  # Added code.
     choosen = triples[rows,:]
     xi = tensorfy_col(choosen, 0)
     xj = tensorfy_col(choosen, 1)
