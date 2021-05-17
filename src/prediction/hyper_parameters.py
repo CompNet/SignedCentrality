@@ -253,8 +253,7 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
         graphic_results.append(r)
     print_parameters_comparisons(prediction_function.__name__, best_param_set, graphic_results, results_ranges, *output)
 
-    collect_graphics.Y_MIN = int(collect_graphics.DEFAULT_Y_MIN)
-    collect_graphics.Y_MAX = int(collect_graphics.DEFAULT_Y_MAX)
+    collect_graphics.reset_y_lims()
     return best_param_set
 
 

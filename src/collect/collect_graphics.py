@@ -2,7 +2,10 @@
 Created on Feb 25, 2021
 
 @author: Laurent PEREIRA DA SILVA
+@author: Virgile Sucal
 '''
+
+
 import os
 from math import ceil
 from statistics import stdev
@@ -19,6 +22,14 @@ DEFAULT_Y_MIN = 0
 DEFAULT_Y_MAX = 100
 Y_MIN = int(DEFAULT_Y_MIN)
 Y_MAX = int(DEFAULT_Y_MAX)
+
+
+def reset_y_lims():
+    global Y_MIN
+    global Y_MAX
+    Y_MIN = int(DEFAULT_Y_MIN)
+    Y_MAX = int(DEFAULT_Y_MAX)
+
 
 def __make_file_path(graphic_title, plot_type: str = None, add_plot_to_name=True, dash_between_name_and_plot=False):
     """
