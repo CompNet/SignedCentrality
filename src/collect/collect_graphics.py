@@ -15,6 +15,10 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
+DEFAULT_Y_MIN = 0
+DEFAULT_Y_MAX = 100
+Y_MIN = int(DEFAULT_Y_MIN)
+Y_MAX = int(DEFAULT_Y_MAX)
 
 def __make_file_path(graphic_title, plot_type: str = None, add_plot_to_name=True, dash_between_name_and_plot=False):
     """
@@ -65,17 +69,16 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
 
     f = plt.figure()
     f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
+    axes = plt.gca()
+    axes.set_ylim([Y_MIN, Y_MAX])
 
     if verbose:
         print("Generating " + name + " for " + graphic_title)
     if plot_function == plt.violinplot or plot_function == plt.boxplot:
-        axes = plt.gca()
         x_values, y_values = args
         plot_function(y_values, **kwargs)
         axes.set_xticks([x + 1 for x in range(len(x_values))])
         axes.set_xticklabels([str(v) for v in x_values])
-
-
     else:
         plot_function(*args, **kwargs)
 

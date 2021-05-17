@@ -11,13 +11,12 @@ from math import isnan
 from os.path import abspath, dirname, join, isdir, exists, isfile
 from sys import stderr
 from time import time
-
 from deprecated import deprecated
 from sklearn import metrics
 import consts
 import sys
-from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean, \
-    generate_boxplot_clean1, generate_std_boxplot, generate_std_violinplot
+from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean,     generate_boxplot_clean1, generate_std_boxplot, generate_std_violinplot, Y_MIN, Y_MAX, DEFAULT_Y_MIN, DEFAULT_Y_MAX
+import collect.collect_graphics as collect_graphics
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics
 from prediction.classification import perform_svc_classification
@@ -213,6 +212,10 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
                 for metric_name, it_metric_value in it_prediction_metrics.items():
                     # prediction_metrics[metric_name] += it_metric_value
                     prediction_metrics_all_values[metric_name].append(it_metric_value)
+                    if it_metric_value < collect_graphics.Y_MIN:
+                        collect_graphics.Y_MIN = it_metric_value
+                    if it_metric_value > collect_graphics.Y_MAX:
+                        collect_graphics.Y_MAX = it_metric_value
 
         # for metric_name, metric_value in prediction_metrics.items():
         #     prediction_metrics[metric_name] = metric_value / train_iterations_number
@@ -250,6 +253,8 @@ def test_hyper_parameters(prediction_function, features, output, train_iteration
         graphic_results.append(r)
     print_parameters_comparisons(prediction_function.__name__, best_param_set, graphic_results, results_ranges, *output)
 
+    collect_graphics.Y_MIN = int(collect_graphics.DEFAULT_Y_MIN)
+    collect_graphics.Y_MAX = int(collect_graphics.DEFAULT_Y_MAX)
     return best_param_set
 
 
