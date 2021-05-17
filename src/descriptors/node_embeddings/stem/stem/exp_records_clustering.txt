@@ -1,0 +1,4 @@
+tribes 0.836 0.616
+stranke94 1.0 0.763
+senate 1.0 0.554
+tribes 0.838 0.753

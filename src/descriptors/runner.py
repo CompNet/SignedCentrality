@@ -3,13 +3,14 @@ Created on Sep 23, 2020
 
 @author: nejat
 '''
-
+import descriptors
 import util
 import consts
 import path
 import os
 from statistics import mean, stdev 
 import pandas as pd
+from descriptors import select_predictors
 
 
 def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_desc, graph_descriptors, force=False, verbose=False):
@@ -52,9 +53,9 @@ def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_des
             if not os.path.exists(result_filepath) or force:
                 result = None
 
-                if desc_name in consts.GRAPH_DESCRIPTORS:
+                if desc_name in select_predictors.GRAPH_DESCRIPTORS:
                     # result = consts.GRAPH_DESCRIPTORS[desc_name](g).tolist()
-                    result = [v for v in consts.GRAPH_DESCRIPTORS[desc_name](g)]
+                    result = [v for v in select_predictors.GRAPH_DESCRIPTORS[desc_name](g)]
 
                 # write the centrality values into file (as the number of values as the number of lines)
                 ################################
@@ -67,23 +68,22 @@ def compute_centralities(n, l0, d, prop_mispl, prop_neg, network_no, network_des
                 ################################
 
                 result_formatted = [util.format_4digits(e) for e in result]
-                df = pd.DataFrame({consts.CENT_COL_NAME : result_formatted})
-                df.to_csv(result_filepath, sep=",",quoting=1,index=False)
+                df = pd.DataFrame({consts.CENT_COL_NAME: result_formatted})
+                df.to_csv(result_filepath, sep=",", quoting=1, index=False)
                
                 # write the mean of the centrality values
                 desc = consts.PREFIX_MEAN+desc_name
-                result_filepath = os.path.join(centr_folder_path,consts.PREFIX_MEAN+result_filename)
+                result_filepath = os.path.join(centr_folder_path, consts.PREFIX_MEAN+result_filename)
                 result_formatted = util.format_4digits(mean(result))
-                df = pd.DataFrame({desc : [result_formatted]})
-                df.to_csv(result_filepath, sep=",",quoting=1,index=False)
+                df = pd.DataFrame({desc: [result_formatted]})
+                df.to_csv(result_filepath, sep=",", quoting=1, index=False)
                     
                 # write the standard deviation of the centrality values
                 desc = consts.PREFIX_STD+desc_name
-                result_filepath = os.path.join(centr_folder_path,consts.PREFIX_STD+result_filename)
+                result_filepath = os.path.join(centr_folder_path, consts.PREFIX_STD+result_filename)
                 result_formatted = util.format_4digits(stdev(result))
-                df = pd.DataFrame({desc : [result_formatted]})
-                df.to_csv(result_filepath, sep=",",quoting=1,index=False)
-                
+                df = pd.DataFrame({desc: [result_formatted]})
+                df.to_csv(result_filepath, sep=",", quoting=1, index=False)
 
 
 def compute_all_centralities(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks, network_desc, graph_descriptors, force=False, verbose=False):
@@ -107,6 +107,8 @@ def compute_all_centralities(graph_sizes, l0_values, d, prop_mispls, prop_negs, 
     :param graph_descriptors: centralities or embeddings, e.g. consts.CENTR_DEGREE_NEG, consts.CENTR_DEGREE_POS, etc.
     :type graph_descriptors: str list
     """
+
+    print("compute_all_centralities")
 
     for n in graph_sizes:
         for l0 in l0_values:

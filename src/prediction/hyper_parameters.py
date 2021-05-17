@@ -10,6 +10,8 @@ import os
 from math import isnan
 from os.path import abspath, dirname, join, isdir, exists, isfile
 from sys import stderr
+from time import time
+
 from deprecated import deprecated
 from sklearn import metrics
 import consts
@@ -22,7 +24,7 @@ from prediction.classification import perform_svc_classification
 from prediction.regression import perform_linear_regression, perform_mlp_regression, perform_svr_regression
 from prediction.classification import perform_svc_classification
 from prediction.random_forest_classification import perform_random_forest_classification
-from util import write_csv, ProgressBar
+from util import write_csv, ProgressBar, export_running_time
 from path import get_csv_folder_path
 
 
@@ -277,6 +279,8 @@ def compare_hyper_parameters(features, *tasks):
     :param features: features to train predictors
     """
 
+    train_iterations_number = 10
+
     max_iter = {  # Max number of iterations for all predictors
         # 10_000,
         # 100_000,
@@ -293,22 +297,31 @@ def compare_hyper_parameters(features, *tasks):
         consts.LinearRegression.POSITIVE: [True, False],
     }
 
-    # layer_sizes = [n for n in range(10, 301, 50)]
-    # layer_sizes = [n for n in range(1, 20, 4)]
-    layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
-    # layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)]]
-    # layers_numbers = [n for n in range(10, 101, 50)]
-    # layers_numbers = [n for n in range(1, 10, 2)]
-    layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
-    # layers_numbers = [1, 2, *[n for n in range(3, 10, 2)]]
-    layers = []
-    for layer_size in layer_sizes:
-        layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
-    # print(len(layers))
-    # layers = [(n, ) for n in range(10, 101, 20)]  # TODO: Only for tests ...
+    # # Initial values:
+    # layer_sizes = [1, 2, 3, *[n for n in range(4, 20, 4)], *[n for n in range(50, 301, 50)]]
+    # layers_numbers = [1, 2, *[n for n in range(3, 10, 2)], 50, 100]
+    # layers = []
+    # for layer_size in layer_sizes:
+    #     layers.extend([tuple(layer_size for _ in range(layers_number)) for layers_number in layers_numbers])
+    # # print(len(layers))
+
+    # New values (chosen using results for initial ones):
+    layer_sizes_for_nb_solutions = [*[n for n in range(4, 13, 1)]]
+    layer_sizes_for_nb_solutions_classes = [*[n for n in range(3, 10, 1)]]
+
+    layers_numbers_for_nb_solutions = [*[n for n in range(20, 71, 5)]]
+    layers_numbers_for_nb_solutions_classes = [*[n for n in range(60, 200, 40)], 200, 250, 300]
+
+    layers_for_nb_solutions = []
+    for layer_size_for_nb_solutions in layer_sizes_for_nb_solutions:
+        layers_for_nb_solutions.extend([tuple(layer_size_for_nb_solutions for _ in range(layers_number)) for layers_number in layers_numbers_for_nb_solutions])
+
+    layers_for_nb_solutions_classes = []
+    for layer_size_for_nb_solutions_classes in layer_sizes_for_nb_solutions_classes:
+        layers_for_nb_solutions_classes.extend([tuple(layer_size_for_nb_solutions_classes for _ in range(layers_number)) for layers_number in layers_numbers_for_nb_solutions_classes])
 
     mlp_params_ranges = {
-        consts.MLP.HIDDEN_LAYER_SIZES: layers,
+        # consts.MLP.HIDDEN_LAYER_SIZES: layers,
         consts.MLP.ACTIVATION: [
             # consts.MLP.IDENTITY,
             # consts.MLP.LOGISTIC,
@@ -347,6 +360,16 @@ def compare_hyper_parameters(features, *tasks):
         # consts.MLP.EPSILON: [1e-08],
         # consts.MLP.N_ITER_NO_CHANGE: [10],
         # consts.MLP.MAX_FUN: [15_000],
+    }
+
+    mlp_params_ranges_for_nb_solutions = {
+        **mlp_params_ranges,
+        consts.MLP.HIDDEN_LAYER_SIZES: layers_for_nb_solutions,
+    }
+
+    mlp_params_ranges_for_nb_solutions_classes = {
+        **mlp_params_ranges,
+        consts.MLP.HIDDEN_LAYER_SIZES: layers_for_nb_solutions_classes,
     }
 
     svm_main_params_ranges = {
@@ -407,8 +430,18 @@ def compare_hyper_parameters(features, *tasks):
 
     regression_functions = {
         perform_linear_regression: linear_params_ranges,
-        perform_mlp_regression: mlp_params_ranges,
+        # perform_mlp_regression: mlp_params_ranges,
         perform_svr_regression: svr_params_ranges,
+    }
+
+    regression_functions_for_nb_solutions = {
+        **regression_functions,
+        perform_mlp_regression: mlp_params_ranges_for_nb_solutions,
+    }
+
+    regression_functions_for_nb_solutions_classes = {
+        **regression_functions,
+        perform_mlp_regression: mlp_params_ranges_for_nb_solutions_classes,
     }
 
     classification_functions = {
@@ -417,9 +450,11 @@ def compare_hyper_parameters(features, *tasks):
     }
     outputs = {
         consts.OUTPUT_IS_SINGLE_SOLUTION: classification_functions,
-        consts.OUTPUT_NB_SOLUTIONS: regression_functions,
+        # consts.OUTPUT_NB_SOLUTIONS: regression_functions,
+        consts.OUTPUT_NB_SOLUTIONS: regression_functions_for_nb_solutions,
         consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES: classification_functions,
-        consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
+        # consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions,
+        consts.OUTPUT_NB_SOLUTION_CLASSES: regression_functions_for_nb_solutions_classes,
     }
 
     # Reset best parameters export:
@@ -427,15 +462,19 @@ def compare_hyper_parameters(features, *tasks):
     if exists(best_param_sets_path):
         os.remove(best_param_sets_path)
 
-    train_iterations_number = 10
-
+    hyper_parameters_start_time = time()
     for output, prediction_functions in outputs.items():
         if len(tasks) > 0 and output not in tasks:
             continue
         for prediction_function, params_ranges in prediction_functions.items():
-            print("####", output, ":", prediction_function.__name__, "####")
+            prediction_function_name = str(prediction_function.__name__).replace("_", " ")[8:]
+            print("####", output, ":", prediction_function_name, "####")
+            prediction_function_start_time = time()
             best_param_set = test_hyper_parameters(prediction_function, features, [output], train_iterations_number=train_iterations_number, **params_ranges)
+            prediction_function_end_time = time() - prediction_function_start_time
             export_best_params_set(output, prediction_function, best_param_set)
+            export_running_time(output + "_-_" + prediction_function_name, prediction_function_end_time)
+            print("Running time for " + prediction_function_name + ":", prediction_function_end_time, "seconds")
 
             print("Best parameters sets:")
             for (metric_name, metric_best_param_set, metric_value) in best_param_set:
@@ -443,3 +482,7 @@ def compare_hyper_parameters(features, *tasks):
                 for param, value in metric_best_param_set.items():
                     print("\t\t", param, ": ", value, sep="")
             print()
+
+    hyper_parameters_end_time = time() - hyper_parameters_start_time
+    export_running_time("all hyper-parameters", hyper_parameters_end_time)
+    print("Running time for hyper-parameters tuning:", hyper_parameters_end_time, "seconds")

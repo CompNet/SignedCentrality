@@ -10,14 +10,10 @@ from sklearn import metrics
 # ===========================
 # Path variables
 # ===========================
-from descriptors.centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
-from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
-from descriptors.centrality.srwr_centrality import SRWRCentrality
-from descriptors.centrality.trolltrust_centrality import TrollTrust
-# from descriptors.centrality.node_effect_centrality import NodeEffect
-from descriptors.centrality.diversity_coef_centrality import diversity_coef_centrality
-from descriptors import GraphDescriptor
-from descriptors.node_embeddings.sne.sne_embedding import SNEEmbedding
+# from descriptors.centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+# from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
+# from descriptors.centrality.srwr_centrality import SRWRCentrality
+# from descriptors.centrality.trolltrust_centrality import TrollTrust
 
 CSV = ".csv"
 TXT = ".txt"
@@ -33,6 +29,7 @@ STAT_FOLDER = os.path.join(OUT_FOLDER, "stats")
 PLOT_FOLDER = os.path.join(OUT_FOLDER, "plots")
 GRAPHICS_FOLDER = os.path.join(OUT_FOLDER, "graphics")
 BEST_PARAM_SET = 'best_parameters_sets' + CSV
+RUNNING_TIMES = 'running_times' + CSV
 
 # ===========================
 # Other Variables
@@ -68,13 +65,13 @@ OUTPUT_GRAPH_IMBALANCE_COUNT = "imbalance_count"
 OUTPUT_GRAPH_IMBALANCE_PERCENTAGE = "imbalance_percentage"
 
 
-# centralities
-CENTR_DEGREE_NEG = NegativeCentrality.__name__
-CENTR_DEGREE_POS = PositiveCentrality.__name__
-CENTR_DEGREE_PN = PNCentrality.__name__
-CENTR_EIGEN = EigenvectorCentrality.__name__
-CENTR_TROLL_TRUST = TrollTrust.__name__
-CENTR_SRWR = SRWRCentrality.__name__
+# # centralities
+# CENTR_DEGREE_NEG = NegativeCentrality.__name__
+# CENTR_DEGREE_POS = PositiveCentrality.__name__
+# CENTR_DEGREE_PN = PNCentrality.__name__
+# CENTR_EIGEN = EigenvectorCentrality.__name__
+# CENTR_TROLL_TRUST = TrollTrust.__name__
+# CENTR_SRWR = SRWRCentrality.__name__
 # CENTR_NODE_EFFECT = NodeEffect.__name__
 
 # stats
@@ -114,7 +111,7 @@ PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
 
 # embeddings
-EMB_SNE = SNEEmbedding.__name__
+# EMB_SNE = SNEEmbedding.__name__
 SNE_SAVE_PATH_NAME = "save_path"
 SNE_TRAIN_DATA_NAME = "train_data"
 SNE_LABEL_DATA_NAME = "label_data"
@@ -205,34 +202,5 @@ PREDICTION_METRICS_OPTIMAL_VALUES = {
     metrics.accuracy_score.__name__: 1,
     metrics.precision_score.__name__: 1,
     metrics.recall_score.__name__: 1,
-}
-
-
-# Graph descriptors
-__NOT_IN_GRAPH_DESCRIPTORS = [  # These classes aren't used as descriptors in models.
-    PositiveCentrality,
-    NegativeCentrality,
-    # SRWRCentrality,
-    TrollTrust,
-]
-
-
-def __add_descriptor_classes(graph_descriptor_class):
-    graph_descriptors_dict = {}
-    for subclass in graph_descriptor_class.__subclasses__():
-        if subclass not in __NOT_IN_GRAPH_DESCRIPTORS:
-            if len(subclass.__subclasses__()) > 0:
-                graph_descriptors_dict = {**graph_descriptors_dict, **__add_descriptor_classes(subclass)}
-            else:
-                graph_descriptors_dict = {
-                    **graph_descriptors_dict,
-                    subclass.__name__: subclass.perform,
-                }
-
-    return graph_descriptors_dict
-
-
-GRAPH_DESCRIPTORS = {
-    **__add_descriptor_classes(GraphDescriptor)
 }
 

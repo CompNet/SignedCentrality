@@ -72,7 +72,9 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
         axes = plt.gca()
         x_values, y_values = args
         plot_function(y_values, **kwargs)
-        axes.set_xticklabels(str(x_values))
+        axes.set_xticks([x + 1 for x in range(len(x_values))])
+        axes.set_xticklabels([str(v) for v in x_values])
+
 
     else:
         plot_function(*args, **kwargs)
@@ -511,5 +513,6 @@ def generate_std_violinplot(x_values, y_values, graphic_title, x_label=None, y_l
         print_title,
         add_plot_to_name, dash_between_name_and_plot,
         verbose,
-        x_values, y_values
+        x_values, y_values,
+        showmeans=True
     )

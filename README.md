@@ -53,7 +53,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
 ## Installation
 
-* Install Python (the tested version is Python 3.7.4)
+* Install Python (the tested version are Python 3.7.4 and Python 3.8.4)
 
 * Install the following python modules
   * igraph 0.8.2
@@ -62,7 +62,14 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * sklearn 0.21.3
   * pandas 0.25.1
   * tensorflow 2.4.0
+  * torch 1.7.1
   * deprecated 1.2.11
+  * hdbscan 0.8.24
+  * pony 0.7.14
+  * gem 1.0.1 from https://github.com/palash1992/GEM.git
+  * keras 2.4.3
+  * seaborn 0.11.1
+  * imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
 
 * Download this project from GitHub
 
@@ -80,7 +87,14 @@ All the modules listed below are the python modules
 * sklearn 0.21.3
 * pandas 0.25.1
 * tensorflow 2.4.0
+* torch 1.7.1
 * deprecated 1.2.11
+* hdbscan 0.8.24
+* pony 0.7.14
+* gem 1.0.1 from https://github.com/palash1992/GEM.git
+* keras 2.4.3
+* seaborn 0.11.1
+* imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
 
 
 
