@@ -7,7 +7,7 @@ in signed and directed social networks centrality.
 
 The measure is computed by following the method of Wei-Chung Liu, Liang-Cheng Huang, Chester Wai-Jen Liu & Ferenc Jordán.
 
-I will use the rpy2 package to execute the R code implemented by the authors directly in this Python module.
+I use the rpy2 package to execute the R code implemented by the authors directly in this Python module.
 Documentation for this package can be found here : https://rpy2.github.io/doc/latest/html/index.html
 
 .. note: WC. Liu, LC. Huang, C. WJ. Liu et J. Ferenc. «A simple approach for quantifying node centrality
@@ -22,32 +22,22 @@ import util
 import rpy2.robjects as robjects
 
 
-
 class NodeEffect(GraphDescriptor):
     """
     This class is used to compute node effects centralities
     """
 
-    GENERATED_INPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectInputData.csv")
+    GENERATED_INPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectInputData.csv") # AttributeError: partially initialized module 'consts' has no attribute 'CSV_FOLDER' (most likely due to a circular import)
     GENERATED_OUTPUT_DATA = os.path.join(consts.CSV_FOLDER, "nodeEffectOutputData.csv")
-    global global_resu
 
     @staticmethod
     def perform_all(graph, **kwargs):
         """
         Compute this centrality.
         """
-        # todo ajouter code centralité
-        """adjacence_matrix = util.get_matrix(graph).toarray() # ndarray that contains all links for all nodes (as an adjacence list)
-        nr, nc = adjacence_matrix.shape # obtaining the number of row and the number of column of the ndarray object
-        R_adjacence_matrix = robjects.r.matrix(adjacence_matrix, nrow=nr, ncol=nc) # https://stackoverflow.com/questions/27283381/how-to-convert-numpy-array-to-r-matrix
-        # robjects.globalenv['matrix_data'] = R_adjacence_matrix # https://stackoverflow.com/questions/30525027/passing-a-python-variable-to-r-using-rpy2
-        robjects.r.assign("data", R_adjacence_matrix) # the R adjacence matrix created above is now associated as a R variable named "data"
-        """
 
-        robjects.globalenv['input_data_path'] = NodeEffect.GENERATED_INPUT_DATA
-        util.write_csv(NodeEffect.GENERATED_INPUT_DATA, util.get_adj_list(graph))
-        # todo add csv reading function in the R code below
+        robjects.globalenv['input_data_path'] = NodeEffect.GENERATED_INPUT_DATA # https://stackoverflow.com/questions/30525027/passing-a-python-variable-to-r-using-rpy2
+        util.write_csv(NodeEffect.GENERATED_INPUT_DATA, util.get_adj_list(graph)) #saving input data into a csv file
         robjects.r('''
         data<-read.csv(input_data_path, header=TRUE, sep=",")
         data
@@ -101,20 +91,21 @@ class NodeEffect(GraphDescriptor):
         
         resu<-data.frame(nodeID,TotalIndex,NetIndex,NetIndex1)
         resu
-        
         ''')
 
-        """global_resu = robjects.globalenv['resu']
-        print("resultat : "+global_resu)"""
-
         resu_to_csv = robjects.globalenv['resu']
+        print("Resultat :"+resu_to_csv)
         util.write_csv(NodeEffect.GENERATED_INPUT_DATA, resu_to_csv)
 
+        node_effect_vector = []
         total_total_effect = NodeEffectTotalIndex.perform(graph, **kwargs)
         total_net_effect_exerted = NodeEffectNetIndex.perform(graph, **kwargs)
         total_net_effect_received = NodeEffectNetIndex1.perform(graph, **kwargs)
+        node_effect_vector.append(total_total_effect)
+        node_effect_vector.append(total_net_effect_exerted)
+        node_effect_vector.append(total_net_effect_received)
 
-        return total_total_effect, total_net_effect_exerted, total_net_effect_received
+        return node_effect_vector
 
 
 class NodeEffectTotalIndex(NodeEffect):
@@ -132,7 +123,8 @@ class NodeEffectTotalIndex(NodeEffect):
         robjects.r('''resu<-read.csv(output_data_path, header=TRUE, sep=",")
         totalTotalIndex<-sum(resu$TotalIndex) # somme de tous les effets totaux ''')
         total_total_effect = robjects.globalenv['totalTotalIndex']
-        return total_total_effect
+        total_effect_vector = [total_total_effect]
+        return total_effect_vector
 
 
 class NodeEffectNetIndex(NodeEffect):
@@ -150,7 +142,8 @@ class NodeEffectNetIndex(NodeEffect):
         robjects.r('''resu<-read.csv(output_data_path, header=TRUE, sep=",")
         totalNetIndex<-sum(resu$NetIndex) # somme de tous les net effect exercés''')
         total_net_effect_exerted = robjects.globalenv['totalNetIndex']
-        return total_net_effect_exerted
+        net_effect_exerted_vector = [total_net_effect_exerted]
+        return net_effect_exerted_vector
 
 
 class NodeEffectNetIndex1(NodeEffect):
@@ -168,4 +161,5 @@ class NodeEffectNetIndex1(NodeEffect):
         robjects.r('''resu<-read.csv(output_data_path, header=TRUE, sep=",")
         totalNetIndex1<-sum(resu$NetIndex1) # somme de tous les net effect reçus''')
         total_net_effect_received = robjects.globalenv['totalNetIndex1']
-        return total_net_effect_received
+        net_effect_received_vector = [total_net_effect_received]
+        return net_effect_received_vector
