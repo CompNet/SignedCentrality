@@ -129,47 +129,50 @@ if __name__ == '__main__':
     # # print(kernel)
     # # classification task : one or more solutions
     # print("\nSVC :")
-    # prediction.classification.perform_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3))
+    # prediction.classification.perform_svc_classification(features, output, kernel, EditedNearestNeighbours(n_neighbors=3), export_graphical_results=False)
     # print("\nRandom Forest :")
     # # prediction.random_forest_classification.perform_classification(features, output, 1000)
     # prediction.random_forest_classification.perform_classification(features, output, EditedNearestNeighbours())
-    #
-    # # regression task : number of solutions
-    # print("Task:", *output1)
-    # print("\nSVR :")
-    # prediction.regression.perform_regression(features, output1, kernel)
-    # print("\nLinear Regression :")
-    # prediction.regression.perform_linear_regression(features, output1)
-    # print("\nMLP Regression :")
-    # prediction.regression.perform_mlp_regression(features, output1)
-    #
-    # # classification task : one or more classes of solution
-    # print("Task:", *output2)
-    # print("\nSVC :")
-    # prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
-    # print("\nRandom Forest :")
-    # # prediction.random_forest_classification.perform_classification(features, output2, 1000)
-    # prediction.random_forest_classification.perform_classification(features, output2, EditedNearestNeighbours())
-    #
-    #
-    # # regression task : number of classes of solution
-    # print("Task:", *output3)
-    # print("\nSVR :")
-    # prediction.regression.perform_regression(features, output3, kernel)
-    # print("\nLinear Regression :")
-    # prediction.regression.perform_linear_regression(features, output3)
-    # print("\nMLP Regression :")
-    # prediction.regression.perform_mlp_regression(features, output3)
-    #
-    # # regression task : graph imbalance
-    # print("Task:", *output4)
-    # print("\nSVR :")
-    # prediction.regression.perform_regression(features, output4, kernel)
-    #
-    # print("Task:", *output4)
-    # print("\nSVR :")
-    # prediction.regression.perform_regression(features, output5, kernel)
-    #
+
+    # regression task : number of solutions
+    print("Task:", *output1)
+    print("\nSVR :")
+    prediction.regression.perform_regression(features, output1, kernel)
+    print("\nLinear Regression :")
+    prediction.regression.perform_linear_regression(features, output1)
+    print("\nMLP Regression :")
+    prediction.regression.perform_mlp_regression(features, output1)
+
+    # classification task : one or more classes of solution
+    print("Task:", *output2)
+    print("\nSVC :")
+    prediction.classification.perform_classification(features, output2, kernel, EditedNearestNeighbours(n_neighbors=3))
+    print("\nRandom Forest :")
+    # prediction.random_forest_classification.perform_classification(features, output2, 1000)
+    prediction.random_forest_classification.perform_classification(features, output2, EditedNearestNeighbours())
+
+
+    # regression task : number of classes of solution
+    print("Task:", *output3)
+    print("\nSVR :")
+    prediction.regression.perform_regression(features, output3, kernel)
+    print("\nLinear Regression :")
+    prediction.regression.perform_linear_regression(features, output3)
+    print("\nMLP Regression :")
+    prediction.regression.perform_mlp_regression(features, output3)
+
+    # regression task : graph imbalance
+    print("Task:", *output4)
+    print("\nSVR :")
+    prediction.regression.perform_regression(features, output4, kernel)
+
+    print("Task:", *output4)
+    print("\nSVR :")
+    prediction.regression.perform_regression(features, output5, kernel)
+
+    # Create boxplots results for all tasks
+    prediction.process_graphics()
+
     # # feature ablation task
     # print("\nTask: feature ablation")
     # print("\nSVC :")

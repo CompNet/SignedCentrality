@@ -15,7 +15,7 @@ from deprecated import deprecated
 from sklearn import metrics
 import consts
 import sys
-from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean,     generate_boxplot_clean1, generate_std_boxplot, generate_std_violinplot, Y_MIN, Y_MAX, DEFAULT_Y_MIN, DEFAULT_Y_MAX
+from collect.collect_graphics import generate_plot, generate_errorbar_plot, generate_boxplot_clean, generate_std_boxplot, generate_std_violinplot, Y_MIN, Y_MAX, DEFAULT_Y_MIN, DEFAULT_Y_MAX
 import collect.collect_graphics as collect_graphics
 from collect.collect_predicted_values import collect_predicted_values
 from prediction import initialize_hyper_parameters, initialize_data, process_graphics

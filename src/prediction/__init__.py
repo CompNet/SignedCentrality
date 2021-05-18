@@ -13,7 +13,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import prediction
 from collect.collect_predicted_values import collect_predicted_values
-import collect.collect_graphics
+import collect.collect_graphics as collect_graphics
 from path import get_csv_folder_path
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss
@@ -37,6 +37,17 @@ This package contains functions related to the classification and regression.
 @author: nejat
 @author: Virgile Sucal
 """
+
+BOXPLOT_VALUES_LIST = []
+
+
+def reset_boxplot_values_list():
+    BOXPLOT_VALUES_LIST.clear()
+    collect_graphics.reset_y_lims()
+
+
+def add_to_boxplot(Y_test, Y_pred, output):
+    BOXPLOT_VALUES_LIST.append((Y_test, Y_pred, output))
 
 
 def import_data(features, output):
@@ -201,7 +212,7 @@ def test_prediction(reg, X_test, Y_test, output, prediction_metrics, print_resul
 
     # Save graphics into a file
     if export_graphical_results:
-        process_graphics(Y_test, Y_pred, output)
+        add_to_boxplot(Y_test, Y_pred, output)
 
     return prediction_metrics_results
 
@@ -255,14 +266,29 @@ def perform_prediction(model_class, default_values, features, output, test_funct
     return model, computed_prediction_metrics
 
 
-def process_graphics(Y_test, Y_pred, output):
+def process_graphics():
     """
     Process graphical display for test results
     """
 
+    dataset = []
+    for (Y_test, Y_pred, output) in BOXPLOT_VALUES_LIST:
+        data, graphic_title, path_to_file, x_axis_names = collect_graphics.generate_data_for_boxplot_regression(Y_test, Y_pred, output)
+        dataset.append((data, graphic_title, path_to_file, x_axis_names))
+        for tmp_list in data:
+            for y in tmp_list:
+                if y < collect_graphics.Y_MIN:
+                    collect_graphics.Y_MIN = y
+                if y > collect_graphics.Y_MAX:
+                    collect_graphics.Y_MAX = y
+
     # Saving graphics to file
-    # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
-    # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
-    # collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
-    collect.collect_graphics.generate_boxplot_clean1(Y_test, Y_pred, output)
+    for (data, graphic_title, path_to_file, x_axis_names) in dataset:
+        # # collect.collect_graphics.generate_plot(Y_test, Y_pred, output)
+        # # collect.collect_graphics.generate_boxplot(Y_test, Y_pred, output)
+        # # collect.collect_graphics.generate_boxplot_clean(Y_test, Y_pred, output)
+        # collect_graphics.generate_boxplot_clean1(Y_test, Y_pred, output)
+        collect_graphics.generate_boxplot_regression(data, graphic_title, path_to_file, x_axis_names)
+
+    reset_boxplot_values_list()
 

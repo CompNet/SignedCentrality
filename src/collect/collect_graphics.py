@@ -19,7 +19,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 DEFAULT_Y_MIN = 0
-DEFAULT_Y_MAX = 100
+DEFAULT_Y_MAX = 0
 Y_MIN = int(DEFAULT_Y_MIN)
 Y_MAX = int(DEFAULT_Y_MAX)
 
@@ -81,7 +81,7 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     f = plt.figure()
     f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
     axes = plt.gca()
-    axes.set_ylim([Y_MIN, Y_MAX])
+    axes.set_ylim([Y_MIN - 1, Y_MAX + 1])
 
     if verbose:
         print("Generating " + name + " for " + graphic_title)
@@ -399,7 +399,8 @@ def generate_boxplot_clean(outputs_values, predicted_values, graphic_title, inte
     reset_y_lims()
 
 
-def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, interval_value=10, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
+# def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, interval_value=10, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
+def generate_data_for_boxplot_regression(outputs_values, predicted_values, graphic_title, interval_value=10, add_plot_to_name=True, dash_between_name_and_plot=False, verbose=False):
     """This method is nearly the same as generate_boxplot_clean, but I modified the interval range to be more modulable if there is a very large scale of solutions
     It generate a boxplot using matplotlib.pyplot
 
@@ -470,10 +471,15 @@ def generate_boxplot_clean1(outputs_values, predicted_values, graphic_title, int
             data.append(tmp_list)
     # print(data)
 
+    return data, graphic_title, path_to_file, x_axis_names
+
+
+def generate_boxplot_regression(data, graphic_title, path_to_file, x_axis_names, verbose=False):
     # Generating boxplot
     if verbose:
         print("Generating boxplot for "+graphic_title, "\n")
     axes = plt.gca()
+    axes.set_ylim([Y_MIN - 1, Y_MAX + 1])
     plt.boxplot(data)
     plt.title(graphic_title)
     axes.set_xticklabels(x_axis_names)
