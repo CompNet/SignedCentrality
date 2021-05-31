@@ -7,6 +7,8 @@ This module contains functions related to the measures of degree centrality for 
 The measure is computed by following the method of Martin Everett and Stephen Borgatti.
 
 .. note: M. Everett & S. Borgatti. (2014). Networks containing negative ties. SocialNetworks, 38, 111-120. 10.1016/j.socnet.2014.03.005
+
+@author: Virgile Sucal
 """
 
 import abc

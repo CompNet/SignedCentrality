@@ -2,7 +2,9 @@
 Created on Sep 23, 2020
 
 @author: nejat
+@author: Virgile Sucal
 '''
+
 import csv
 import itertools as iter
 from os.path import join, isfile
@@ -362,6 +364,13 @@ def export_running_time(label=None, time=None, unit="seconds", new_file=False):
 
 
 def prediction_name_refactor(prediction_name):
+    """
+    Make prediction names more legible
+
+    :param prediction_name: name of a prediction task
+    :return: the refactored name
+    """
+
     refactored_name = prediction_name
     if prediction_name == "['nb_solutions']":
         refactored_name = consts.OUTPUT_NB_SOLUTIONS

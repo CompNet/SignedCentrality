@@ -16,7 +16,14 @@ import numpy as np
 
 
 def collect_predicted_values(predicted_values, prediction_name, verbose=False):
-    """ initial version, where only the predicted values are saved to file, by "brute force".
+    """
+    Write predicted values in a CSV file
+
+    Initial version, where only the predicted values are saved to file, by "brute force".
+
+    :param predicted_values: Values to write in a file
+    :param prediction_name: Name of the prediction technique
+    :param verbose: True if information must be printed
     """
     predicted_dataset = pd.DataFrame([])
 
@@ -53,11 +60,18 @@ def collect_predicted_values(predicted_values, prediction_name, verbose=False):
 
 
 def collect_predicted_values_with_graph_name(predicted_values, prediction_name, verbose=False):
-    """ updated version, with the predicted values and the graph name associated.
+    """
+    Write predicted values in a CSV file
+
+    Updated version, with the predicted values and the graph name associated.
     first, collect all graph names (from outputs.csv file for example)
     then, write it in csv the "same way" as "collect_all_outputs" method (at least for the graph name)
     after that, collect the predicted dataset and extract elements for it, and write it row by row, next to the graph name
     convert everything to csv file at the end
+
+    :param predicted_values: Values to write in a file
+    :param prediction_name: Name of the prediction technique
+    :param verbose: True if information must be printed
     """
 
     # graph_names = pd.read_csv(os.path.join(path.get_csv_folder_path(), consts.FILE_CSV_OUTPUTS+"_full.csv"), usecols=[0])

@@ -2,6 +2,7 @@
 Created on Sep 23, 2020
 
 @author: nejat
+@author: Virgile Sucal
 '''
 
 import os
@@ -127,6 +128,10 @@ SNE_IS_TRAIN_NAME = "is_train"
 
 # Linear regression hyper parameters
 class LinearRegression:
+    """
+    Const values for linear regression
+    """
+
     FIT_INTERCEPT = "fit_intercept"
     NORMALIZE = "normalize"
     COPY_X = "copy_X"
@@ -136,6 +141,10 @@ class LinearRegression:
 
 # SVM hyper parameters
 class SVM:
+    """
+    Const values for SVM regression
+    """
+
     # Parameters Names
     KERNEL = "kernel"
     GAMMA = "gamma"
@@ -154,6 +163,10 @@ class SVM:
 
 # MLP hyper parameters
 class MLP:
+    """
+    Const values for MLP regression
+    """
+
     # Parameters Names
     HIDDEN_LAYER_SIZES = "hidden_layer_sizes"
     ACTIVATION = "activation"

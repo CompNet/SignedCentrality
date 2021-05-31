@@ -3,6 +3,8 @@
 
 """
 This module contains functions related to the SNE tests.
+
+@author: Virgile Sucal
 """
 
 from descriptors.node_embeddings.sne.sne_embedding import *

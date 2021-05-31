@@ -7,6 +7,8 @@ This module contains functions related to the measure of eigenvector centrality.
 The measure is computed by following the method of Phillip Bonacich and Paulette Lloyd.
 
 .. note: P. Bonacich & P. Lloyd. (2004). Calculating status with negative relations. SocialNetworks, 26, 331-338. 10.1016/j.socnet.2004.08.007
+
+@author: Virgile Sucal
 """
 
 import numpy as np
@@ -18,18 +20,33 @@ from util import get_matrix, get_scale, which
 
 
 class EigenvectorCentrality(GraphDescriptor):
-	#todo
 	"""
-	TODO: Check again this function
-	
 	This class is used to compute eigenvector centralities
 
 	This processing is done in a class because it is used in the classifier.
 	This classifier calls a method "undirected()" for all centrality computing classes which are in the package centrality.
+
+	TODO: Check again this function
 	"""
 
 	@staticmethod
 	def perform(graph, scaled=False):
+		"""
+		Compute the eigenvector centrality.
+
+		If scaled is True, the values will be set such that the maximum is 1.
+
+		The graph must be an undirected signed graph or two unsigned graphs.
+		If there are two graphs, the first one represent the positive weights and the second one defines the negative ones.
+
+		:param graph: the graph
+		:type graph: igraph.Graph or tuple
+		:param scaled: indicates if the centrality must be scaled
+		:type scaled: bool
+		:return: the eigenvector centrality
+		:rtype: list
+		"""
+
 		return EigenvectorCentrality.undirected(graph, scaled)
 
 	@staticmethod

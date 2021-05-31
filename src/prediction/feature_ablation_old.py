@@ -31,6 +31,14 @@ https://scikit-learn.org/stable/modules/feature_selection.html#recursive-feature
 
 
 def feature_ablation(features, output, kernel):
+    """
+    This method is the general method to perform the task of feature ablation for a single output.
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param kernel: kernel to use
+    """
+
     # =======================================================
     # Read features and output from file (original code)
     # =======================================================
@@ -79,7 +87,17 @@ def score_model(X_train, X_test, y_train, y_test, kernel):  # the "identical sco
     return metrics.mean_squared_error(y_test, y_pred)
 
 
-def feature_ablation_1(features, output, kernel): # https://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_digits.html#sphx-glr-auto-examples-feature-selection-plot-rfe-digits-py
+def feature_ablation_1(features, output, kernel):
+    """
+    This method is the general method to perform the task of feature ablation for a single output.
+
+    .. note: https://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_digits.html#sphx-glr-auto-examples-feature-selection-plot-rfe-digits-py
+
+    :param features: a list of features
+    :param output: a single output, e.g. consts.OUTPUT_NB_SOLUTIONS
+    :param kernel: kernel to use
+    """
+
     # =======================================================
     # Read features and output from file
     # =======================================================
@@ -196,6 +214,17 @@ def feature_ablation_1(features, output, kernel): # https://scikit-learn.org/sta
 
 
 def score_model1(predictor, X_train, X_test, y_train, y_test, kernel):  # the "identical score everytime" issue is probably here
+    """
+    Return mean squared error for a predictor
+
+    :param predictor: prediction technique
+    :param X_train: Samples for train set
+    :param X_test: Samples for test set
+    :param Y_train: Values for train set
+    :param Y_test: Values for test set
+    :return: mean squared error
+    """
+
     predictor.fit(X_train, y_train)
     y_pred = predictor.predict(X_test)
     # print(metrics.f1_score(y_test, y_pred))

@@ -12,6 +12,8 @@ Each module of the package contains functions that compute a measure of centrali
 .. seealso: eigenvector_centrality
 .. seealso: igraph
 .. seealso: scipy
+
+@author: Virgile Sucal
 """
 
 import abc

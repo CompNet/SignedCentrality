@@ -22,7 +22,10 @@ import consts
 
 
 class TrollTrust(GraphDescriptor):
-    
+    """
+    Contain methods computing measures of Troll-Trust centrality on signed graphs
+    """
+
     @staticmethod
     def calculate_rep_values(graph, pi):
         """This method calculates a list of Reputation values for each nodes.

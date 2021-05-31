@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+This module is used to select predictors to use in the program
+
+@author: Virgile Sucal
+"""
+
 import importlib
 import sys
 from deprecated import deprecated
@@ -26,6 +32,15 @@ __NOT_IN_GRAPH_DESCRIPTORS = [  # These classes aren't used as descriptors in mo
 
 
 def __add_descriptor_classes(graph_descriptor_class):
+	"""
+	Select which descriptors will be computed and used
+
+	Content of __NOT_IN_GRAPH_DESCRIPTORS won't be added.
+
+	:param graph_descriptor_class: Superclass of all descriptors
+	:return: dict containing descriptors
+	"""
+
 	graph_descriptors_dict = {}
 	for subclass in graph_descriptor_class.__subclasses__():
 		if subclass not in __NOT_IN_GRAPH_DESCRIPTORS:

@@ -42,6 +42,17 @@ https://scikit-learn.org/stable/modules/feature_selection.html#recursive-feature
 
 
 def score_model_classification(predictor, X_train, X_test, Y_train, Y_test):
+    """
+    Return F1 score for a predictor
+
+    :param predictor: prediction technique
+    :param X_train: Samples for train set
+    :param X_test: Samples for test set
+    :param Y_train: Values for train set
+    :param Y_test: Values for test set
+    :return: F1 score
+    """
+
     predictor.fit(X_train, Y_train)
     Y_pred = predictor.predict(X_test)
     # print(metrics.f1_score(Y_test, Y_pred))
@@ -49,6 +60,17 @@ def score_model_classification(predictor, X_train, X_test, Y_train, Y_test):
 
 
 def score_model_regression(predictor, X_train, X_test, Y_train, Y_test):
+    """
+    Return mean squared error for a predictor
+
+    :param predictor: prediction technique
+    :param X_train: Samples for train set
+    :param X_test: Samples for test set
+    :param Y_train: Values for train set
+    :param Y_test: Values for test set
+    :return: mean squared error
+    """
+
     predictor.fit(X_train, Y_train)
     Y_pred = predictor.predict(X_test)
     # print(metrics.mean_squared_error(Y_test, Y_pred))

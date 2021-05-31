@@ -2,6 +2,9 @@
 Created on Sep 23, 2020
 
 @author: nejat
+@author: Alexandre Faure
+@author: Laurent PEREIRA DA SILVA
+@author: Virgile Sucal
 '''
 
 import itertools

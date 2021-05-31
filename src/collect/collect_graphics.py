@@ -25,6 +25,10 @@ Y_MAX = int(DEFAULT_Y_MAX)
 
 
 def reset_y_lims():
+    """
+    Reset Y_MIN and Y_MAX to their default values.
+    """
+
     global Y_MIN
     global Y_MAX
     Y_MIN = int(DEFAULT_Y_MIN)
@@ -81,7 +85,7 @@ def __make_plot(plot_function, graphic_title, x_label=None, y_label=None, print_
     f = plt.figure()
     f.set_figwidth(max(ceil(len(args[0]) / 4), 6.4))  # x values are set first ; 6.4 is default value
     axes = plt.gca()
-    axes.set_ylim([Y_MIN - 1, Y_MAX + 1])
+    axes.set_ylim([Y_MIN, Y_MAX])
 
     if verbose:
         print("Generating " + name + " for " + graphic_title)
@@ -475,11 +479,21 @@ def generate_data_for_boxplot_regression(outputs_values, predicted_values, graph
 
 
 def generate_boxplot_regression(data, graphic_title, path_to_file, x_axis_names, verbose=False):
+    """
+    Generate a boxplot plot for regression tasks using matplotlib.pyplot
+
+    :param data: Data to show on plot
+    :param graphic_title: the title of the graphic
+    :param path_to_file: path to file containing boxplot
+    :param x_axis_names: names for x axis
+    :param verbose: True if information must be printed
+    """
+
     # Generating boxplot
     if verbose:
         print("Generating boxplot for "+graphic_title, "\n")
     axes = plt.gca()
-    axes.set_ylim([Y_MIN - 1, Y_MAX + 1])
+    axes.set_ylim([Y_MIN, Y_MAX])
     plt.boxplot(data)
     plt.title(graphic_title)
     axes.set_xticklabels(x_axis_names)

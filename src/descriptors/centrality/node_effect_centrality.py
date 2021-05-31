@@ -14,7 +14,9 @@ Documentation for this package can be found here : https://rpy2.github.io/doc/la
 in signed and directed social networks». In :Applied Network Science5.1 (août 2020), p. 46. issn : 2364-8228.
 doi :10.1007/s41109-020-00288-w
 
+@author: Laurent PEREIRA DA SILVA
 """
+
 import os
 from os import makedirs
 from os.path import abspath, dirname, exists
@@ -33,6 +35,7 @@ class NodeEffect(GraphDescriptor):
     """
     This class is used to compute node effects centralities
     """
+
     ROOT_PATH = dirname(abspath(__file__)) + '/../../../..'
     """
     Path to the root directory

@@ -12,25 +12,18 @@ from sklearn import svm
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-
 import os
+from igraph import *
+from descriptors import GraphDescriptor
+from descriptors.centrality import CentralityMeasure
+import consts
+from bct.algorithms.centrality import diversity_coef_sign
+from bct.algorithms import modularity_finetune_dir
+from util import get_matrix
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-
-from igraph import *
-
-from descriptors import GraphDescriptor
-
-from centrality import CentralityMeasure
-import consts
-
-from bct.algorithms.centrality import diversity_coef_sign
-
-from bct.algorithms import modularity_finetune_dir
-
-from util import get_matrix
 
 
 class diversity_coef_centrality(GraphDescriptor):
