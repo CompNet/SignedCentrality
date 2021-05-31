@@ -36,7 +36,7 @@ class NodeEffect(GraphDescriptor):
     This class is used to compute node effects centralities
     """
 
-    ROOT_PATH = dirname(abspath(__file__)) + '/../../../..'
+    ROOT_PATH = dirname(abspath(__file__)) + '/../../..'
     """
     Path to the root directory
     """
@@ -66,11 +66,6 @@ class NodeEffect(GraphDescriptor):
     Path to write the files containing graph data to be read by StEM classes.
     """
 
-    TRAIN_DATA = DATA + "/soc-sign-Slashdot090221.txt"
-    """
-    Path to the training file.
-    """
-
     GENERATED_INPUT_DATA = DATA + "/nodeEffectInputData.csv"
     """
     Path to the generated CSV file.
@@ -81,11 +76,6 @@ class NodeEffect(GraphDescriptor):
     Path to the generated CSV file.
     """
 
-    # EMBEDDING_SIZE = 32  # Default value in paper
-    EMBEDDING_SIZE = 10  # To have the same size in all embeddings
-    """
-    Embedding dimension size. 
-    """
 
     @staticmethod
     def __initialize_directories():
