@@ -55,37 +55,26 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
 * Install Python (the tested version are Python 3.7.4 and Python 3.8.4)
 
-* Install the following python modules
-  * igraph 0.8.2
-  * numpy 1.17.2
-  * scipy 1.3.1
-  * sklearn 0.21.3
-  * pandas 0.25.1
-  * tensorflow 2.4.0
-  * torch 1.7.1
-  * deprecated 1.2.11
-  * hdbscan 0.8.24
-  * pony 0.7.14
-  * gem 1.0.1 from https://github.com/palash1992/GEM.git
-  * keras 2.4.3
-  * seaborn 0.11.1
-  * imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
-  * rpy2 3.4.4
+* Install dependencies using following command:
+
+  ```
+  pip install -r requirements.txt --use-feature=2020-resolver
+  ```
   
 * Download this project from GitHub
 
   You also need to retrieve the data from Figshare. Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place the contents of them into folders `in` and `output`, respectively. Finally, configure the input parameters in `src/main.py` and then run it inside the folder `src`.
 
-
+* The project must be run from `src/` directory.
 
 ## Dependencies
 
 All the modules listed below are the python modules
 
-* igraph 0.8.2
+* python-igraph 0.8.2
 * numpy 1.17.2
 * scipy 1.3.1
-* sklearn 0.21.3
+* scikit-learn 0.21.3
 * pandas 0.25.1
 * tensorflow 2.4.0
 * torch 1.7.1
@@ -97,6 +86,8 @@ All the modules listed below are the python modules
 * seaborn 0.11.1
 * imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
 * rpy2 3.4.4
+* tqdm
+* bctpy 0.5.2
 
 
 ## To-do list
