@@ -46,7 +46,14 @@ PROP_MISPLS = [0.2, 0.3] #[x/20 for x in range(0, 11)] # float range from 0.0 to
 DENSITY = 1
 INPUT_NETWORKS = range(1,11)
 PROP_NEGS = None # when density=1, this equals 'None'
-#PROP_NEGS = [0.3, 0.5, 0.7] # do not uncomment !
+
+##GRAPH_SIZES = [16,20,24,28,32,26] # 
+##L0_VALS = [2,3,4] #
+##PROP_MISPLS = [x/20 for x in range(0, 21)] # float range from 0.0 to 1.0 with decimal steps
+##DENSITY = 1
+##INPUT_NETWORKS = range(1,101)
+##PROP_NEGS = None # when density=1, this equals 'None'
+
 
 NETWORK_DESC = consts.SIGNED_UNWEIGHTED
 
@@ -70,14 +77,14 @@ OUTPUTS = [
 
 # FORCE = False
 FORCE = True
-VERBOSE = False
+VERBOSE = True
 # =====================================
 
 
 if __name__ == '__main__':
 
     program_start_time = time()
-    export_running_time(new_file=True)
+    #export_running_time(new_file=True)
 
     print(NETWORK_DESC)
     print(GRAPH_DESCRIPTORS)
@@ -86,7 +93,7 @@ if __name__ == '__main__':
 
     features_start_time = time()
     compute_all_centralities(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, FORCE, VERBOSE)
-
+    print("!!!!!!!!!!!!!!")
     stats.runner.compute_all_stats(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, STATS, FORCE, VERBOSE)
 
     collect.collect_features.collect_all_features(GRAPH_SIZES, L0_VALS, DENSITY, PROP_MISPLS, PROP_NEGS, INPUT_NETWORKS, NETWORK_DESC, GRAPH_DESCRIPTORS, STATS, FORCE)
@@ -136,7 +143,7 @@ if __name__ == '__main__':
     # print("\nRandom Forest :")
     # # prediction.random_forest_classification.perform_classification(features, output, 1000)
     # prediction.random_forest_classification.perform_classification(features, output, EditedNearestNeighbours())
-
+    """
     # regression task : number of solutions
     print("Task:", *output1)
     print("\nSVR :")
@@ -230,6 +237,7 @@ if __name__ == '__main__':
     program_end_time = time() - program_start_time
     export_running_time("full program", program_end_time)
     print("Running time of the full program:", program_end_time, "seconds")
-
+    """
+    
     print("All tests have been executed successfully.")
 

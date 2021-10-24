@@ -28,6 +28,7 @@ __NOT_IN_GRAPH_DESCRIPTORS = [  # These classes aren't used as descriptors in mo
 	NegativeCentrality,
 	# SRWRCentrality,
 	TrollTrust,
+	NodeEffect,
 ]
 
 
