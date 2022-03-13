@@ -1,1 +1,3 @@
 __pycache__/
+src/node_embeddings/sne/sne/data/wiki_edit_num_40.walk
+src/node_embeddings/sne/sne/lbl_wiki_edit_emb.pkl

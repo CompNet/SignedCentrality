@@ -12,13 +12,9 @@ Created on Sep 23, 2020
 '''
 
 import util
-import centrality.degree_centrality
-import centrality.eigenvector_centrality
 import consts
 import path
 import os
-from statistics import mean, stdev
-
 import pandas as pd
 
 
@@ -51,41 +47,57 @@ def collect_outputs(n, l0, d, prop_mispl, prop_neg, network_no, network_desc,
     
     # we continue if the corresponding input network exists
     if os.path.exists(network_path):
-        eval_partitions_folder_path = path.get_evaluate_partitions_folder_path(n, l0, d, prop_mispl, prop_neg,
-                                                     network_no, network_desc)
-        #print("..... collecting outputs in "+eval_partitions_folder_path)
-        for output_desc in output_descs:
-            result = None
-            
-            if output_desc == consts.OUTPUT_NB_SOLUTIONS or output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION:
-                result_filepath = os.path.join(eval_partitions_folder_path,"nb-solution.csv")
-                nb_solutions = int(pd.read_csv(result_filepath, index_col=0).values) 
+        g = util.read_graph(network_path, consts.FILE_FORMAT_GRAPHML)
+        gpos = g.copy()
+        gpos.es.select(weight_le=0).delete()
+        clusters = gpos.clusters(mode='weak')
+        nb_comps = len(clusters)
+        #print(nb_comps)
+        
+        if nb_comps == 1:
+            eval_partitions_folder_path = path.get_evaluate_partitions_folder_path(n, l0, d, prop_mispl, prop_neg,
+                                                         network_no, network_desc)
+            #print("..... collecting outputs in "+eval_partitions_folder_path)
+            for output_desc in output_descs:
+                result = None
                 
-                if output_desc == consts.OUTPUT_NB_SOLUTIONS:
-                    result = [nb_solutions] # a list of a single value
-                if output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION:
-                    result = [int(nb_solutions==1)] # a list of a single value
+                if output_desc == consts.OUTPUT_NB_SOLUTIONS or output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION:
+                    result_filepath = os.path.join(eval_partitions_folder_path,"nb-solution.csv")
+                    nb_solutions = int(pd.read_csv(result_filepath, index_col=0).values) 
                     
-            elif output_desc == consts.OUTPUT_NB_SOLUTION_CLASSES or output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES:
-                result_filepath = os.path.join(eval_partitions_folder_path,"Best-k-for-kmedoids.csv")
-                nb_solution_classes = 1 # by default
-                if os.path.exists(result_filepath):
-                    nb_solution_classes = int(pd.read_csv(result_filepath, usecols=['Best k for Silhouette']).values) 
-                
-                if output_desc == consts.OUTPUT_NB_SOLUTION_CLASSES:
-                    result = [nb_solution_classes] # a list of a single value
-                if output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES:
-                    result = [int(nb_solution_classes==1)] # a list of a single value
-                
-            df = pd.DataFrame(data=result, index=consts.COL_NAMES[output_desc]).transpose() # row vector
-            outputs = pd.concat([outputs, df], axis=1)
+                    if output_desc == consts.OUTPUT_NB_SOLUTIONS:
+                        result = [nb_solutions] # a list of a single value
+                    if output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION:
+                        result = [int(nb_solutions==1)] # a list of a single value
+                        
+                elif output_desc == consts.OUTPUT_NB_SOLUTION_CLASSES or output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES:
+                    result_filepath = os.path.join(eval_partitions_folder_path,"Best-k-for-kmedoids-VI.csv")
+                    nb_solution_classes = 1 # by default
+                    if os.path.exists(result_filepath):
+                        nb_solution_classes = int(pd.read_csv(result_filepath, usecols=['Best k for Silhouette']).values) 
+                    
+                    if output_desc == consts.OUTPUT_NB_SOLUTION_CLASSES:
+                        result = [nb_solution_classes] # a list of a single value
+                    if output_desc == consts.OUTPUT_IS_SINGLE_SOLUTION_CLASSES:
+                        result = [int(nb_solution_classes==1)] # a list of a single value
+    
+                elif output_desc == consts.OUTPUT_GRAPH_IMBALANCE_COUNT or output_desc == consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE:
+                    result_filepath = os.path.join(eval_partitions_folder_path, "imbalance.csv")
+                    imbalance_count = int(pd.read_csv(result_filepath, usecols=['imbalance count']).values)
+                    imbalance_percentage = float(pd.read_csv(result_filepath, usecols=['imbalance percentage']).values)
+                    if output_desc == consts.OUTPUT_GRAPH_IMBALANCE_COUNT:
+                        result = [imbalance_count] # a list of a single value
+                    if output_desc == consts.OUTPUT_GRAPH_IMBALANCE_PERCENTAGE:
+                        result = [imbalance_percentage] # a list of a single value
+                    
+                df = pd.DataFrame(data=result, index=consts.COL_NAMES[output_desc]).transpose() # row vector
+                outputs = pd.concat([outputs, df], axis=1)
 
     return outputs       
   
                
 
-def collect_all_outputs(graph_sizes, l0_values, d, prop_mispls, prop_negs, networks,
-                              network_desc, output_descs, force=False):
+def collect_all_outputs(graph_sizes, l0_values, d_values, prop_mispls, prop_negs, networks, network_desc, output_descs, force=False, verbose=False):
     """This method handles the input signed networks before collecting the indicated outputs.
        
     :param graph_sizes: a list of number of nodes
@@ -114,32 +126,37 @@ def collect_all_outputs(graph_sizes, l0_values, d, prop_mispls, prop_negs, netwo
     
     if not os.path.exists(result_filepath) or force:
         rownames = []
-        for n in graph_sizes:
-            for l0 in l0_values:
-                for prop_mispl in prop_mispls:
-                    
-                    my_prop_negs = prop_negs
-                    if my_prop_negs is None and d == 1:
-                        my_prop_negs = [util.compute_prop_neg(n, l0)]
+        for d in d_values:
+            for n in graph_sizes:
+                for l0 in l0_values:
+                    for prop_mispl in prop_mispls:
                         
-                    for prop_neg in my_prop_negs:
-                        for network_no in networks:
-                            desc = "n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d)+", propMispl="+util.format_4digits(prop_mispl)+", propNeg="+util.format_4digits(prop_neg)+", network="+str(network_no)
-                                
-                            print("... collecting outputs with n="+str(n)+", l0="+str(l0)+
-                                  ", dens="+util.format_4digits(d), ", propMispl="+
-                                  util.format_4digits(prop_mispl), 
-                                ", propNeg="+util.format_4digits(prop_neg), 
-                                ", network="+str(network_no))
-        
-                            row = collect_outputs(n, l0, d, prop_mispl, prop_neg, 
-                                                 network_no, network_desc, output_descs)
-                            if row.size != 0:
-                                outputs = outputs.append(row)
-                                rownames.append(desc)
-        
-        outputs.index =  rownames          
+                        my_prop_negs = prop_negs
+                        if d == 1:
+                            my_prop_negs = [util.compute_prop_neg(n, l0)]
+                            
+                        for prop_neg in my_prop_negs:
+                            for network_no in networks:
+                                desc = "n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d)+", propMispl="+util.format_4digits(prop_mispl)+", propNeg="+util.format_4digits(prop_neg)+", network="+str(network_no)
+
+                                if verbose:
+                                    print(
+                                        "... collecting outputs with n="+str(n)+", l0="+str(l0)+", dens="+util.format_4digits(d),
+                                        ", propMispl="+util.format_4digits(prop_mispl),
+                                        ", propNeg="+util.format_4digits(prop_neg),
+                                        ", network="+str(network_no)
+                                    )
+            
+                                row = collect_outputs(n, l0, d, prop_mispl, prop_neg, 
+                                                     network_no, network_desc, output_descs)
+                                if row.size != 0:
+                                    outputs = outputs.append(row)
+                                    rownames.append(desc)
+            
+        outputs.index =  rownames
+        outputs[outputs[consts.OUTPUT_NB_SOLUTIONS] > 10000] = 10000      
         outputs.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
-        print(result_filepath+" already exists")   
-        
+        if verbose:
+            print(result_filepath+" already exists")
+

@@ -2,22 +2,44 @@
 Created on Sep 23, 2020
 
 @author: nejat
+@author: Virgile Sucal
 '''
 
 import os
+from sklearn import metrics
 
 # ===========================
 # Path variables
 # ===========================
+# from descriptors.centrality.degree_centrality import NegativeCentrality, PositiveCentrality, PNCentrality
+# from descriptors.centrality.eigenvector_centrality import EigenvectorCentrality
+# from descriptors.centrality.srwr_centrality import SRWRCentrality
+# from descriptors.centrality.trolltrust_centrality import TrollTrust
+
+CSV = ".csv"
+TXT = ".txt"
+PNG = ".png"
+PDF = ".pdf"
 MAIN_FOLDER = os.path.abspath("..") # the absolute path of the previous level
 IN_FOLDER = os.path.join(MAIN_FOLDER, "in")
 OUT_FOLDER = os.path.join(MAIN_FOLDER, "out")
+#OUT_FOLDER = os.path.join(MAIN_FOLDER, "out_uncomplete_complete_networks")
+#OUT_FOLDER = os.path.join(MAIN_FOLDER, "out_complete_networks")
+
 EVAL_PARTITIONS_FOLDER = os.path.join(OUT_FOLDER, "evaluate-partitions")
 CSV_FOLDER = os.path.join(OUT_FOLDER, "csv")
+PREDICTION_RESULTS_FOLDER = os.path.join(OUT_FOLDER, "prediction_results")
+PREDICTION_EVAL_RESULTS_FOLDER = os.path.join(PREDICTION_RESULTS_FOLDER, "prediction_eval")
+HYPERPARAMETERS_EVAL_RESULTS_FOLDER = os.path.join(PREDICTION_RESULTS_FOLDER, "hyperparameters_eval")
+PREDICTION_PLOTS_FOLDER = os.path.join(PREDICTION_RESULTS_FOLDER, "plots")
+
+
 CENTR_FOLDER = os.path.join(OUT_FOLDER, "centralities")
 STAT_FOLDER = os.path.join(OUT_FOLDER, "stats")
 PLOT_FOLDER = os.path.join(OUT_FOLDER, "plots")
-
+GRAPHICS_FOLDER = os.path.join(OUT_FOLDER, "graphics")
+BEST_PARAM_SET = 'best_parameters_sets' + CSV
+RUNNING_TIMES = 'running_times' + CSV
 
 # ===========================
 # Other Variables
@@ -40,21 +62,30 @@ PREFIX_STD = "Std_"
 
 # some filenames
 FILE_CSV_OUTPUTS = "outputs"
+FILE_CSV_OUTPUTS_WITH_ORDINAL_VAR = "outputs_with_ordinal_var"
 FILE_CSV_FEATURES = "features"
+FILE_CSV_PREDICTED_VALUES = "predicted_values"
 
 
 # outputs
 OUTPUT_NB_SOLUTIONS = "nb_solutions"
+OUTPUT_NB_SOLUTIONS_ORDINAL = "nb_solutions_ordinal"
 OUTPUT_IS_SINGLE_SOLUTION = "single_solution"
 OUTPUT_NB_SOLUTION_CLASSES = "nb_solution_classes"
+OUTPUT_NB_SOLUTION_CLASSES_ORDINAL = "nb_solution_classes_ordinal"
 OUTPUT_IS_SINGLE_SOLUTION_CLASSES = "single_solution_class"
+OUTPUT_GRAPH_IMBALANCE_COUNT = "imbalance_count"
+OUTPUT_GRAPH_IMBALANCE_PERCENTAGE = "imbalance_percentage"
 
 
-# centralities
-CENTR_DEGREE_NEG = "degree_neg"
-CENTR_DEGREE_POS = "degree_pos"
-CENTR_DEGREE_PN = "degree_pn"
-CENTR_EIGEN = "eigen"
+# # centralities
+# CENTR_DEGREE_NEG = NegativeCentrality.__name__
+# CENTR_DEGREE_POS = PositiveCentrality.__name__
+# CENTR_DEGREE_PN = PNCentrality.__name__
+# CENTR_EIGEN = EigenvectorCentrality.__name__
+# CENTR_TROLL_TRUST = TrollTrust.__name__
+# CENTR_SRWR = SRWRCentrality.__name__
+# CENTR_NODE_EFFECT = NodeEffect.__name__
 
 # stats
 STATS_NB_NODES = "nb_nodes"
@@ -81,7 +112,9 @@ COL_NAMES = {
     OUTPUT_NB_SOLUTIONS : [OUTPUT_NB_SOLUTIONS],
     OUTPUT_IS_SINGLE_SOLUTION : [OUTPUT_IS_SINGLE_SOLUTION],
     OUTPUT_NB_SOLUTION_CLASSES : [OUTPUT_NB_SOLUTION_CLASSES],
-    OUTPUT_IS_SINGLE_SOLUTION_CLASSES : [OUTPUT_IS_SINGLE_SOLUTION_CLASSES]
+    OUTPUT_IS_SINGLE_SOLUTION_CLASSES : [OUTPUT_IS_SINGLE_SOLUTION_CLASSES],
+    OUTPUT_GRAPH_IMBALANCE_COUNT : [OUTPUT_GRAPH_IMBALANCE_COUNT],
+    OUTPUT_GRAPH_IMBALANCE_PERCENTAGE : [OUTPUT_GRAPH_IMBALANCE_PERCENTAGE]
 }
 
 # classification
@@ -89,5 +122,19 @@ PREDICTION_KERNEL_LINEAR = "linear"
 PREDICTION_KERNEL_POLY = "poly"
 PREDICTION_KERNEL_RBF = "rbf"
 PREDICTION_KERNEL_SIGMOID = "sigmoid"
+
+# embeddings
+# EMB_SNE = SNEEmbedding.__name__
+SNE_SAVE_PATH_NAME = "save_path"
+SNE_TRAIN_DATA_NAME = "train_data"
+SNE_LABEL_DATA_NAME = "label_data"
+SNE_WALKS_DATA_NAME = "walks_data"
+SNE_EMBEDDING_SIZE_NAME = "embedding_size"
+SNE_SAMPLES_TO_TRAIN_NAME = "samples_to_train"
+SNE_LEARNING_RATE_NAME = "learning_rate"
+SNE_NUM_SAMPLED_NAME = "num_sampled"
+SNE_CONTEXT_SIZE_NAME = "context_size"
+SNE_BATCH_SIZE_NAME = "batch_size"
+SNE_IS_TRAIN_NAME = "is_train"
 
 
