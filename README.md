@@ -52,7 +52,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 * Install dependencies using following command:
 
   ```
-  pip install -r requirements.txt --use-feature=2020-resolver
+  pip install -r requirements.txt
   ```
   
 * Download this project from GitHub
@@ -75,7 +75,7 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 All the modules listed below are the python modules
 
 * python-igraph 0.8.2
-* numpy 1.17.2
+* numpy 1.19.2
 * scipy 1.3.1
 * scikit-learn 0.21.3
 * pandas 0.25.1
@@ -85,7 +85,7 @@ All the modules listed below are the python modules
 * hdbscan 0.8.24
 * pony 0.7.14
 * gem 1.0.1 from https://github.com/palash1992/GEM.git
-* keras 2.4.3
+* keras 2.0.2
 * seaborn 0.11.1
 * imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
 * rpy2 3.4.4
@@ -99,5 +99,5 @@ All the modules listed below are the python modules
 * add more graph-related statistics
 * add some signed node embeddings
 * add some signed graph embeddings
-* add ordinal logistic regression
-* add recursive feature selection method from [scikit-learn](https://scikit-learn.org/stable/modules/feature_selection.html#rfe)
+* add ordinal logistic regression from the package [statsmodels](https://www.statsmodels.org/devel/examples/notebooks/generated/ordinal_regression.html)
+* add recursive feature selection method from the package [scikit-learn](https://scikit-learn.org/stable/modules/feature_selection.html#rfe)
