@@ -27,11 +27,11 @@ from prediction import balanced_data_processing
 #INPUT_NETWORKS = range(1,11)
 #PROP_NEGS = None # when density=1, this equals 'None'
 
-GRAPH_SIZES = [20,24]
-L0_VALS = [3] #
+GRAPH_SIZES = [20,24,28]
+L0_VALS = [2,3,4] #
 PROP_MISPLS = [x/20 for x in range(0, 21)] # float range from 0.0 to 1.0 with decimal steps
 DENSITY = [0.25, 0.5, 1] # 
-INPUT_NETWORKS = range(1,11)
+INPUT_NETWORKS = range(1,21)
 PROP_NEGS = [0.3, 0.5, 0.7] # when density=1, this equals 'None'
 
 # GRAPH_SIZES = [16,20,24,28,32,36,40,45,50] # 

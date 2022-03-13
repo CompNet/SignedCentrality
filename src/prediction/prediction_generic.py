@@ -24,6 +24,7 @@ from imblearn.over_sampling import ADASYN
 
 from prediction import regression
 
+import pickle
 
 
 
@@ -285,7 +286,7 @@ def perform_classification_or_regression_prediction(task_description, X, Y, mode
   # =============================================================
   # Preprocessing
   # =============================================================
-  Y =  Y.ravel() # convert into 1D array, due to the warning
+  Y = Y.ravel() # convert into 1D array, due to the warning
   
   if not task_description.startswith("regression"):
     unique, counts = np.unique(Y, return_counts=True)
@@ -294,7 +295,8 @@ def perform_classification_or_regression_prediction(task_description, X, Y, mode
   
     # ----------------------------------------
     # make the dataset balanced >> Deprecated. "imblearn_class" is supposed to be 'None'    if imblearn_class is not None:
-    X, Y = imblearn_class.fit_resample(X, Y)
+    if imblearn_class is not None:
+      X, Y = imblearn_class.fit_resample(X, Y)
   
     unique, counts = np.unique(Y, return_counts=True)
     unique = ["after, " + str(uint) for uint in unique]

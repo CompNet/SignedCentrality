@@ -43,6 +43,13 @@ In order to compute centrality measures or to perform some prediction tasks, we 
   * Folder `graph_embeddings`: All the unit and integration tests related to signed graph embeddings.
   * Folder `node_embeddings`: All the unit and integration tests related to signed node embeddings.
 
+* There are 4 main files.
+
+  * `main_feature_and_output_extraction.py`: The main file, in which we process the features and the outputs.
+  * `main_binary_classification.py`: The main file, in which we perform the binary classification task.
+  * `main_ordinal_classification.py`: The main file, in which we perform the ordinal classification task.
+  * `main_regression.py`: The main file, in which we perform the regression task.
+
 
 
 ## Installation
@@ -59,15 +66,10 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
   You also need to retrieve the data from [Figshare](https://doi.org/10.6084/m9.figshare.19350284). Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place the contents of them into folders `in` and `output/evaluate-partitions`, respectively. Finally, configure the input parameters in one of the main files and then run it inside the folder `src`.
 
+* Do not forget to change the global variable in the four main files in order to cover the whole dataset.
+
 * The project must be run from `src/` directory.
 
-
-* There are 4 main files.
-
-  * `main_feature_and_output_extraction.py`: The main file, in which we process the features and the outputs.
-  * `main_binary_classification.py`: The main file, in which we perform the binary classification task.
-  * `main_ordinal_classification.py`: The main file, in which we perform the ordinal classification task.
-  * `main_regression.py`: The main file, in which we perform the regression task.
 
 
 ## Dependencies
