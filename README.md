@@ -45,10 +45,10 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
 * There are 4 main files.
 
-  * `main_feature_and_output_extraction.py`: The main file, in which we process the features and the outputs.
-  * `main_binary_classification.py`: The main file, in which we perform the binary classification task.
-  * `main_ordinal_classification.py`: The main file, in which we perform the ordinal classification task.
-  * `main_regression.py`: The main file, in which we perform the regression task.
+  * `main_feature_and_output_extraction.py`: It processes the features and the outputs.
+  * `main_binary_classification.py`: It performs the binary classification task.
+  * `main_ordinal_classification.py`: It performs the ordinal classification task.
+  * `main_regression.py`: It performs the regression task.
 
 
 
@@ -56,43 +56,39 @@ In order to compute centrality measures or to perform some prediction tasks, we 
 
 * Install Python (tested with Python 3.8.12)
 
-* Install dependencies using following command:
+* Install dependencies using the following command:
 
   ```
   pip install -r requirements.txt
   ```
-  
+
 * Download this project from GitHub
 
-  You also need to retrieve the data from [Figshare](https://doi.org/10.6084/m9.figshare.19350284). Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place the contents of them into folders `in` and `output/evaluate-partitions`, respectively. Finally, configure the input parameters in one of the main files and then run it inside the folder `src`.
-
-* Do not forget to change the global variable in the four main files in order to cover the whole dataset.
-
-* The project must be run from `src/` directory.
+* You need to retrieve the data from [Figshare](https://doi.org/10.6084/m9.figshare.19350284). Download and untar `Input Signed Networks.tar.gz` and `Evaluation Results.tar.gz`.  Place them into the `in` and `output/evaluate-partitions` folders, respectively. Finally, we might need to configure the input parameters, i.e. the global variables such as `GRAPH_SIZES`, in the main files. You do not need to change these input parameters, if you work with the whole dataset. 
+  
 
 
+## How to run ?
 
-## Dependencies
+### Use Case 1: The whole workflow -> 1) Extracting features and output variables, 2) Performing prediction tasks
 
-All the modules listed below are the python modules
+* Go to the folder `src`.
 
-* python-igraph 0.8.2
-* numpy 1.19.2
-* scipy 1.3.1
-* scikit-learn 0.21.3
-* pandas 0.25.1
-* tensorflow 2.4.0
-* torch 1.7.1
-* deprecated 1.2.11
-* hdbscan 0.8.24
-* pony 0.7.14
-* gem 1.0.1 from https://github.com/palash1992/GEM.git
-* keras 2.0.2
-* seaborn 0.11.1
-* imbalanced-learn 0.9.0.dev0 from https://github.com/scikit-learn-contrib/imbalanced-learn.git
-* rpy2 3.4.4
-* tqdm 4.60.0
-* bctpy 0.5.2
+* We run the file `main_feature_and_output_extraction.py` inside the folder `src`. Or, you can configure the `PYTHONPATH` variable, if you do not want to run it from the folder `src`. Note that it can take several hours.
+
+* Apply the use case 2
+
+
+
+### Use Case 2: Performing prediction tasks
+
+* If you skip the use case 1, then you need to download and untar `csv.tar.gz` from [Figshare](https://doi.org/10.6084/m9.figshare.19350284). Place it into the `out/csv` folder.
+
+* Go to the folder `src`.
+
+* We run the files `main_binary_classification.py`, `main_ordinal_classification.py` and `main_regression.py` inside the folder `src`. Or, you can configure the `PYTHONPATH` variable, if you do not want to run it from the folder `src`.
+
+
 
 
 ## To-do list

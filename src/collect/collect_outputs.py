@@ -154,7 +154,8 @@ def collect_all_outputs(graph_sizes, l0_values, d_values, prop_mispls, prop_negs
                                     rownames.append(desc)
             
         outputs.index =  rownames
-        outputs[outputs[consts.OUTPUT_NB_SOLUTIONS] > 10000] = 10000      
+        i = list(outputs[outputs[consts.OUTPUT_NB_SOLUTIONS] > 10000].index)
+        outputs.loc[i,[consts.OUTPUT_NB_SOLUTIONS]] = 10000      
         outputs.to_csv(result_filepath, sep=",", quoting=1, index=True)
     else:
         if verbose:
